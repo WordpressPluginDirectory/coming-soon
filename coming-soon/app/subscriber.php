@@ -66,7 +66,7 @@ function seedprod_lite_subscribers_datatable() {
 		$period   = new \DatePeriod( $now, $interval, $chart_timeframe ); // 7 Days
 
 		$recent_subscribers_data = array(
-			array( 'Year', 'Subscribers' ),
+			array( __( 'Year', 'coming-soon' ), __( 'Subscribers', 'coming-soon' ) ),
 		);
 		foreach ( $period as $day ) {
 			$key         = $day->format( 'Y-m-d' );

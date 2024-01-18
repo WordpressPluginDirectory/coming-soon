@@ -30,7 +30,7 @@ function seedprod_lite_get_ip() {
 function seedprod_lite_change_wp_cookie_logout( $expirein ) {
 	global $seed_cspv5_bypass_expires;
 	if ( ! empty( $seed_cspv5_bypass_expires ) ) {
-		return $seed_cspv5_bypass_expires; // Modify the exire cookie
+		return $seed_cspv5_bypass_expires; // Modify the expire cookie
 	} else {
 		return $expirein;
 	}
@@ -240,7 +240,6 @@ function seedprod_lite_block_options() {
 	<svg xmlns="http://www.w3.org/2000/svg" class="sp-w-6 sp-fill-current " viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>',
 		),
 
-
 		array(
 			'name'   => __( 'Optin Form', 'coming-soon' ),
 			'is_pro' => true,
@@ -286,6 +285,18 @@ function seedprod_lite_block_options() {
 			'icon'   => '<svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" class="sp-w-6 sp-fill-current "><path d="M0 0h24v24H0V0z" fill="none"/><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92zM18 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM6 13c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 7.02c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>',
 		),
 		// array('name'=>__('Form','coming-soon'),'is_pro'=> false  ,'cat'=>'adv','type'=>'form', 'id'=>25, 'icon' => 'far fa-envelope'),
+
+		array(
+			'name'   => __( 'Video Pop Up', 'coming-soon' ),
+			'is_pro' => true,
+			'cat'    => 'adv',
+			'type'   => 'videopopup',
+			'id'     => 83,
+			'icon'   => '<svg class="sp-w-6 sp-fill-current" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path fill-rule="evenodd" clip-rule="evenodd" d="M9 2C9 1.44772 9.44771 1 10 1H20C20.5523 1 21 1.44772 21 2C21 2.55228 20.5523 3 20 3H10C9.44771 3 9 2.55228 9 2ZM8 4C7.44772 4 7 4.44772 7 5C7 5.55228 7.44772 6 8 6H22C22.5523 6 23 5.55228 23 5C23 4.44772 22.5523 4 22 4H8ZM3 21V9C3 8.46957 3.21071 7.96086 3.58579 7.58579C3.96086 7.21071 4.46957 7 5 7H25C25.5304 7 26.0391 7.21071 26.4142 7.58579C26.7893 7.96086 27 8.46957 27 9V21C27 21.5304 26.7893 22.0391 26.4142 22.4142C26.0391 22.7893 25.5304 23 25 23H5C4.46957 23 3.96086 22.7893 3.58579 22.4142C3.21071 22.0391 3 21.5304 3 21ZM5 21H25V9H5V21ZM12.7473 11.2106L17.8075 14.584C17.876 14.6297 17.9321 14.6915 17.9709 14.7641C18.0098 14.8367 18.0301 14.9177 18.0301 15C18.0301 15.0823 18.0098 15.1633 17.9709 15.2359C17.9321 15.3085 17.876 15.3703 17.8075 15.416L12.7473 18.7894C12.672 18.8396 12.5845 18.8684 12.4941 18.8728C12.4037 18.8772 12.3138 18.8569 12.2341 18.8142C12.1543 18.7715 12.0876 18.708 12.041 18.6304C11.9945 18.5527 11.97 18.4639 11.97 18.3734V11.6266C11.97 11.5361 11.9945 11.4473 12.041 11.3696C12.0876 11.292 12.1543 11.2284 12.2341 11.1857C12.3138 11.143 12.4037 11.1228 12.4941 11.1272C12.5845 11.1315 12.672 11.1604 12.7473 11.2106ZM22 26C22.5523 26 23 25.5523 23 25C23 24.4477 22.5523 24 22 24H8C7.44771 24 7 24.4477 7 25C7 25.5523 7.44771 26 8 26H22ZM21 28C21 28.5523 20.5523 29 20 29H10C9.44771 29 9 28.5523 9 28C9 27.4477 9.44771 27 10 27H20C20.5523 27 21 27.4477 21 28Z" fill="evenodd"/>
+			</svg>
+			',
+		),
 		array(
 			'name'   => __( 'Animated Headline', 'coming-soon' ),
 			'is_pro' => true,
@@ -1915,7 +1926,7 @@ function seedprod_lite_wp_post_revision_fields( $fields, $post ) {
 	} elseif ( ! empty( $post['post_content_filtered'] ) && strpos( $post['post_content_filtered'], 'template_id' ) !== false ) {
 		$fields['post_content_filtered'] = 'Content Filtered';
 		return $fields;
-	}  else {
+	} else {
 		return $fields;
 	}
 }
@@ -1985,60 +1996,60 @@ function seedprod_lite_dismiss_upsell() {
  */
 function seedprod_lite_get_expire_times() {
 	return array(
-		'1'    => '1 Hour',
-		'2'    => '2 Hours',
-		'3'    => '3 Hours',
-		'4'    => '4 Hours',
-		'5'    => '5 Hours',
-		'6'    => '6 Hours',
-		'7'    => '7 Hours',
-		'8'    => '8 Hours',
-		'9'    => '9 Hours',
-		'10'   => '10 Hours',
-		'11'   => '11 Hours',
-		'12'   => '12 Hours',
-		'13'   => '13 Hours',
-		'14'   => '14 Hours',
-		'15'   => '15 Hours',
-		'16'   => '16 Hours',
-		'17'   => '17 Hours',
-		'18'   => '18 Hours',
-		'19'   => '19 Hours',
-		'20'   => '20 Hours',
-		'21'   => '21 Hours',
-		'21'   => '22 Hours',
-		'23'   => '23 Hours',
-		'24'   => '1 Day',
-		'48'   => '2 Days',
-		'72'   => '3 Days',
-		'96'   => '4 Days',
-		'120'  => '5 Days',
-		'144'  => '6 Days',
-		'168'  => '7 Days',
-		'192'  => '8 Days',
-		'216'  => '9 Days',
-		'240'  => '10 Days',
-		'264'  => '11 Days',
-		'288'  => '12 Days',
-		'312'  => '13 Days',
-		'336'  => '14 Days',
-		'360'  => '15 Days',
-		'384'  => '16 Days',
-		'408'  => '17 Days',
-		'432'  => '18 Days',
-		'456'  => '19 Days',
-		'480'  => '20 Days',
-		'504'  => '21 Days',
-		'528'  => '22 Days',
-		'552'  => '23 Days',
-		'576'  => '24 Days',
-		'600'  => '25 Days',
-		'624'  => '26 Days',
-		'648'  => '27 Days',
-		'672'  => '28 Days',
-		'696'  => '29 Days',
-		'720'  => '30 Days',
-		'8760' => '1 Year',
+		'1'    => __( '1 Hour', 'coming-soon' ),
+		'2'    => __( '2 Hours', 'coming-soon' ),
+		'3'    => __( '3 Hours', 'coming-soon' ),
+		'4'    => __( '4 Hours', 'coming-soon' ),
+		'5'    => __( '5 Hours', 'coming-soon' ),
+		'6'    => __( '6 Hours', 'coming-soon' ),
+		'7'    => __( '7 Hours', 'coming-soon' ),
+		'8'    => __( '8 Hours', 'coming-soon' ),
+		'9'    => __( '9 Hours', 'coming-soon' ),
+		'10'   => __( '10 Hours', 'coming-soon' ),
+		'11'   => __( '11 Hours', 'coming-soon' ),
+		'12'   => __( '12 Hours', 'coming-soon' ),
+		'13'   => __( '13 Hours', 'coming-soon' ),
+		'14'   => __( '14 Hours', 'coming-soon' ),
+		'15'   => __( '15 Hours', 'coming-soon' ),
+		'16'   => __( '16 Hours', 'coming-soon' ),
+		'17'   => __( '17 Hours', 'coming-soon' ),
+		'18'   => __( '18 Hours', 'coming-soon' ),
+		'19'   => __( '19 Hours', 'coming-soon' ),
+		'20'   => __( '20 Hours', 'coming-soon' ),
+		'21'   => __( '21 Hours', 'coming-soon' ),
+		'21'   => __( '22 Hours', 'coming-soon' ),
+		'23'   => __( '23 Hours', 'coming-soon' ),
+		'24'   => __( '1 Day', 'coming-soon' ),
+		'48'   => __( '2 Days', 'coming-soon' ),
+		'72'   => __( '3 Days', 'coming-soon' ),
+		'96'   => __( '4 Days', 'coming-soon' ),
+		'120'  => __( '5 Days', 'coming-soon' ),
+		'144'  => __( '6 Days', 'coming-soon' ),
+		'168'  => __( '7 Days', 'coming-soon' ),
+		'192'  => __( '8 Days', 'coming-soon' ),
+		'216'  => __( '9 Days', 'coming-soon' ),
+		'240'  => __( '10 Days', 'coming-soon' ),
+		'264'  => __( '11 Days', 'coming-soon' ),
+		'288'  => __( '12 Days', 'coming-soon' ),
+		'312'  => __( '13 Days', 'coming-soon' ),
+		'336'  => __( '14 Days', 'coming-soon' ),
+		'360'  => __( '15 Days', 'coming-soon' ),
+		'384'  => __( '16 Days', 'coming-soon' ),
+		'408'  => __( '17 Days', 'coming-soon' ),
+		'432'  => __( '18 Days', 'coming-soon' ),
+		'456'  => __( '19 Days', 'coming-soon' ),
+		'480'  => __( '20 Days', 'coming-soon' ),
+		'504'  => __( '21 Days', 'coming-soon' ),
+		'528'  => __( '22 Days', 'coming-soon' ),
+		'552'  => __( '23 Days', 'coming-soon' ),
+		'576'  => __( '24 Days', 'coming-soon' ),
+		'600'  => __( '25 Days', 'coming-soon' ),
+		'624'  => __( '26 Days', 'coming-soon' ),
+		'648'  => __( '27 Days', 'coming-soon' ),
+		'672'  => __( '28 Days', 'coming-soon' ),
+		'696'  => __( '29 Days', 'coming-soon' ),
+		'720'  => __( '30 Days', 'coming-soon' ),
+		'8760' => __( '1 Year', 'coming-soon' ),
 	);
 }
 
