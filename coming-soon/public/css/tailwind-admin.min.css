@@ -2224,6 +2224,23 @@ p.om-tagline2{max-width:550px;font-size:18px !important;font-weight:500;margin-l
 .seedprod-builder-help-categories .seedprod-builder-category-accordion li a,.seedprod-builder-help-result .seedprod-builder-category-accordion li a{border-bottom:1px solid transparent;color:#666;font-size:15px;text-decoration:none}
 .seedprod-builder-help-categories .seedprod-builder-category-accordion li a:hover,.seedprod-builder-help-result .seedprod-builder-category-accordion li a:hover{border-bottom:1px solid #79c2f4;color:#036aab}
 .seedprod-builder-help-content .seedprod-builder-help-result .seedprod-builder-help-no-articles{border-bottom:1px solid transparent;color:#666;font-size:15px;text-decoration:none}
+#seedprod-flyout{position:fixed;z-index:99999;transition:all .2s ease-in-out;right:40px;bottom:40px;opacity:1}
+#seedprod-flyout .seedprod-flyout-item{position:absolute;left:10px;width:40px;height:40px;opacity:0;visibility:hidden;transition:all .2s ease-in-out;-webkit-transform:scale(0);transform:scale(0);border-radius:50%;box-shadow:0 3px 20px rgba(0,0,0,0.2);background:#dd4a1f 0 0 no-repeat padding-box;text-align:center;vertical-align:middle}
+#seedprod-flyout.opened .seedprod-flyout-item{opacity:1;visibility:visible;-webkit-transform:scale(1);transform:scale(1)}
+#seedprod-flyout .seedprod-flyout-item{position:absolute;left:10px;width:40px;height:40px;opacity:0;visibility:hidden;transition:all .2s ease-in-out;-webkit-transform:scale(0);transform:scale(0);border-radius:50%;box-shadow:0 3px 20px rgba(0,0,0,0.2);background:#dd4a1f 0 0 no-repeat padding-box;text-align:center;vertical-align:middle}
+#seedprod-flyout .seedprod-flyout-item.seedprod-flyout-item-0{bottom:75px}
+#seedprod-flyout.opened .seedprod-flyout-item-0{transition:background-color .2s,-webkit-transform .2s 0ms;transition:transform .2s 0ms,background-color .2s;transition:transform .2s 0ms,background-color .2s,-webkit-transform .2s 0ms}
+#seedprod-flyout .seedprod-flyout-item.seedprod-flyout-item-1{bottom:130px}
+#seedprod-flyout.opened .seedprod-flyout-item-1{transition:background-color .2s,-webkit-transform .2s 35ms;transition:transform .2s 35ms,background-color .2s;transition:transform .2s 35ms,background-color .2s,-webkit-transform .2s 35ms}
+#seedprod-flyout.opened .seedprod-flyout-item-2{transition:background-color .2s,-webkit-transform .2s 70ms;transition:transform .2s 70ms,background-color .2s;transition:transform .2s 70ms,background-color .2s,-webkit-transform .2s 70ms}
+#seedprod-flyout .seedprod-flyout-item.seedprod-flyout-item-2{bottom:185px}
+#seedprod-flyout .seedprod-flyout-head{display:block}
+#seedprod-flyout .seedprod-flyout-head .seedprod-flyout-label{right:calc(100% + 15px)}
+#seedprod-flyout .seedprod-flyout-head .seedprod-flyout-label{opacity:0;-webkit-transform:translateY(-50%) scale(0);transform:translateY(-50%) scale(0);margin-right:-50px}
+#seedprod-flyout .seedprod-flyout-label{position:absolute;display:block;top:50%;right:calc(100% + 25px);transform:translateY(-50%);-moz-transform:translateY(-50%);-webkit-transform:translateY(-50%);color:#fff;background:#5f5e5e 0 0 no-repeat padding-box;font-size:12px;white-space:nowrap;padding:5px 10px;height:auto !important;line-height:initial;transition:all .2s ease-out;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px}
+#seedprod-flyout .seedprod-flyout-head:hover .seedprod-flyout-label{opacity:1;-webkit-transform:translateY(-50%) scale(1);transform:translateY(-50%) scale(1);margin-right:0}
+#seedprod-flyout .seedprod-flyout-head img{width:54px;height:54px;display:block;padding:10px;border-radius:50%;overflow:inherit;box-shadow:0 3px 20px rgba(0,0,0,0.2);transition:all .2s ease-in-out;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+#seedprod-flyout .seedprod-flyout-item i{color:#fff;font-size:20px;line-height:40px;vertical-align:middle}
 @media(min-width:640px){.sm\:sp-sr-only{position:absolute !important;width:1px !important;height:1px !important;padding:0 !important;margin:-1px !important;overflow:hidden !important;clip:rect(0,0,0,0) !important;white-space:nowrap !important;border-width:0 !important}
 .sm\:sp-not-sr-only{position:static !important;width:auto !important;height:auto !important;padding:0 !important;margin:0 !important;overflow:visible !important;clip:auto !important;white-space:normal !important}
 .sm\:focus\:sp-sr-only:focus{position:absolute !important;width:1px !important;height:1px !important;padding:0 !important;margin:-1px !important;overflow:hidden !important;clip:rect(0,0,0,0) !important;white-space:nowrap !important;border-width:0 !important}

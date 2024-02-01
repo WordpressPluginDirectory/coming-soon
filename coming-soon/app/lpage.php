@@ -48,10 +48,19 @@ function seedprod_lite_slug_exists() {
  * New lpage.
  */
 function seedprod_lite_new_lpage() {
+	// check permissions
+	if ( ! current_user_can( apply_filters( 'seedprod_lpage_capability', 'edit_others_posts' ) ) ) {
+		wp_die();
+	}
+
 	$get_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$get_id   = isset( $_GET['id'] ) ? sanitize_text_field( wp_unslash( $_GET['id'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 	if ( null !== $get_page && 'seedprod_lite_template' == $get_page && null !== $get_id && '0' == $get_id ) {
+		// check nonce
+		if(wp_verify_nonce( $_GET['_wpnonce'], 'seedprod_nonce' ) === false) {
+			wp_die('nonce check failed'); 
+		}
 		// get theme code
 		$id = absint( $get_id );
 

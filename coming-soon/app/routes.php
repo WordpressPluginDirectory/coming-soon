@@ -364,7 +364,8 @@ function seedprod_lite_redirect_to_site() {
 
 	// subscribers
 	if ( isset( $_GET['page'] ) && 'seedprod_lite_templates' === $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		wp_safe_redirect( 'admin.php?page=seedprod_lite_template&id=0&from=sidebar#/template' );
+		$seedprod_nonce = wp_create_nonce( 'seedprod_nonce' );
+		wp_safe_redirect( 'admin.php?page=seedprod_lite_template&_wpnonce='.$seedprod_nonce.'&id=0&from=sidebar#/template' );
 		exit();
 	}
 

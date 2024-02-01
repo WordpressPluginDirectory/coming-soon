@@ -1224,7 +1224,7 @@ function seedprod_pro_video_pop_up_trigger_video(blockId, videoHtml, blockOption
   if (options.enable_image_overlay) {
     if (options.enable_lightbox) {
       // Open lightbox modal onclick
-      jQuery("#sp-".concat(blockId, " .sp-video-pop-up-image-overlay")).click(function () {
+      jQuery("#sp-".concat(blockId, " .sp-video-pop-up-image-overlay-container")).click(function () {
         // Set modal content html
         jQuery("#sp-".concat(blockId, " #video-pop-up-lightbox-modal-").concat(blockId, " .modal-content")).html("<div id=\"sp-video-responsive-".concat(blockId, "\" class=\"").concat(responsiveClass, " sp-video-pop-up-video\">").concat(videoHtml, "</div>"));
         jQuery("#sp-".concat(blockId, " #video-pop-up-lightbox-modal-").concat(blockId)).css('display', 'block');
@@ -1235,8 +1235,8 @@ function seedprod_pro_video_pop_up_trigger_video(blockId, videoHtml, blockOption
       });
     } else {
       // When image overlay is clicked, display video.
-      jQuery("#sp-".concat(blockId, " .sp-video-pop-up-image-overlay")).click(function () {
-        jQuery("#sp-".concat(blockId, " .sp-video-pop-up-image-overlay")).remove(); // Create video element.
+      jQuery("#sp-".concat(blockId, " .sp-video-pop-up-image-overlay-container")).click(function () {
+        jQuery("#sp-".concat(blockId, " .sp-video-pop-up-image-overlay-container")).remove(); // Create video element.
 
         jQuery("#sp-".concat(blockId, " .sp-video-wrapper")).append("<div id=\"sp-video-responsive-".concat(blockId, "\" class=\"").concat(responsiveClass, " sp-video-pop-up-video\">").concat(videoHtml, "</div>"));
         jQuery("#sp-".concat(blockId, " #sp-video-responsive-").concat(blockId)).css('aspect-ratio', options.aspect_ratio);
@@ -1256,7 +1256,14 @@ function seedprod_pro_video_pop_up_trigger_video(blockId, videoHtml, blockOption
           jQuery("#sp-".concat(blockId, " #sp-video-responsive-").concat(blockId)).removeClass('sp-video-responsive-sticky').addClass(responsiveClass);
 
           if (options.enable_banner) {
-            jQuery("#sp-".concat(blockId, " #sp-video-pop-up-banner-").concat(blockId)).removeClass('sp-video-pop-up-banner-sticky').addClass('sp-video-pop-up-banner');
+            // Check if video is custom
+            if (options.source === 'custom') {
+              jQuery("#sp-".concat(blockId, " #sp-video-pop-up-banner-").concat(blockId)).removeClass('sp-video-pop-up-banner-custom-sticky').addClass('sp-video-pop-up-banner');
+            } else if (options.source === 'vimeo') {
+              jQuery("#sp-".concat(blockId, " #sp-video-pop-up-banner-").concat(blockId)).removeClass('sp-video-pop-up-banner-vimeo-sticky').addClass('sp-video-pop-up-banner');
+            } else {
+              jQuery("#sp-".concat(blockId, " #sp-video-pop-up-banner-").concat(blockId)).removeClass('sp-video-pop-up-banner-sticky').addClass('sp-video-pop-up-banner');
+            }
           }
         } else {
           // Add sticky class
@@ -1264,7 +1271,14 @@ function seedprod_pro_video_pop_up_trigger_video(blockId, videoHtml, blockOption
           jQuery("#sp-".concat(blockId, " #sp-video-responsive-").concat(blockId)).removeClass(responsiveClass).addClass('sp-video-responsive-sticky');
 
           if (options.enable_banner) {
-            jQuery("#sp-".concat(blockId, " #sp-video-pop-up-banner-").concat(blockId)).removeClass('sp-video-pop-up-banner').addClass('sp-video-pop-up-banner-sticky');
+            // Check if video is custom or vimeo
+            if (options.source === 'custom') {
+              jQuery("#sp-".concat(blockId, " #sp-video-pop-up-banner-").concat(blockId)).removeClass('sp-video-pop-up-banner').addClass('sp-video-pop-up-banner-custom-sticky');
+            } else if (options.source === 'vimeo') {
+              jQuery("#sp-".concat(blockId, " #sp-video-pop-up-banner-").concat(blockId)).removeClass('sp-video-pop-up-banner').addClass('sp-video-pop-up-banner-vimeo-sticky');
+            } else {
+              jQuery("#sp-".concat(blockId, " #sp-video-pop-up-banner-").concat(blockId)).removeClass('sp-video-pop-up-banner').addClass('sp-video-pop-up-banner-sticky');
+            }
           }
         }
       }

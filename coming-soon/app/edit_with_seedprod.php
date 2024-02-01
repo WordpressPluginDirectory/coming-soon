@@ -199,6 +199,7 @@ function seedprod_lite_add_admin_edit_seedprod() {
 			$is_seedprod_true        = 'seed_editor_false';
 			$remove_post_callback    = 'seedprod_lite_remove_post';
 			$seedprod_template_type  = 'template';
+			$seedprod_nonce 		= wp_create_nonce( 'seedprod_nonce' );
 
 
 			if ( ! empty( $_GET['post'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -225,9 +226,9 @@ function seedprod_lite_add_admin_edit_seedprod() {
 			$from = 'post';
 
 			if ( 'template' == $seedprod_template_type ) {
-				$edit_url = admin_url() . 'admin.php?page=' . $seedprod_template_label . '_template&from=' . $from . '&id=' . $id . '#/template/' . $id;
+				$edit_url = admin_url() . 'admin.php?page=' . $seedprod_template_label . '_template&_wpnonce='.$seedprod_nonce.'&from=' . $from . '&id=' . $id . '#/template/' . $id;
 			} else {
-				$edit_url = admin_url() . 'admin.php?page=' . $seedprod_template_label . '_builder&from=' . $from . '&id=' . $id . '#/setup/' . $id;
+				$edit_url = admin_url() . 'admin.php?page=' . $seedprod_template_label . '_builder&_wpnonce='.$seedprod_nonce.'&from=' . $from . '&id=' . $id . '#/setup/' . $id;
 			}
 
 			$edit_seedprod_label  = '<img src="' . SEEDPROD_PLUGIN_URL . 'public/svg/admin-bar-icon.svg" style="margin-right:7px; margin-top:5px">' . __( 'Edit with SeedProd', 'coming-soon' );
@@ -289,9 +290,9 @@ function seedprod_lite_add_admin_edit_seedprod() {
                     var admin_url = localizedVars.admin_url; 
 
                     if(seedprod_template_type=="template"){
-                        seedprod_template_edit_url_ = `${admin_url}?page=${seedprod_label}_${seedprod_template_type}&from=' . esc_html( $from ) . '&id=${post_ID}#/template/${post_ID}`;
+                        seedprod_template_edit_url_ = `${admin_url}?page=${seedprod_label}_${seedprod_template_type}&_wpnonce='.$seedprod_nonce.'&from=' . esc_html( $from ) . '&id=${post_ID}#/template/${post_ID}`;
                     }else{
-                        seedprod_template_edit_url_ = `${admin_url}?page=${seedprod_label}_${seedprod_template_type}&from=' . esc_html( $from ) . '&id=${post_ID}#/setup/${post_ID}`;
+                        seedprod_template_edit_url_ = `${admin_url}?page=${seedprod_label}_${seedprod_template_type}&_wpnonce='.$seedprod_nonce.'&from=' . esc_html( $from ) . '&id=${post_ID}#/setup/${post_ID}`;
                     }
                     //console.log(seedprod_template_edit_url_);
                     location.href = seedprod_template_edit_url_;
@@ -499,7 +500,8 @@ add_action( 'admin_bar_menu', 'seedprod_lite_add_menu_item', 80 );
  * @return void
  */
 function seedprod_lite_add_menu_item( $wp_admin_bar ) {
-	$seedprod_menu_link = 'admin.php?page=seedprod_lite_template&id=0#/template';
+	$seedprod_nonce 		= wp_create_nonce( 'seedprod_nonce' );
+	$seedprod_menu_link = 'admin.php?page=seedprod_lite_template&_wpnonce='.$seedprod_nonce.'&id=0#/template';
 
 	$args = array(
 		'id'     => 'seedprod_template',
