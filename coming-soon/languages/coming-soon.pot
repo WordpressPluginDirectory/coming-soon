@@ -774,23 +774,23 @@ msgstr ""
 msgid "Invalid License Key."
 msgstr ""
 
-#: build/coming-soon/app/lpage.php:202, build/coming-soon/app/lpage.php:204, build/coming-soon/app/setup-wizard.php:197, build/coming-soon/app/setup-wizard.php:199
+#: build/coming-soon/app/lpage.php:203, build/coming-soon/app/lpage.php:205, build/coming-soon/app/setup-wizard.php:197, build/coming-soon/app/setup-wizard.php:199
 msgid "New Page"
 msgstr ""
 
-#: build/coming-soon/app/lpage.php:717
+#: build/coming-soon/app/lpage.php:718
 msgid "Page cannot be saved. Invalid JSON. This sometimes happens if you copy and paste text in. Please contact support."
 msgstr ""
 
-#: build/coming-soon/app/lpage.php:862
+#: build/coming-soon/app/lpage.php:863
 msgid "Starts in"
 msgstr ""
 
-#: build/coming-soon/app/lpage.php:864
+#: build/coming-soon/app/lpage.php:865
 msgid "Ended"
 msgstr ""
 
-#: build/coming-soon/app/lpage.php:1025, build/coming-soon/app/theme-templates.php:809
+#: build/coming-soon/app/lpage.php:1026, build/coming-soon/app/theme-templates.php:809
 msgid "<br><br>Please enter a valid license key to access the themes. You can still proceed to create a page with the default theme.<br> <a class='seedprod_no_themes' href='?theme=0'>Click to continue &#8594;</a>"
 msgstr ""
 
