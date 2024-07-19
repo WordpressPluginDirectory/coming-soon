@@ -926,18 +926,18 @@ function seedprod_add_gallery_lightbox(blockId) {
   });
   imgpreview.update();
   jQuery("#sp-" + blockId + " .sp-gallery-tabs a.sp-gallery-tab-title").click(function () {
-    var dataindex = jQuery(this).attr("data-gallery-index");
+    var activeTabIndex = jQuery(this).attr("data-gallery-index");
     jQuery('#sp-' + blockId + ' .sp-gallery-tab-title').removeClass('sp-tab-active');
-    jQuery(this).addClass('sp-tab-active'); //console.log(dataindex);
-
+    jQuery(this).addClass('sp-tab-active');
     jQuery.each(jQuery('#sp-' + blockId + ' .sp-gallery-items'), function (i, v) {
       jQuery(this).removeClass('sp-hidden-items');
-      jQuery(this).removeClass('zoom-in');
+      jQuery(this).removeClass('zoom-in'); // Hide images that do not match the active tab index.
 
-      if (dataindex != 'all') {
-        var indexvalues = jQuery(v).data('tags');
+      if (activeTabIndex !== 'all') {
+        var currentTabIndex = jQuery(v).data('tags');
+        var cleanCurrentTabIndex = currentTabIndex.split(',');
 
-        if (indexvalues.indexOf(dataindex) > -1) {} else {
+        if (!cleanCurrentTabIndex.includes(activeTabIndex)) {
           jQuery(this).addClass('sp-hidden-items');
         }
       }
@@ -948,18 +948,18 @@ function seedprod_add_gallery_lightbox(blockId) {
 
 function seedprod_add_gallery_js(blockId) {
   jQuery("#sp-" + blockId + " .sp-gallery-tabs a.sp-gallery-tab-title").click(function () {
-    var dataindex = jQuery(this).attr("data-gallery-index");
+    var activeTabIndex = jQuery(this).attr("data-gallery-index");
     jQuery('#sp-' + blockId + ' .sp-gallery-tab-title').removeClass('sp-tab-active');
-    jQuery(this).addClass('sp-tab-active'); //console.log(dataindex);
-
+    jQuery(this).addClass('sp-tab-active');
     jQuery.each(jQuery('#sp-' + blockId + ' .sp-gallery-items'), function (i, v) {
       jQuery(this).removeClass('sp-hidden-items');
-      jQuery(this).removeClass('zoom-in');
+      jQuery(this).removeClass('zoom-in'); // Hide images that do not match the active tab index.
 
-      if (dataindex != 'all') {
-        var indexvalues = jQuery(v).data('tags');
+      if (activeTabIndex !== 'all') {
+        var currentTabIndex = jQuery(v).data('tags');
+        var cleanCurrentTabIndex = currentTabIndex.split(',');
 
-        if (indexvalues.indexOf(dataindex) > -1) {} else {
+        if (!cleanCurrentTabIndex.includes(activeTabIndex)) {
           jQuery(this).addClass('sp-hidden-items');
         }
       }
@@ -994,6 +994,33 @@ function counter(blockId) {
   options.toValue = endNumber;
   jQuery("#sp-counter-number-".concat(blockId)).html(startNumber);
   jQuery("#sp-counter-number-".concat(blockId)).numerator(options);
+} // Render dynamic tags.
+
+
+function image_dynamic_tags(blockId) {
+  // Replace image src if source is dynamic tags
+  jQuery(".sp-image-block-".concat(blockId)).each(function () {
+    var _this = this;
+
+    // If data-image-src === dynamictags
+    var imageSrc = jQuery(this).attr('data-image-src');
+
+    if ('dynamictags' === imageSrc) {
+      var imageLink = jQuery(this).attr('data-dynamic-tag');
+
+      if (imageLink) {
+        // Pre-load the image
+        var img = new Image();
+
+        img.onload = function () {
+          // Set new src when the image has loaded
+          jQuery(_this).attr('src', imageLink);
+        };
+
+        img.src = imageLink;
+      }
+    }
+  });
 }
 
 function postcomments(blockId) {

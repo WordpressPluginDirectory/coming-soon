@@ -64,9 +64,9 @@ function seedprod_lite_install_addon() {
 		$installer->install( $download_url );
 
 		// Set referrer if one exists
-		if(!empty($_POST['referrer'])){
+		if ( ! empty( $_POST['referrer'] ) ) {
 			$referrer = sanitize_text_field( wp_unslash( $_POST['referrer'] ) );
-			update_option('optinmonster_referred_by', $referrer );
+			update_option( 'optinmonster_referred_by', $referrer );
 		}
 
 		// Flush the cache and return the newly installed plugin basename.
@@ -76,8 +76,6 @@ function seedprod_lite_install_addon() {
 			echo wp_json_encode( array( 'plugin' => $plugin_basename ) );
 			wp_die();
 		}
-
-
 	}
 
 	// Send back a response.
@@ -199,6 +197,8 @@ function seedprod_lite_get_plugins_list() {
 		'easy-digital-downloads/easy-digital-downloads.php' => 'easydigitaldownloads',
 		'searchwp/index.php'                               => 'searchwp',
 		'affiliate-wp/affiliate-wp.php'                    => 'affiliatewp',
+		'insert-headers-and-footers/ihaf.php'              => 'wpcode',
+		'wpcode-premium/wpcode.php'                        => 'wpcode-pro',
 	);
 	$all_plugins = get_plugins();
 
@@ -268,6 +268,8 @@ function seedprod_lite_get_plugins_array() {
 		'easy-digital-downloads/easy-digital-downloads.php' => 'easydigitaldownloads',
 		'searchwp/index.php'                               => 'searchwp',
 		'affiliate-wp/affiliate-wp.php'                    => 'affiliatewp',
+		'insert-headers-and-footers/ihaf.php'              => 'wpcode',
+		'wpcode-premium/wpcode.php'                        => 'wpcode-pro',
 	);
 	$all_plugins = get_plugins();
 
@@ -306,6 +308,34 @@ function seedprod_lite_get_form_plugins_list() {
 	$am_plugins  = array(
 		'wpforms/wpforms.php'      => 'wpforms',
 		'wpforms-lite/wpforms.php' => 'wpforms-lite',
+	);
+	$all_plugins = get_plugins();
+
+	$response = array();
+
+	foreach ( $am_plugins as $slug => $label ) {
+		if ( array_key_exists( $slug, $all_plugins ) ) {
+			if ( is_plugin_active( $slug ) ) {
+				$response[ $label ] = 1; // Active
+			} else {
+				$response[ $label ] = 2; // InActive
+			}
+		} else {
+			$response[ $label ] = 0; // Not installed
+		}
+	}
+
+	return $response;
+}
+
+/**
+ * Get push notifications plugins list.
+ *
+ * @return array $response Contains array of plugins and installation states as integers.
+ */
+function seedprod_lite_get_push_notification_plugins_list() {
+	$am_plugins  = array(
+		'pushengage/main.php' => 'pushengage',
 	);
 	$all_plugins = get_plugins();
 
@@ -395,8 +425,10 @@ function seedprod_lite_get_seo_plugins_list() {
  */
 function seedprod_lite_get_analytics_plugins_list() {
 	$am_plugins  = array(
-		'google-analytics-for-wordpress/googleanalytics.php' => 'monster-insights',
+		'google-analytics-for-wordpress/googleanalytics.php' => 'monsterinsights',
+		'google-analytics-premium/googleanalytics-premium.php' => 'monsterinsights-pro',
 		'google-analytics-dashboard-for-wp/gadwp.php' => 'exactmetrics',
+		'exactmetrics-premium/exactmetrics-premium.php' => 'exactmetrics-pro',
 	);
 	$all_plugins = get_plugins();
 
@@ -448,4 +480,72 @@ function seedprod_lite_get_plugins_install_url( $slug ) {
 function seedprod_lite_get_plugins_activate_url( $slug ) {
 	$url = wp_nonce_url( 'plugins.php?action=activate&amp;plugin=' . rawurlencode( $slug ), 'activate-plugin_' . $slug );
 	return $url;
+}
+
+/**
+ * Get Open AI Users Credits
+ *
+ * @return array $result An array of remaining open ai credits of users
+ */
+function seedprod_lite_get_ai_credits() {
+
+		$seedprod_api_key = seedprod_lite_get_api_key();
+		$api_key          = $seedprod_api_key;
+		$token            = get_option( 'seedprod_token' );
+		$api_token        = get_option( 'seedprod_api_token' );
+
+		$data = array(
+			'api_token' => $api_token,
+			'api_key'   => $api_key,
+			'token'     => $token,
+		);
+
+		$headers = array(
+			'Accept'        => 'application/json',
+			'Authorization' => 'Bearer ' . $api_token,
+		);
+
+		$url = SEEDPROD_API_URL . 'openaicredits';
+
+		try {
+
+			$response = wp_remote_post(
+				$url,
+				array(
+					'body'      => wp_json_encode( $data ),
+					'headers'   => $headers,
+					'sslverify' => false,
+					'timeout'   => 60,
+				)
+			);
+
+			if ( is_wp_error( $response ) ) {
+
+				$curl_error = $response->get_error_code();
+				if ( 'http_request_failed' === $curl_error ) {
+					$result = array( 'error' => __( 'cURL error:', 'coming-soon' ) . $response->get_error_message() );
+				} else {
+					$result = array( 'error' => $response->get_error_message() );
+				}
+			} else {
+				$http_status = wp_remote_retrieve_response_code( $response );
+				if ( 200 === $http_status ) {
+					$response_body = wp_remote_retrieve_body( $response );
+					$result_data   = json_decode( $response_body, true );
+
+					if ( null === $result_data && json_last_error() !== JSON_ERROR_NONE ) {
+						$result = array( 'error' => __( 'Invalid JSON response', 'coming-soon' ) );
+					} else {
+						$result = $result_data;
+					}
+				} else {
+					// Request timeout error.
+					$result = array( 'error' => __( 'Server error or request timeout. Try again later.', 'coming-soon' ) );
+				}
+			}
+		} catch ( Exception $e ) {
+			$result = array( 'error' => __( 'Server error or request timeout. Try again later.', 'coming-soon' ) );
+		}
+
+		return $result;
 }

@@ -54,7 +54,7 @@
     var unsubscribe = wp.data.subscribe( function () {
         setTimeout( function () {
             if ( !document.getElementById( link_id ) ) {
-                var toolbalEl = editorEl.querySelector( '.edit-post-header-toolbar__left' );
+                var toolbalEl = editorEl.querySelector( '.edit-post-header-toolbar' );
                 if( toolbalEl instanceof HTMLElement ){
                     toolbalEl.insertAdjacentHTML( 'beforeend', seedprod_html );
                 }

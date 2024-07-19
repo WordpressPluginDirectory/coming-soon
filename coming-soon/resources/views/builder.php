@@ -8,21 +8,21 @@ require_once SEEDPROD_PLUGIN_PATH . 'resources/data-templates/basic-page.php';
 global $wpdb;
 
 // look for mixed content and mis configured WordPress sites.
-$actual_link          = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http' ) . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$actual_link          = ( isset( $_SERVER['HTTPS'] ) && 'on' === $_SERVER['HTTPS'] ? 'https' : 'http' ) . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 $seedprod_builder_url = wp_parse_url( $actual_link );
 $mixed_content        = false;
 if ( false !== $seedprod_builder_url ) {
-	if ( ! empty( $seedprod_builder_url['scheme'] && $seedprod_builder_url['scheme'] == 'https' ) ) {
+	if ( ! empty( $seedprod_builder_url['scheme'] && 'https' == $seedprod_builder_url['scheme'] ) ) {
 		$sp_home_url        = get_option( 'home' );
 		$sp_home_url_parsed = wp_parse_url( $sp_home_url );
 		$sp_site_url        = get_option( 'siteurl' );
 		$sp_site_url_parsed = wp_parse_url( $sp_site_url );
 
-		if ( ! empty( $sp_home_url_parsed['scheme'] ) && $sp_home_url_parsed['scheme'] == 'http' ) {
+		if ( ! empty( $sp_home_url_parsed['scheme'] ) && 'http' == $sp_home_url_parsed['scheme'] ) {
 			$mixed_content = true;
 		}
 
-		if ( ! empty( $site_url_parsed['scheme'] ) && $site_url_parsed['scheme'] == 'http' ) {
+		if ( ! empty( $site_url_parsed['scheme'] ) && 'http' == $site_url_parsed['scheme'] ) {
 			$mixed_content = true;
 		}
 	}
@@ -85,14 +85,14 @@ if ( empty( $lpage->post_content_filtered ) ) {
 	// get settings and maybe modify
 	$settings = json_decode( $lpage->post_content_filtered, true );
 
-	if ($settings === null && json_last_error() !== JSON_ERROR_NONE) {
+	if ( null === $settings && JSON_ERROR_NONE !== json_last_error() ) {
 		// JSON is invalid
 		// Handle the error or display an error message
 		//echo "<script>alert('JSON is invalid. Entering Recovery Mode'); </script>";
 		require_once SEEDPROD_PLUGIN_PATH . 'resources/data-templates/basic-page.php';
 		$settings = json_decode( $seedprod_recovery, true );
 
-	} 
+	}
 }
 
 // Check is this is a seedprod template part or page/post using the seedprod editor
@@ -256,7 +256,7 @@ function array_keys_exists( array $keys, array $array ) {
 $decoded_personalization_preferences = json_decode( $user_personalization_preferences, true );
 
 // Update user meta with new settings.
-if ( is_array( $decoded_personalization_preferences ) && $decoded_personalization_preferences !== null ) {
+if ( is_array( $decoded_personalization_preferences ) && null !== $decoded_personalization_preferences ) {
 	// Determine whether to update or not.
 	if ( ! array_keys_exists( $get_array_keys, $decoded_personalization_preferences ) ) {
 		// Update user meta with new settings.
@@ -390,6 +390,9 @@ var seedprod_backgrounds_sideload_url = <?php echo wp_json_encode( esc_url_raw( 
 <?php $backgrounds_download_url = html_entity_decode( wp_nonce_url( 'admin-ajax.php?action=seedprod_lite_backgrounds_download', 'seedprod_lite_backgrounds_download' ) ); ?>
 var seedprod_backgrounds_download_url = <?php echo wp_json_encode( esc_url_raw( $backgrounds_download_url ) ); ?>;
 
+<?php $open_ai_backgrounds_sideload_url = html_entity_decode( wp_nonce_url( 'admin-ajax.php?action=seedprod_lite_open_ai_backgrounds_sideload', 'seedprod_lite_open_ai_backgrounds_sideload' ) ); ?>
+var seedprod_open_ai_backgrounds_sideload_url = <?php echo wp_json_encode( esc_url_raw( $open_ai_backgrounds_sideload_url ) ); ?>;
+
 <?php $ajax_url = html_entity_decode( wp_nonce_url( 'admin-ajax.php?action=seedprod_lite_slug_exists', 'seedprod_lite_slug_exists' ) ); ?>
 var seedprod_slug_exists_url = <?php echo wp_json_encode( esc_url_raw( $ajax_url ) ); ?>;
 
@@ -400,6 +403,15 @@ var seedprod_seo_install_link = <?php echo wp_json_encode( esc_url_raw( htmlspec
 
 <?php $url = seedprod_lite_get_plugins_install_url( 'wpforms-lite' ); ?>
 var seedprod_form_install_link = <?php echo wp_json_encode( esc_url_raw( htmlspecialchars_decode( $url ) ) ); ?>;
+
+<?php $url = seedprod_lite_get_plugins_install_url( 'pushengage' ); ?>
+var seedprod_push_notifications_install_link = <?php echo wp_json_encode( esc_url_raw( htmlspecialchars_decode( $url ) ) ); ?>;
+
+<?php
+	$url = seedprod_lite_get_plugins_activate_url( 'pushengage/main.php' );
+?>
+
+var seedprod_push_notifications_activate_link = <?php echo wp_json_encode( esc_url_raw( htmlspecialchars_decode( $url ) ) ); ?>;
 
 <?php $url = seedprod_lite_get_plugins_install_url( 'rafflepress' ); ?>
 var seedprod_giveaway_install_link = <?php echo wp_json_encode( esc_url_raw( htmlspecialchars_decode( $url ) ) ); ?>;
@@ -412,6 +424,12 @@ var seedprod_analytics_install_link = <?php echo wp_json_encode( esc_url_raw( ht
 ?>
 
 var seedprod_analytics_activate_link = <?php echo wp_json_encode( esc_url_raw( htmlspecialchars_decode( $url ) ) ); ?>;
+
+<?php
+	$url = seedprod_lite_get_plugins_activate_url( 'google-analytics-premium/googleanalytics-premium.php' );
+?>
+
+var seedprod_analytics_pro_activate_link = <?php echo wp_json_encode( esc_url_raw( htmlspecialchars_decode( $url ) ) ); ?>;
 
 <?php
 	$url = seedprod_lite_get_plugins_activate_url( 'wpforms-lite/wpforms.php' );
@@ -491,66 +509,68 @@ $wp_getlocale = substr( $wp_getlocale, 0, 2 );
 var seedprod_data = 
 <?php
 $seedprod_data = array(
-	'seedprod_web_api'                 => $seedprod_web_api,
-	'seedprod_stripe_connect_token'    => $seedprod_stripe_connect_token,
-	'seedprod_stripe_connect_origin'   => $seedprod_stripe_connect_origin,
-	'seedprod_settings'                => $seedprod_settings,
-	'mixed_content'                    => $mixed_content,
-	'is_landing_page'                  => $is_landing_page,
-	'edited_with_seedprod'             => $edited_with_seedprod,
-	'unfiltered_html'                  => $unfiltered_html,
-	'global_css_page_id'               => $global_css_page_id,
-	'global_css_settings'              => $global_css_settings,
-	'show_bottombar_cta'               => $show_bottombar_cta,
-	'template_preview_path'            => $template_preview_path,
-	'page_uuid'                        => $lpage_uuid,
-	'placeholder_image'                => SEEDPROD_PLUGIN_URL . 'public/img/img-placeholder.png',
-	'placeholder_sm_image'             => SEEDPROD_PLUGIN_URL . 'public/img/img-placeholder-sm.png',
-	'block_templates'                  => json_decode( $seedprod_lite_block_templates ),
-	'seedprod_menus'                   => $seedprod_options,
-	'seedprod_first_menu'              => $seedprod_first_menu,
-	'expire_times'                     => seedprod_lite_get_expire_times(),
-	'roles'                            => seedprod_lite_get_roles(),
-	'my_ip'                            => seedprod_lite_get_ip(),
-	'plugins_installed'                => seedprod_lite_get_plugins_array(),
-	'giveaway_plugins_installed'       => seedprod_lite_get_giveaway_plugins_list(),
-	'form_plugins_installed'           => seedprod_lite_get_form_plugins_list(),
-	'seo_plugins_installed'            => seedprod_lite_get_seo_plugins_list(),
-	'analytics_plugins_installed'      => seedprod_lite_get_analytics_plugins_list(),
-	'seedprod_template_parts'          => $seedprod_template_parts,
-	'seedprod_selected_template_parts' => $seedprod_selected_template_parts,
-	'page_type'                        => $settings['page_type'],
-	'current_user_name'                => $current_user_name,
-	'current_user_email_hash'          => $current_user_email_hash,
-	'current_user_email'               => $current_user_email,
-	'free_templates_subscribed'        => $free_templates_subscribed,
-	'preview_link'                     => $preview_link,
-	'icons'                            => $icons,
-	'googlefonts'                      => $fonts,
-	'api_token'                        => $seedprod_api_token,
-	'seedprod_user_id'                 => $seedprod_user_id,
-	'site_token'                       => $seedprod_site_token,
-	'license_key'                      => $license_key,
-	'page_path'                        => 'seedprod_lite',
-	'plugin_path'                      => SEEDPROD_PLUGIN_URL,
-	'web_path'                         => SEEDPROD_WEB_API_URL,
-	'home_url'                         => home_url(),
-	'upgrade_link'                     => $seedprod_upgrade_link,
-	'lpage'                            => $lpage,
-	'settings'                         => $settings,
-	'app_settings'                     => $seedprod_app_settings,
-	'block_options'                    => $block_options,
-	'timezones'                        => $timezones,
-	'times'                            => $times,
-	'template_dev_mode'                => $template_dev_mode,
-	'template_dev_mode_url'            => $template_dev_mode_url,
-	'template_dev_mode_password'       => $template_dev_mode_password,
-	'email_integration_url'            => $email_integration_url,
-	'per'                              => $per,
-	'active_license'                   => $active_license,
-	'is_theme_template'                => $seedprod_is_theme_template,
-	'personalization_preferences'      => $user_personalization_preferences,
-	'wplocale'                         => $wp_getlocale,
+	'seedprod_web_api'                    => $seedprod_web_api,
+	'seedprod_stripe_connect_token'       => $seedprod_stripe_connect_token,
+	'seedprod_stripe_connect_origin'      => $seedprod_stripe_connect_origin,
+	'seedprod_settings'                   => $seedprod_settings,
+	'mixed_content'                       => $mixed_content,
+	'is_landing_page'                     => $is_landing_page,
+	'edited_with_seedprod'                => $edited_with_seedprod,
+	'unfiltered_html'                     => $unfiltered_html,
+	'global_css_page_id'                  => $global_css_page_id,
+	'global_css_settings'                 => $global_css_settings,
+	'show_bottombar_cta'                  => $show_bottombar_cta,
+	'template_preview_path'               => $template_preview_path,
+	'page_uuid'                           => $lpage_uuid,
+	'placeholder_image'                   => SEEDPROD_PLUGIN_URL . 'public/img/img-placeholder.png',
+	'placeholder_sm_image'                => SEEDPROD_PLUGIN_URL . 'public/img/img-placeholder-sm.png',
+	'block_templates'                     => json_decode( $seedprod_lite_block_templates ),
+	'seedprod_menus'                      => $seedprod_options,
+	'seedprod_first_menu'                 => $seedprod_first_menu,
+	'expire_times'                        => seedprod_lite_get_expire_times(),
+	'roles'                               => seedprod_lite_get_roles(),
+	'my_ip'                               => seedprod_lite_get_ip(),
+	'plugins_installed'                   => seedprod_lite_get_plugins_array(),
+	'giveaway_plugins_installed'          => seedprod_lite_get_giveaway_plugins_list(),
+	'form_plugins_installed'              => seedprod_lite_get_form_plugins_list(),
+	'seo_plugins_installed'               => seedprod_lite_get_seo_plugins_list(),
+	'analytics_plugins_installed'         => seedprod_lite_get_analytics_plugins_list(),
+	'push_notification_plugins_installed' => seedprod_lite_get_push_notification_plugins_list(),
+	'seedprod_template_parts'             => $seedprod_template_parts,
+	'seedprod_selected_template_parts'    => $seedprod_selected_template_parts,
+	'page_type'                           => $settings['page_type'],
+	'current_user_name'                   => $current_user_name,
+	'current_user_email_hash'             => $current_user_email_hash,
+	'current_user_email'                  => $current_user_email,
+	'free_templates_subscribed'           => $free_templates_subscribed,
+	'preview_link'                        => $preview_link,
+	'icons'                               => $icons,
+	'googlefonts'                         => $fonts,
+	'api_token'                           => $seedprod_api_token,
+	'seedprod_user_id'                    => $seedprod_user_id,
+	'site_token'                          => $seedprod_site_token,
+	'license_key'                         => $license_key,
+	'page_path'                           => 'seedprod_lite',
+	'plugin_path'                         => SEEDPROD_PLUGIN_URL,
+	'web_path'                            => SEEDPROD_WEB_API_URL,
+	'home_url'                            => home_url(),
+	'upgrade_link'                        => $seedprod_upgrade_link,
+	'lpage'                               => $lpage,
+	'settings'                            => $settings,
+	'app_settings'                        => $seedprod_app_settings,
+	'block_options'                       => $block_options,
+	'timezones'                           => $timezones,
+	'times'                               => $times,
+	'template_dev_mode'                   => $template_dev_mode,
+	'template_dev_mode_url'               => $template_dev_mode_url,
+	'template_dev_mode_password'          => $template_dev_mode_password,
+	'email_integration_url'               => $email_integration_url,
+	'per'                                 => $per,
+	'credits'                             => seedprod_lite_get_ai_credits(),
+	'active_license'                      => $active_license,
+	'is_theme_template'                   => $seedprod_is_theme_template,
+	'personalization_preferences'         => $user_personalization_preferences,
+	'wplocale'                            => $wp_getlocale,
 );
 
 
@@ -576,6 +596,18 @@ $seedprod_data = array(
 		$seedprod_data['wc_active'] = true;
 	} else {
 		$seedprod_data['wc_active'] = false;
+	}
+
+	// Check if ACF is active
+	if ( ( in_array( 'advanced-custom-fields/acf.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) || in_array( 'advanced-custom-fields-pro/acf.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) && function_exists( 'acf_get_field_groups' ) ) {
+		$seedprod_data['acf_active'] = true;
+
+		// Get ACF options.
+		$seedprod_data['acf_groups'] = [];
+
+	} else {
+		$seedprod_data['acf_active'] = false;
+		$seedprod_data['acf_groups'] = [];
 	}
 
 	// Check if Easy Digital Downloads is active
