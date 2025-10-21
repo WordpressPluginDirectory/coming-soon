@@ -920,6 +920,17 @@ function seedprod_lite_theme_import( $id = null ) {
 		//reinsert settings because wp_insert screws up json.
 		$post_content_filtered = $v1['post_content_filtered'];
 		$post_content          = $v1['post_content'];
+
+		// For CSS templates, ensure page_type is set in the JSON
+		if ( 'css' === $meta->_seedprod_page_template_type[0] ) {
+			$json_data = json_decode( $post_content_filtered, true );
+			if ( null !== $json_data ) {
+				// Ensure page_type is set at the root level
+				$json_data['page_type'] = 'css';
+				$post_content_filtered = wp_json_encode( $json_data );
+			}
+		}
+
 		global $wpdb;
 		$tablename     = $wpdb->prefix . 'posts';
 		$sql           = "UPDATE $tablename SET post_content_filtered = %s,post_content = %s WHERE id = %d";

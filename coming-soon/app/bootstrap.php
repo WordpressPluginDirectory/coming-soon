@@ -16,14 +16,17 @@ function seedprod_lite_admin_enqueue_scripts( $hook_suffix ) {
 	$is_localhost = seedprod_lite_is_localhost();
 
 	// Load our admin styles and scripts only on our pages
-	if ( strpos( $hook_suffix, 'seedprod_lite' ) !== false ) {
+	if ( strpos( $hook_suffix, 'seedprod_lite' ) !== false || $hook_suffix === 'admin_page_seedprod_lite_builder' ) {
 		// remove conflicting scripts
 		wp_dequeue_script( 'googlesitekit_admin' );
 		wp_dequeue_script( 'tds_js_vue_files_last' );
 		wp_dequeue_script( 'js_files_for_wp_admin' );
 
 		$vue_app_folder = 'lite';
-		if ( strpos( $hook_suffix, 'seedprod_lite_builder' ) !== false || strpos( $hook_suffix, 'seedprod_lite_template' ) !== false ) {
+
+		// Check for builder page (hidden admin page)
+		if ( $hook_suffix === 'admin_page_seedprod_lite_builder' ) {
+
 			if ( $is_localhost ) {
 			} else {
 				wp_register_script(
@@ -65,62 +68,9 @@ function seedprod_lite_admin_enqueue_scripts( $hook_suffix ) {
 				wp_enqueue_script( 'seedprod_vue_builder_app_3' );
 				wp_enqueue_style( 'seedprod_vue_builder_app_css_1', SEEDPROD_PLUGIN_URL . 'public/' . $vue_app_folder . '/vue-backend/css/chunk-vendors.css', false, SEEDPROD_VERSION );
 			}
-		} else {
-			if ( $is_localhost ) {
-			} else {
-				wp_register_script(
-					'seedprod_vue_admin_app_1',
-					SEEDPROD_PLUGIN_URL . 'public/' . $vue_app_folder . '/vue-backend/js/admin.js',
-					array( 'wp-i18n' ),
-					SEEDPROD_VERSION,
-					true
-				);
-				wp_register_script(
-					'seedprod_vue_admin_app_2',
-					SEEDPROD_PLUGIN_URL . 'public/' . $vue_app_folder . '/vue-backend/js/chunk-vendors.js',
-					array( 'wp-i18n' ),
-					SEEDPROD_VERSION,
-					true
-				);
-				wp_register_script(
-					'seedprod_vue_admin_app_3',
-					SEEDPROD_PLUGIN_URL . 'public/' . $vue_app_folder . '/vue-backend/js/chunk-common.js',
-					array( 'wp-i18n' ),
-					SEEDPROD_VERSION,
-					true
-				);
+		} 
 
-				wp_set_script_translations( 'seedprod_vue_admin_app_1', 'coming-soon' );
-				wp_set_script_translations( 'seedprod_vue_admin_app_2', 'coming-soon' );
-				wp_set_script_translations( 'seedprod_vue_admin_app_3', 'coming-soon' );
-
-				wp_localize_script(
-					'seedprod_vue_admin_app_1',
-					'seedprodProTranslations',
-					array(
-						'translations_pro' => seedprod_lite_get_jed_locale_data( 'coming-soon' ),
-					)
-				);
-
-				wp_enqueue_script( 'seedprod_vue_admin_app_1' );
-				wp_enqueue_script( 'seedprod_vue_admin_app_2' );
-				wp_enqueue_script( 'seedprod_vue_admin_app_3' );
-				wp_enqueue_style(
-					'seedprod_vue_admin_app_css_1',
-					SEEDPROD_PLUGIN_URL . 'public/' . $vue_app_folder . '/vue-backend/css/chunk-vendors.css',
-					false,
-					SEEDPROD_VERSION
-				);
-				// wp_enqueue_style(
-				// 'seedprod_vue_admin_app_css_2',
-				// SEEDPROD_PLUGIN_URL . 'public/'.$vue_app_folder.'/vue-backend/css/admin.css',
-				// false,
-				// SEEDPROD_VERSION
-				// );
-			}
-		}
-
-		if ( strpos( $hook_suffix, 'seedprod_lite_builder' ) !== false ) {
+		if ( $hook_suffix === 'admin_page_seedprod_lite_builder' ) {
 			wp_enqueue_style(
 				'seedprod-css',
 				SEEDPROD_PLUGIN_URL . 'public/css/admin-style.min.css',
@@ -268,29 +218,7 @@ function seedprod_lite_admin_enqueue_scripts( $hook_suffix ) {
 			}
 		}
 
-		if ( strpos( $hook_suffix, 'seedprod_lite_template' ) !== false ) {
-			wp_enqueue_style(
-				'seedprod-css',
-				SEEDPROD_PLUGIN_URL . 'public/css/admin-style.min.css',
-				false,
-				SEEDPROD_VERSION
-			);
-			wp_enqueue_style(
-				'seedprod-builder-css',
-				SEEDPROD_PLUGIN_URL . 'public/css/tailwind-builder.min.css',
-				false,
-				SEEDPROD_VERSION
-			);
-		}
 
-		if ( strpos( $hook_suffix, 'seedprod_lite_builder' ) === false ) {
-			wp_enqueue_style(
-				'seedprod-css',
-				SEEDPROD_PLUGIN_URL . 'public/css/tailwind-admin.min.css',
-				false,
-				SEEDPROD_VERSION
-			);
-		}
 
 		$allow_google_fonts = apply_filters( 'seedprod_allow_google_fonts', true );
 		if ( $allow_google_fonts ) {
@@ -373,13 +301,6 @@ add_action( 'admin_enqueue_scripts', 'seedprod_lite_admin_enqueue_scripts', 9999
  * @return void
  */
 function seedprod_lite_wp_enqueue_styles() {
-	// wp_register_style(
-	// 'seedprod-style',
-	// SEEDPROD_PLUGIN_URL . 'public/css/seedprod-style.min.css',
-	// false,
-	// SEEDPROD_VERSION
-	// );
-	// wp_enqueue_style('seedprod-style');
 
 	$is_user_logged_in = is_user_logged_in();
 	if ( $is_user_logged_in ) {
@@ -403,32 +324,6 @@ function seedprod_lite_wp_enqueue_styles() {
 add_action( 'init', 'seedprod_lite_wp_enqueue_styles' );
 
 
-/**
- * Display settings link on plugin page
- */
-add_filter( 'plugin_action_links', 'seedprod_lite_plugin_action_links', 10, 2 );
-
-/**
- * Plugin action links.
- *
- * @param array  $links Action links.
- * @param string $file  Plugin file.
- * @return array $links Processed action links.
- */
-function seedprod_lite_plugin_action_links( $links, $file ) {
-	$plugin_file = SEEDPROD_SLUG;
-
-	if ( $file == $plugin_file || 'seedprod-pro/seedprod-pro.php' == $file ) {
-		$settings_link = '<a href="admin.php?page=seedprod_lite">Settings</a>';
-		array_unshift( $links, $settings_link );
-		if ( 'lite' === SEEDPROD_BUILD ) {
-			$upgrade_link = '<a href="https://www.seedprod.com/lite-upgrade/?utm_source=WordPress&utm_campaign=liteplugin&utm_medium=plugin-actions-upgrade-link" target="_blank" style="color: #1da867;
-font-weight: 600;">Upgrade to Pro</a>';
-			array_unshift( $links, $upgrade_link );
-		}
-	}
-	return $links;
-}
 
 /**
  * Remove other plugin's style from our page so they don't conflict
@@ -467,16 +362,6 @@ function seedprod_lite_deregister_backend_styles() {
 				}
 			}
 
-			// foreach ($wp_styles->registered as $handle => $asset) {
-			// echo '<br> '.$handle;
-			// if (!in_array($handle, $s)) {
-			// if (strpos($handle, 'seedprod') === false && strpos($asset->src, $wpforms_url) === false) {
-			// wp_dequeue_style($handle);
-			// wp_deregister_style($handle);
-			// echo '<br>removed '.$handle;
-			// }
-			// }
-			// }
 
 			// remove scripts
 
@@ -535,7 +420,7 @@ function seedprod_lite_add_admin_body_classes( $classes ) {
 	$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 	if ( null !== $page && strpos( $page, 'seedprod_lite' ) !== false ) {
-		$classes .= ' seedprod-body seedprod-lite';
+		$classes .= ' sp-bg-white seedprod-lite';
 	}
 	if ( null !== $page && ( strpos( $page, 'seedprod_lite_builder' ) !== false ) ) {
 		$classes .= ' seedprod-builder seedprod-lite';
@@ -608,14 +493,6 @@ function seedprod_lite_get_jed_locale_data( $domain ) {
 	foreach ( $translations->entries as $msgid => $entry ) {
 		$locale[ $msgid ] = $entry->translations;
 	}
-
-	// If any of the translated strings incorrectly contains HTML line breaks i.e. <br>, we need to return or else the admin is no longer accessible.
-	// https://github.com/awesomemotive/aioseo/issues/2074
-	// Commented out incase we need to use this in the future.
-	// $json = wp_json_encode( $locale );
-	// if ( preg_match( '/<br[\s\/\\\\]*>/', $json ) ) {
-	// 	return array();
-	// }
 
 	return $locale;
 }

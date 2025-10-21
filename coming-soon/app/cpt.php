@@ -23,3 +23,12 @@ $sedprod_pt = post_type_exists( 'seedprod' );
 if ( false === $sedprod_pt ) {
 	add_action( 'init', 'seedprod_lite_post_type', 0 );
 }
+
+/**
+ * Add custom rewrite rules for special SeedProd pages
+ */
+function seedprod_lite_custom_rewrite_rules() {
+	// Add rewrite rule for login page
+	add_rewrite_rule( '^sp-login/?$', 'index.php?post_type=seedprod&name=sp-login', 'top' );
+}
+add_action( 'init', 'seedprod_lite_custom_rewrite_rules' );

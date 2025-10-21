@@ -250,11 +250,16 @@ $global_css_page_id  = get_option( 'seedprod_global_css_page_id' );
 
 
 // get preview link
-// $preview_link = get_preview_post_link( $lpage_id );
-if ( 'lp' === $settings['page_type'] ) {
-	$preview_link = home_url() . "/?page_id=$lpage_id&preview_id=$lpage_id&preview_nonce=" . wp_create_nonce( 'post_preview_' . $lpage_id ) . '&preview=true';
-} else {
-	$preview_link = home_url() . "/?post_type=seedprod&page_id=$lpage_id&preview_id=$lpage_id&preview_nonce=" . wp_create_nonce( 'post_preview_' . $lpage_id ) . '&preview=true';
+//$preview_link = get_preview_post_link( $lpage_id );
+// Fallback if get_preview_post_link returns empty (shouldn't happen but just in case)
+if ( empty( $preview_link ) ) {
+	if ( 'lp' === $settings['page_type'] || 'post' === $settings['page_type'] ) {
+		// Landing pages and theme pages (post type) use regular page preview URL
+		$preview_link = home_url() . "/?page_id=$lpage_id&preview_id=$lpage_id&preview_nonce=" . wp_create_nonce( 'post_preview_' . $lpage_id ) . '&preview=true';
+	} else {
+		// Other page types (cs, mm, 404, loginpage) use seedprod post type URL
+		$preview_link = home_url() . "/?post_type=seedprod&page_id=$lpage_id&preview_id=$lpage_id&preview_nonce=" . wp_create_nonce( 'post_preview_' . $lpage_id ) . '&preview=true';
+	}
 }
 
 // keep track for changes
@@ -536,6 +541,9 @@ var seedprod_push_notifications_activate_link = <?php echo wp_json_encode( esc_u
 <?php $url = seedprod_lite_get_plugins_install_url( 'rafflepress' ); ?>
 var seedprod_giveaway_install_link = <?php echo wp_json_encode( esc_url_raw( htmlspecialchars_decode( $url ) ) ); ?>;
 
+<?php $url = seedprod_lite_get_plugins_activate_url( 'rafflepress' ); ?>
+var seedprod_giveaway_activate_link = <?php echo wp_json_encode( esc_url_raw( htmlspecialchars_decode( $url ) ) ); ?>;
+
 <?php $url = seedprod_lite_get_plugins_install_url( 'mypaykit' ); ?>
 var seedprod_mypaykit_install_link = <?php echo wp_json_encode( esc_url_raw( htmlspecialchars_decode( $url ) ) ); ?>;
 
@@ -670,7 +678,7 @@ $seedprod_data = array(
 	'push_notification_plugins_installed' => seedprod_lite_get_push_notification_plugins_list(),
 	'seedprod_template_parts'             => $seedprod_template_parts,
 	'seedprod_selected_template_parts'    => $seedprod_selected_template_parts,
-	'page_type'                           => $settings['page_type'],
+	'page_type'                           => isset( $settings['page_type'] ) ? $settings['page_type'] : '',
 	'current_user_name'                   => $current_user_name,
 	'current_user_email_hash'             => $current_user_email_hash,
 	'current_user_email'                  => $current_user_email,

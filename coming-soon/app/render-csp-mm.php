@@ -76,8 +76,6 @@ class SeedProd_Lite_Render {
 					} else {
 						add_action( 'template_redirect', array( &$this, 'render_comingsoon_page' ), $priority );
 					}
-
-					add_action( 'admin_bar_menu', 'seedprod_lite_admin_bar_menu', 999 );
 				}
 				add_action( 'init', array( &$this, 'remove_ngg_print_scripts' ) );
 			}

@@ -3,8 +3,9 @@
 
 /**
  * Welcome Page On Activation
+ * DEPRECATED: Now using V2 admin redirect - seedprod_lite_v2_welcome_screen_do_activation_redirect
  */
-add_action( 'admin_init', 'seedprod_lite_welcome_screen_do_activation_redirect' );
+// add_action( 'admin_init', 'seedprod_lite_welcome_screen_do_activation_redirect' );
 
 /**
  * Welcome screen for activation redirect.
@@ -39,7 +40,8 @@ function seedprod_lite_welcome_screen_do_activation_redirect() {
 		// run new onboarding flow
 		if(empty($seedprod_dismiss_setup_wizard)){
 			update_option( 'seedprod_dismiss_setup_wizard', true );
-			wp_safe_redirect( add_query_arg( array( 'page' => 'seedprod_lite' ), admin_url( 'admin.php' ) ) . '#/welcome' );
+			// Use native WordPress welcome page instead of Vue
+			wp_safe_redirect( add_query_arg( array( 'page' => 'seedprod_lite_welcome' ), admin_url( 'admin.php' ) ) );
 			exit();
 		}
 	  }

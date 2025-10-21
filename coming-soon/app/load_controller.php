@@ -3,7 +3,6 @@
 require_once SEEDPROD_PLUGIN_PATH . 'app/functions-utils.php';
 
 require_once SEEDPROD_PLUGIN_PATH . 'app/cpt.php';
-require_once SEEDPROD_PLUGIN_PATH . 'app/admin-bar-menu.php';
 require_once SEEDPROD_PLUGIN_PATH . 'app/class-seedprod-notifications.php';
 
 // helper functions
@@ -31,11 +30,10 @@ if ( is_admin() ) {
 	// Admin Only
 	require_once SEEDPROD_PLUGIN_PATH . 'app/settings.php';
 	require_once SEEDPROD_PLUGIN_PATH . 'app/lpage.php';
-	require_once SEEDPROD_PLUGIN_PATH . 'app/edit_with_seedprod.php';
+	// OLD: require_once SEEDPROD_PLUGIN_PATH . 'app/edit_with_seedprod.php';
+	// MOVED TO: admin/class-seedprod-admin.php load_admin_functions()
 	require_once SEEDPROD_PLUGIN_PATH . 'app/functions-addons.php';
-	if ( 'lite' == SEEDPROD_BUILD ) {
-		require_once SEEDPROD_PLUGIN_PATH . 'app/class-seedprod-review.php';
-	}
+	// Review functionality has been moved to V2 admin: admin/includes/review-functions.php
 }
 
 // Load on Public and Admin

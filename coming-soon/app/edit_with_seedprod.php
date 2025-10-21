@@ -7,12 +7,12 @@ function seedprod_lite_admin_js() {
 	// Make Admin upgrade submenu link target _blank
 	if ( defined( 'SEEDPROD_TEMPLATE_DEV_MODE' ) && SEEDPROD_TEMPLATE_DEV_MODE === true ) {
 		// echo "
-        // <script>
-        //     jQuery( document ).ready(function($) {
-        //         $('.toplevel_page_seedprod_lite .wp-first-item').hide();
-        //     });
-        // </script>
-        // ";
+		// <script>
+		//     jQuery( document ).ready(function($) {
+		//         $('.toplevel_page_seedprod_lite .wp-first-item').hide();
+		//     });
+		// </script>
+		// ";
 	}
 	echo "
     <script>
@@ -64,12 +64,93 @@ function seedprod_lite_admin_js() {
             }
          }, 100);
 
+        // SEPARATE: iframe-specific fallback (runs independently)
+        var iframeAttempts = 0;
+        var checkIframe = setInterval(function() {
+            iframeAttempts++;
+            
+            // Only run if original code didn't work AND iframe exists
+            if ($('.managed_by_seedprod').length > 0) {
+                clearInterval(checkIframe);
+                return;
+            }
+            
+            // Look for iframe editor
+            var iframe = $('iframe[name=\"editor-canvas\"]');
+            if (iframe.length === 0) {
+                iframe = $('iframe[name=\"editor-canvas-iframe\"]');
+            }
+            
+            if (iframe.length > 0 && 1 === " . esc_html( $is_seedprod ) . ") {
+                try {
+                    var iframeDoc = iframe[0].contentDocument;
+                    if (!iframeDoc) return;
+                    
+                    // Wait for basic structure
+                    if (iframeDoc.querySelectorAll('*').length < 3) return;
+                    
+                    var body = $(iframeDoc).find('body');
+                    if (body.length === 0) return;
+                    
+                    // Wait for content to load
+                    var docUrl = iframeDoc.URL || '';
+                    var bodyHtml = body.html();
+                    var hasBlob = docUrl.includes('blob:');
+                    var hasContent = bodyHtml && bodyHtml.trim().length > 0;
+                    var iframeSrc = iframe.attr('src') || '';
+                    var srcHasBlob = iframeSrc.includes('blob:');
+                    
+                    // Wait for BLOB URL to load
+                    if (!hasBlob && docUrl === 'about:blank') {
+                        if (!srcHasBlob) return;
+                        if (iframeAttempts > 50) {
+                            if (bodyHtml && bodyHtml.length > 100) {
+                                hasContent = true;
+                            } else {
+                                return;
+                            }
+                        } else {
+                            return;
+                        }
+                    }
+                    
+                    if (!hasContent) return;
+                    
+                    // Check for loading states
+                    var isLoading = $(iframeDoc).find('.components-spinner, .wp-block-placeholder').length > 0;
+                    if (isLoading) return;
+                    
+                    // Find editor elements
+                    var blockEditor = $(iframeDoc).find('.block-editor-block-list__layout');
+                    if (blockEditor.length === 0) {
+                        var selectors = ['.wp-block-post-content', '.edit-post-visual-editor', '.block-editor-writing-flow', 'div[contenteditable=\"true\"]'];
+                        for (var i = 0; i < selectors.length; i++) {
+                            blockEditor = $(iframeDoc).find(selectors[i]);
+                            if (blockEditor.length > 0) break;
+                        }
+                    }
+                    
+                    if (blockEditor.length > 0) {
+                        blockEditor.hide();
+                        blockEditor.after('<div style=\"text-align:center;\" class=\"managed_by_seedprod\">This page is managed by SeedProd<br><a href=\"" . esc_attr( $edit_url ) . "\" target=\"_parent\" onclick=\"window.open(this.href, \'_parent\'); return false;\" class=\"button button-primary\" style=\"display: inline-flex; align-items: center; justify-content: center; font-size: 16px; padding: 12px 24px; text-decoration: none; border-radius: 4px; background: #2271b1; color: white; border: 1px solid #2271b1; box-shadow: 0 1px 0 rgba(0,0,0,.15); margin-top:10px;\"><img src=\"" . esc_attr( SEEDPROD_PLUGIN_URL ) . "public/svg/admin-bar-icon.svg\" style=\"margin-right:7px; filter: brightness(0) invert(1);\"> Edit with SeedProd</a></div>');
+                        clearInterval(checkIframe);
+                    }
+                } catch (e) {
+                    // Silent fail for cross-origin issues
+                }
+            }
+            
+            // Give up after 100 attempts (10 seconds)
+            if (iframeAttempts > 100) {
+                clearInterval(checkIframe);
+            }
+        }, 100);
+
     });
     </script>
     ";
 		}
 	}
-
 }
 add_action( 'admin_footer', 'seedprod_lite_admin_js' );
 
@@ -110,12 +191,93 @@ function seedprod_lite_admin_js_check_theme_template_part() {
             }
          }, 100);
 
+        // SEPARATE: iframe-specific fallback for templates (runs independently)
+        var templateIframeAttempts = 0;
+        var checkTemplateIframe = setInterval(function() {
+            templateIframeAttempts++;
+            
+            // Only run if original code didn't work AND iframe exists
+            if ($('.managed_by_seedprod').length > 0) {
+                clearInterval(checkTemplateIframe);
+                return;
+            }
+            
+            // Look for iframe editor
+            var iframe = $('iframe[name=\"editor-canvas\"]');
+            if (iframe.length === 0) {
+                iframe = $('iframe[name=\"editor-canvas-iframe\"]');
+            }
+            
+            if (iframe.length > 0 && 1 === " . esc_html( $is_seedprod ) . ") {
+                try {
+                    var iframeDoc = iframe[0].contentDocument;
+                    if (!iframeDoc) return;
+                    
+                    // Wait for basic structure
+                    if (iframeDoc.querySelectorAll('*').length < 3) return;
+                    
+                    var body = $(iframeDoc).find('body');
+                    if (body.length === 0) return;
+                    
+                    // Wait for content to load
+                    var docUrl = iframeDoc.URL || '';
+                    var bodyHtml = body.html();
+                    var hasBlob = docUrl.includes('blob:');
+                    var hasContent = bodyHtml && bodyHtml.trim().length > 0;
+                    var iframeSrc = iframe.attr('src') || '';
+                    var srcHasBlob = iframeSrc.includes('blob:');
+                    
+                    // Wait for BLOB URL to load
+                    if (!hasBlob && docUrl === 'about:blank') {
+                        if (!srcHasBlob) return;
+                        if (templateIframeAttempts > 50) {
+                            if (bodyHtml && bodyHtml.length > 100) {
+                                hasContent = true;
+                            } else {
+                                return;
+                            }
+                        } else {
+                            return;
+                        }
+                    }
+                    
+                    if (!hasContent) return;
+                    
+                    // Check for loading states
+                    var isLoading = $(iframeDoc).find('.components-spinner, .wp-block-placeholder').length > 0;
+                    if (isLoading) return;
+                    
+                    // Find editor elements
+                    var blockEditor = $(iframeDoc).find('.block-editor-block-list__layout');
+                    if (blockEditor.length === 0) {
+                        var selectors = ['.wp-block-post-content', '.edit-post-visual-editor', '.block-editor-writing-flow', 'div[contenteditable=\"true\"]'];
+                        for (var i = 0; i < selectors.length; i++) {
+                            blockEditor = $(iframeDoc).find(selectors[i]);
+                            if (blockEditor.length > 0) break;
+                        }
+                    }
+                    
+                    if (blockEditor.length > 0) {
+                        blockEditor.hide();
+                        blockEditor.after('<div style=\"text-align:center;\" class=\"managed_by_seedprod\">This template page is managed by SeedProd<br><a href=\"" . esc_attr( $edit_url ) . "\" target=\"_parent\" onclick=\"window.open(this.href, \'_parent\'); return false;\" class=\"button button-primary\" style=\"display: inline-flex; align-items: center; justify-content: center; font-size: 16px; padding: 12px 24px; text-decoration: none; border-radius: 4px; background: #2271b1; color: white; border: 1px solid #2271b1; box-shadow: 0 1px 0 rgba(0,0,0,.15); margin-top:10px;\"><img src=\"" . esc_attr( SEEDPROD_PLUGIN_URL ) . "public/svg/admin-bar-icon.svg\" style=\"margin-right:7px; filter: brightness(0) invert(1);\"> Edit with SeedProd</a></div>');
+                        clearInterval(checkTemplateIframe);
+                    }
+                } catch (e) {
+                    // Silent fail for cross-origin issues
+                }
+            }
+            
+            // Give up after 100 attempts (10 seconds)
+            if (templateIframeAttempts > 100) {
+                clearInterval(checkTemplateIframe);
+            }
+        }, 100);
+
     });
     </script>
     ";
 		}
 	}
-
 }
 add_action( 'admin_footer', 'seedprod_lite_admin_js_check_theme_template_part' );
 
@@ -199,7 +361,7 @@ function seedprod_lite_add_admin_edit_seedprod() {
 			$is_seedprod_true        = 'seed_editor_false';
 			$remove_post_callback    = 'seedprod_lite_remove_post';
 			$seedprod_template_type  = 'template';
-			$seedprod_nonce 		= wp_create_nonce( 'seedprod_nonce' );
+			$seedprod_nonce          = wp_create_nonce( 'seedprod_nonce' );
 
 
 			if ( ! empty( $_GET['post'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -226,12 +388,12 @@ function seedprod_lite_add_admin_edit_seedprod() {
 			$from = 'post';
 
 			if ( 'template' == $seedprod_template_type ) {
-				$edit_url = admin_url() . 'admin.php?page=' . $seedprod_template_label . '_template&_wpnonce='.$seedprod_nonce.'&from=' . $from . '&id=' . $id . '#/template/' . $id;
+				$edit_url = admin_url() . 'admin.php?page=' . $seedprod_template_label . '_template&_wpnonce=' . esc_attr( $seedprod_nonce ) . '&from=' . $from . '&id=' . $id . '#/template/' . $id;
 			} else {
-				$edit_url = admin_url() . 'admin.php?page=' . $seedprod_template_label . '_builder&_wpnonce='.$seedprod_nonce.'&from=' . $from . '&id=' . $id . '#/setup/' . $id;
+				$edit_url = admin_url() . 'admin.php?page=' . $seedprod_template_label . '_builder&_wpnonce=' . esc_attr( $seedprod_nonce ) . '&from=' . $from . '&id=' . $id . '#/setup/' . $id;
 			}
 
-			$edit_seedprod_label  = '<img src="' . SEEDPROD_PLUGIN_URL . 'public/svg/admin-bar-icon.svg" style="margin-right:7px; margin-top:5px">' . __( 'Edit with SeedProd', 'coming-soon' );
+			$edit_seedprod_label  = '<img src="' . esc_url( SEEDPROD_PLUGIN_URL . 'public/svg/admin-bar-icon.svg' ) . '" style="margin-right:7px; margin-top:5px">' . __( 'Edit with SeedProd', 'coming-soon' );
 			$back_wordpress_label = __( 'Switch Back to WordPress Editor', 'coming-soon' );
 
 			$localizations = array(
@@ -245,7 +407,7 @@ function seedprod_lite_add_admin_edit_seedprod() {
         <div class="' . esc_attr( $is_seedprod_true ) . '">
             <span class="seedprod-off">
             <a href="' . esc_attr( $edit_url ) . '" id="edit_seedprod_custom_link" class="edit_seedprod_custom_link button button-primary">
-            ' .  $edit_seedprod_label  . '
+            ' . wp_kses_post( $edit_seedprod_label ) . '
             </a></span>
             <span class="seedprod-on">
             <a href="#back" class="back_to_wp_editor button">' . esc_html( $back_wordpress_label ) . '</a>
@@ -290,9 +452,9 @@ function seedprod_lite_add_admin_edit_seedprod() {
                     var admin_url = localizedVars.admin_url; 
 
                     if(seedprod_template_type=="template"){
-                        seedprod_template_edit_url_ = `${admin_url}?page=${seedprod_label}_${seedprod_template_type}&_wpnonce='.$seedprod_nonce.'&from=' . esc_html( $from ) . '&id=${post_ID}#/template/${post_ID}`;
+                        seedprod_template_edit_url_ = `${admin_url}?page=${seedprod_label}_${seedprod_template_type}&_wpnonce=' . esc_attr( $seedprod_nonce ) . '&from=' . esc_html( $from ) . '&id=${post_ID}#/template/${post_ID}`;
                     }else{
-                        seedprod_template_edit_url_ = `${admin_url}?page=${seedprod_label}_${seedprod_template_type}&_wpnonce='.$seedprod_nonce.'&from=' . esc_html( $from ) . '&id=${post_ID}#/setup/${post_ID}`;
+                        seedprod_template_edit_url_ = `${admin_url}?page=${seedprod_label}_${seedprod_template_type}&_wpnonce=' . esc_attr( $seedprod_nonce ) . '&from=' . esc_html( $from ) . '&id=${post_ID}#/setup/${post_ID}`;
                     }
                     //console.log(seedprod_template_edit_url_);
                     location.href = seedprod_template_edit_url_;
@@ -500,8 +662,8 @@ add_action( 'admin_bar_menu', 'seedprod_lite_add_menu_item', 80 );
  * @return void
  */
 function seedprod_lite_add_menu_item( $wp_admin_bar ) {
-	$seedprod_nonce 		= wp_create_nonce( 'seedprod_nonce' );
-	$seedprod_menu_link = 'admin.php?page=seedprod_lite_template&_wpnonce='.$seedprod_nonce.'&id=0#/template';
+	$seedprod_nonce     = wp_create_nonce( 'seedprod_nonce' );
+	$seedprod_menu_link = 'admin.php?page=seedprod_lite_template&_wpnonce=' . esc_attr( $seedprod_nonce ) . '&id=0#/template';
 
 	$args = array(
 		'id'     => 'seedprod_template',
