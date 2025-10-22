@@ -191,6 +191,13 @@ class SeedProd_Lite_Render {
 		$safe_sql  = $wpdb->prepare( $sql, absint( $page_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		$page      = $wpdb->get_row( $safe_sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
+		// Check if this page has been converted from legacy to native blocks
+		$is_converted = get_post_meta( $page_id, '_seedprod_converted_from_legacy', true );
+		if ( '1' === $is_converted || 1 === $is_converted ) {
+			// Page has been converted - process WordPress native blocks
+			$page->post_content = do_blocks( $page->post_content );
+		}
+
 		$settings = json_decode( $page->post_content_filtered );
 
 		// redirect mode

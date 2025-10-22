@@ -123,8 +123,8 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 			$total_subscribers     = $stats['total_subscribers'];
 			$recent_subscribers    = $stats['recent_subscribers'];
 
-			// Check if theme builder is enabled
-			$theme_builder_enabled = get_option( 'seedprod_theme_enabled' );
+			// Check if theme builder is enabled (checks both old and new format)
+			$theme_builder_enabled = seedprod_lite_v2_is_theme_enabled();
 			?>
 			<!-- Main Dashboard Content -->
 			<div class="seedprod-dashboard-content">

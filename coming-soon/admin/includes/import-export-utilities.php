@@ -600,7 +600,7 @@ function seedprod_lite_v2_theme_import_json( $json_content = null ) {
 									$new_page_id = wp_insert_post( $page_details );
 									if ( ! empty( $new_page_id ) ) {
 										// add meta
-										update_post_meta( $new_page_id, '_seedprod_edited_with_seedprod', true );
+										update_post_meta( $new_page_id, '_seedprod_edited_with_seedprod', '1' );
 										// reinsert settings because wp_insert screws up json.
 										$post_content_filtered_new_page = $v1['post_content_filtered'];
 										global $wpdb;

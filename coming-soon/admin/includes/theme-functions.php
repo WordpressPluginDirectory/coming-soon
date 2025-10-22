@@ -12,6 +12,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Check if SeedProd theme is enabled
+ * Checks BOTH old (seedprod_theme_enabled) and new (seedprod_settings JSON) formats
+ *
+ * @return bool True if theme is enabled in either location
+ */
+function seedprod_lite_v2_is_theme_enabled() {
+	// Check new format (seedprod_settings JSON)
+	$settings_json = get_option( 'seedprod_settings' );
+	if ( ! empty( $settings_json ) ) {
+		$settings = json_decode( $settings_json, true );
+		if ( is_array( $settings ) && ! empty( $settings['enable_seedprod_theme'] ) ) {
+			return true;
+		}
+	}
+
+	// Check old format (direct option)
+	$old_enabled = get_option( 'seedprod_theme_enabled' );
+	if ( ! empty( $old_enabled ) ) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
  * Update SeedProd theme enabled status (V2 version)
  * AJAX handler for toggling the theme on/off
  */

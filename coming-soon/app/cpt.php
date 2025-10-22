@@ -7,11 +7,27 @@
  */
 function seedprod_lite_post_type() {
 
+	// Enable UI for converted pages (only if conversion system exists)
+	// but hide from admin menu
+	$show_ui = false;
+	$show_in_menu = false;
+
+	// Check if conversion system exists (sp-smart-builder folder)
+	$conversion_system_exists = file_exists( SEEDPROD_PLUGIN_PATH . 'sp-smart-builder' );
+
+	if ( $conversion_system_exists ) {
+		$show_ui = true;
+		// Keep menu hidden
+		$show_in_menu = false;
+	}
+
 	$args = array(
 		'supports'           => array( 'title', 'editor', 'revisions' ),
 		'public'             => false,
 		'capability_type'    => 'page',
-		'show_ui'            => false,
+		'show_ui'            => $show_ui,
+		'show_in_menu'       => $show_in_menu, // Hide from admin menu
+		'show_in_rest'       => $show_ui, // Enable Gutenberg editor
 		'publicly_queryable' => true,
 		'can_export'         => false,
 	);

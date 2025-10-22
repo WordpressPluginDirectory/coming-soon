@@ -498,7 +498,7 @@ function seedprod_lite_v2_create_page_from_template() {
 	$update_result = $wpdb->query( $safe_sql );
 
 	// Set SeedProd page meta (matching old flow - no _seedprod_page_id)
-	update_post_meta( $page_id, '_seedprod_page', true );
+	update_post_meta( $page_id, '_seedprod_page', '1' );
 	update_post_meta( $page_id, '_seedprod_page_template_type', $page_type );
 
 	// Generate page UUID if not exists (matching existing SeedProd pattern)

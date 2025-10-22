@@ -53,8 +53,8 @@ if ( ! empty( $settings_json ) ) {
 	$settings = array();
 }
 
-// Check if theme is enabled
-$theme_enabled = ! empty( $settings['enable_seedprod_theme'] );
+// Check if theme is enabled (checks both old and new format)
+$theme_enabled = seedprod_lite_v2_is_theme_enabled();
 
 // Ensure theme-templates.php is loaded (contains required functions)
 if ( ! function_exists( 'seedprod_lite_conditions_map' ) ) {

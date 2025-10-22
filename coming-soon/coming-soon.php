@@ -3,7 +3,7 @@
 Plugin Name: Coming Soon Page, Maintenance Mode, Landing Pages & WordPress Website Builder by SeedProd
 Plugin URI: https://www.seedprod.com/lite-upgrade/?utm_source=WordPress&utm_campaign=liteplugin&utm_medium=plugin-uri-link
 Description: The Easiest WordPress Drag & Drop Page Builder that allows you to build your website, create Landing Pages, Coming Soon Pages, Maintenance Mode Pages and more.
-Version:  6.19.0
+Version:  6.19.1
 Author: SeedProd
 Author URI: https://www.seedprod.com/lite-upgrade/?utm_source=WordPress&utm_campaign=liteplugin&utm_medium=author-uri-link
 Text Domain: coming-soon
@@ -17,7 +17,7 @@ License: GPLv2 or later
 
 define( 'SEEDPROD_BUILD', 'lite' );
 define( 'SEEDPROD_SLUG', 'coming-soon/coming-soon.php' );
-define( 'SEEDPROD_VERSION', '6.19.0' );
+define( 'SEEDPROD_VERSION', '6.19.1' );
 define( 'SEEDPROD_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 // Example output: /Applications/MAMP/htdocs/wordpress/wp-content/plugins/seedprod/
 define( 'SEEDPROD_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -151,6 +151,21 @@ require_once SEEDPROD_PLUGIN_PATH . 'app/load_controller.php';
 // Load Smart Builder frontend functionality (must be loaded early for render_block filter)
 if ( file_exists( SEEDPROD_PLUGIN_PATH . 'sp-smart-builder/smart-builder-frontend.php' ) ) {
 	require_once SEEDPROD_PLUGIN_PATH . 'sp-smart-builder/smart-builder-frontend.php';
+}
+
+// Load Smart Builder API endpoints (AJAX handlers)
+if ( file_exists( SEEDPROD_PLUGIN_PATH . 'sp-smart-builder/api-endpoints.php' ) ) {
+	require_once SEEDPROD_PLUGIN_PATH . 'sp-smart-builder/api-endpoints.php';
+}
+
+// Load Custom Gutenberg Blocks
+if ( file_exists( SEEDPROD_PLUGIN_PATH . 'blocks/countdown/index.php' ) ) {
+	require_once SEEDPROD_PLUGIN_PATH . 'blocks/countdown/index.php';
+}
+
+// Load Smart Builder conversion system
+if ( file_exists( SEEDPROD_PLUGIN_PATH . 'sp-smart-builder/conversion/loader.php' ) ) {
+	require_once SEEDPROD_PLUGIN_PATH . 'sp-smart-builder/conversion/loader.php';
 }
 
 

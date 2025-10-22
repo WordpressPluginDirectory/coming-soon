@@ -30,8 +30,7 @@ if ( is_admin() ) {
 	// Admin Only
 	require_once SEEDPROD_PLUGIN_PATH . 'app/settings.php';
 	require_once SEEDPROD_PLUGIN_PATH . 'app/lpage.php';
-	// OLD: require_once SEEDPROD_PLUGIN_PATH . 'app/edit_with_seedprod.php';
-	// MOVED TO: admin/class-seedprod-admin.php load_admin_functions()
+	// Edit with SeedProd functionality moved to V2 admin: admin/includes/edit-with-seedprod-functions.php
 	require_once SEEDPROD_PLUGIN_PATH . 'app/functions-addons.php';
 	// Review functionality has been moved to V2 admin: admin/includes/review-functions.php
 }

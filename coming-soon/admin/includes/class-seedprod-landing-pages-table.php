@@ -306,41 +306,14 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 				'trash'   => 0,
 			);
 
-			// Get special page IDs to exclude (matching Vue logic)
-			$exclude_ids    = array();
-			$coming_soon_id = get_option( 'seedprod_coming_soon_page_id' );
-			$maintenance_id = get_option( 'seedprod_maintenance_mode_page_id' );
-			$login_id       = get_option( 'seedprod_login_page_id' );
-			$fourohfour_id  = get_option( 'seedprod_404_page_id' );
-
-			if ( $coming_soon_id ) {
-				$exclude_ids[] = $coming_soon_id;
-			}
-			if ( $maintenance_id ) {
-				$exclude_ids[] = $maintenance_id;
-			}
-			if ( $login_id ) {
-				$exclude_ids[] = $login_id;
-			}
-			if ( $fourohfour_id ) {
-				$exclude_ids[] = $fourohfour_id;
-			}
-
-			// Build exclusion clause
-			$exclude_clause = '';
-			if ( ! empty( $exclude_ids ) ) {
-				$exclude_ids_string = implode( ',', array_map( 'intval', $exclude_ids ) );
-				$exclude_clause     = "AND p.ID NOT IN ({$exclude_ids_string})";
-			}
-
-			// Query to get counts (exact match to Vue logic - only 'page' type with '_seedprod_page_uuid' meta)
+			// Query to get counts - ONLY landing pages (template_type = 'lp')
 			$results = $wpdb->get_results(
 				"SELECT p.post_status, COUNT(*) as count
 				FROM {$wpdb->posts} p
-				INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
-				WHERE pm.meta_key = '_seedprod_page_uuid'
-				AND p.post_type = 'page'
-				{$exclude_clause}
+				INNER JOIN {$wpdb->postmeta} pm_uuid ON (p.ID = pm_uuid.post_id AND pm_uuid.meta_key = '_seedprod_page_uuid')
+				INNER JOIN {$wpdb->postmeta} pm_type ON (p.ID = pm_type.post_id AND pm_type.meta_key = '_seedprod_page_template_type')
+				WHERE p.post_type = 'page'
+				AND pm_type.meta_value = 'lp'
 				GROUP BY p.post_status",
 				ARRAY_A
 			);
@@ -380,39 +353,27 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 		$current_page = $this->get_pagenum();
 		$offset       = ( $current_page - 1 ) * $per_page;
 
-		// Get special page IDs to exclude (matching Vue logic)
-		$exclude_ids    = array();
-		$coming_soon_id = get_option( 'seedprod_coming_soon_page_id' );
-		$maintenance_id = get_option( 'seedprod_maintenance_mode_page_id' );
-		$login_id       = get_option( 'seedprod_login_page_id' );
-		$fourohfour_id  = get_option( 'seedprod_404_page_id' );
-
-		if ( $coming_soon_id ) {
-			$exclude_ids[] = $coming_soon_id;
-		}
-		if ( $maintenance_id ) {
-			$exclude_ids[] = $maintenance_id;
-		}
-		if ( $login_id ) {
-			$exclude_ids[] = $login_id;
-		}
-		if ( $fourohfour_id ) {
-			$exclude_ids[] = $fourohfour_id;
-		}
-
-		// Build query args (exact match to Vue get_lpage_list logic)
+		// Build query args - ONLY show landing pages (template_type = 'lp')
 		$args = array(
-			'post_type'      => 'page', // Only 'page' type like Vue logic
+			'post_type'      => 'page',
 			'posts_per_page' => $per_page,
 			'offset'         => $offset,
-			'meta_key'       => '_seedprod_page_uuid', // Match Vue: meta_key = '_seedprod_page_uuid'
 			'post_status'    => 'any',
+			'meta_query'     => array(
+				'relation' => 'AND',
+				array(
+					'key'     => '_seedprod_page_uuid',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key'     => '_seedprod_page_template_type',
+					'value'   => 'lp',
+					'compare' => '=',
+				),
+			),
 		);
 
-		// Exclude special pages by ID
-		if ( ! empty( $exclude_ids ) ) {
-			$args['post__not_in'] = $exclude_ids;
-		}
+		// Note: No need to exclude special pages anymore - they have template_type cs/mm/404/loginpage, not 'lp'
 
 		// Filter by status
 		if ( ! empty( $_REQUEST['post_status'] ) ) {

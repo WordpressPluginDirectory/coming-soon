@@ -55,6 +55,15 @@ class SeedProd_Lite_Admin {
 		// Hook admin bar menu
 		add_action( 'admin_bar_menu', array( $this, 'add_admin_bar_menu' ), 999 );
 
+		// Hook Smart Builder admin bar button (only if Smart Builder folder exists)
+		if ( file_exists( SEEDPROD_PLUGIN_PATH . 'sp-smart-builder' ) ) {
+			add_action( 'admin_bar_menu', array( $this, 'add_smart_builder_admin_bar_button' ), 100 );
+
+			// Add Smart Builder button styles (loads on all pages with admin bar)
+			add_action( 'admin_head', array( $this, 'add_smart_builder_button_styles' ) );
+			add_action( 'wp_head', array( $this, 'add_smart_builder_button_styles' ) );
+		}
+
 		// Add inline CSS for admin bar (loads on all admin pages when modes are active)
 		add_action( 'admin_head', array( $this, 'add_admin_bar_styles' ) );
 		add_action( 'wp_head', array( $this, 'add_admin_bar_styles' ) );
@@ -100,8 +109,6 @@ class SeedProd_Lite_Admin {
 		// Load system info functions (V2 admin)
 		require_once $includes_dir . 'system-info-functions.php';
 
-		// Load "Edit with SeedProd" functionality (V2 admin)
-		require_once $includes_dir . 'edit-with-seedprod-functions.php';
 
 		// Load debug functions (V2 admin)
 		require_once $includes_dir . 'debug-functions.php';
@@ -745,15 +752,17 @@ class SeedProd_Lite_Admin {
 			array( $this, 'display_subscribers_page' )
 		);
 
-		// Hidden Smart Builder page (AI-powered frontend editor)
-		add_submenu_page(
-			'options.php', // Use non-existent parent to hide from menu (avoids null deprecation)
-			__( 'Smart Builder', 'coming-soon' ),
-			__( 'Smart Builder', 'coming-soon' ),
-			apply_filters( 'seedprod_smart_builder_menu_capability', 'edit_posts' ),
-			'seedprod_lite_smart_builder',
-			array( $this, 'display_smart_builder_page' )
-		);
+		// Hidden Smart Builder page (AI-powered frontend editor) - only if folder exists
+		if ( file_exists( SEEDPROD_PLUGIN_PATH . 'sp-smart-builder' ) ) {
+			add_submenu_page(
+				'options.php', // Use non-existent parent to hide from menu (avoids null deprecation)
+				__( 'Smart Builder', 'coming-soon' ),
+				__( 'Smart Builder', 'coming-soon' ),
+				apply_filters( 'seedprod_smart_builder_menu_capability', 'edit_posts' ),
+				'seedprod_lite_smart_builder',
+				array( $this, 'display_smart_builder_page' )
+			);
+		}
 	}
 
 	/**
@@ -1031,6 +1040,109 @@ class SeedProd_Lite_Admin {
 				'meta'   => array( 'class' => 'seedprod-mode-active' ),
 			)
 		);
+	}
+
+	/**
+	 * Add Smart Builder button to admin bar
+	 *
+	 * @param WP_Admin_Bar $wp_admin_bar The WordPress admin bar object
+	 */
+	public function add_smart_builder_admin_bar_button( $wp_admin_bar ) {
+		// Check user capability
+		if ( ! current_user_can( apply_filters( 'seedprod_smart_builder_menu_capability', 'edit_posts' ) ) ) {
+			return;
+		}
+
+		// Don't show if Smart Builder is already open
+		$is_smart_builder_page = isset( $_GET['page'] ) && 'seedprod_lite_smart_builder' === $_GET['page'];
+		if ( $is_smart_builder_page ) {
+			return;
+		}
+
+		// SeedProd leaf icon (same as used in mode-active menu bar)
+		$icon = '<span class="seedprod-sb-icon"><svg width="22" height="23" viewBox="0 0 22 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<g filter="url(#filter0_d_sb)">
+			<path fill-rule="evenodd" clip-rule="evenodd" d="M4 0C4 0 4.32666 0.022488 11.036 0.91214C17.7453 1.80179 20.0674 8.70527 15.9594 14.7304C16.5949 9.34689 15.4319 3.76206 10.7604 3.10916C6.08886 2.45626 6.49574 2.5563 6.49574 2.5563C6.49574 2.5563 6.57314 3.74204 7.01149 6.92954C7.44984 10.117 9.90279 11.6803 12.0495 12.485C12.0495 12.485 12.1754 8.75455 10.9777 7.1126C9.77997 5.47066 8.2899 4.38023 8.2899 4.38023C8.2899 4.38023 11.7916 4.80636 13.1137 7.28431C14.4358 9.76225 14.307 15 14.307 15L12.8808 14.9251C9.04318 14.4574 5.45792 12.1126 4.84831 7.19318C4.23871 2.27373 4 0 4 0Z" fill="black"/>
+			<path fill-rule="evenodd" clip-rule="evenodd" d="M4 0C4 0 4.32666 0.022488 11.036 0.91214C17.7453 1.80179 20.0674 8.70527 15.9594 14.7304C16.5949 9.34689 15.4319 3.76206 10.7604 3.10916C6.08886 2.45626 6.49574 2.5563 6.49574 2.5563C6.49574 2.5563 6.57314 3.74204 7.01149 6.92954C7.44984 10.117 9.90279 11.6803 12.0495 12.485C12.0495 12.485 12.1754 8.75455 10.9777 7.1126C9.77997 5.47066 8.2899 4.38023 8.2899 4.38023C8.2899 4.38023 11.7916 4.80636 13.1137 7.28431C14.4358 9.76225 14.307 15 14.307 15L12.8808 14.9251C9.04318 14.4574 5.45792 12.1126 4.84831 7.19318C4.23871 2.27373 4 0 4 0Z" fill="white"/>
+			</g>
+			<defs>
+			<filter id="filter0_d_sb" x="0" y="0" width="22" height="23" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+			<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+			<feOffset dy="4"/>
+			<feGaussianBlur stdDeviation="2"/>
+			<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+			<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+			<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+			</filter>
+			</defs>
+			</svg></span>';
+
+		// Add the Smart Builder button
+		$wp_admin_bar->add_node(
+			array(
+				'id'     => 'seedprod_smart_builder',
+				'title'  => $icon . '<span>' . __( 'SeedProd AI Builder', 'coming-soon' ) . '</span>',
+				'href'   => admin_url( 'admin.php?page=seedprod_lite_smart_builder' ),
+				'meta'   => array(
+					'class' => 'seedprod-smart-builder-button',
+					'title' => __( 'Edit site with SeedProd AI Builder', 'coming-soon' ),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Add styles for Smart Builder button in admin bar
+	 */
+	public function add_smart_builder_button_styles() {
+		// Check if admin bar is showing
+		if ( ! is_admin_bar_showing() ) {
+			return;
+		}
+
+		// Check user capability
+		if ( ! current_user_can( apply_filters( 'seedprod_smart_builder_menu_capability', 'edit_posts' ) ) ) {
+			return;
+		}
+
+		?>
+		<style type="text/css">
+			/* SeedProd Smart Builder Admin Bar Button */
+			#wpadminbar #wp-admin-bar-seedprod_smart_builder .ab-item {
+				display: flex !important;
+				align-items: center !important;
+				justify-content: center !important;
+				background: transparent !important;
+			}
+			#wpadminbar #wp-admin-bar-seedprod_smart_builder .seedprod-sb-icon {
+				display: inline-flex;
+				align-items: center;
+				margin-right: 6px;
+				position: relative;
+				top: 2px;
+			}
+			#wpadminbar #wp-admin-bar-seedprod_smart_builder .seedprod-sb-icon svg {
+				width: 18px;
+				height: 19px;
+			}
+			#wpadminbar #wp-admin-bar-seedprod_smart_builder .seedprod-sb-icon svg path {
+				fill: #f0f0f1 !important;
+			}
+			#wpadminbar #wp-admin-bar-seedprod_smart_builder > .ab-item {
+				color: #f0f0f1 !important;
+			}
+			#wpadminbar #wp-admin-bar-seedprod_smart_builder:hover > .ab-item {
+				background: #2c3338 !important;
+			}
+			#wpadminbar #wp-admin-bar-seedprod_smart_builder:hover > .ab-item > span:not(.seedprod-sb-icon) {
+				color: #72aee6 !important;
+			}
+			#wpadminbar #wp-admin-bar-seedprod_smart_builder:hover .seedprod-sb-icon svg path {
+				fill: #f0f0f1 !important;
+			}
+		</style>
+		<?php
 	}
 
 	/**
