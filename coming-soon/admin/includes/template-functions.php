@@ -612,6 +612,7 @@ function seedprod_lite_v2_duplicate_lpage() {
 	$meta_to_copy = array(
 		'_seedprod_page_type',
 		'_seedprod_page_template_id',
+		'_seedprod_page_template_type',
 	);
 
 	foreach ( $meta_to_copy as $meta_key ) {

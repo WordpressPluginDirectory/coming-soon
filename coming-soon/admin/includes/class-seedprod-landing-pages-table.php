@@ -151,8 +151,9 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 	 * URL column
 	 */
 	protected function column_url( $item ) {
-		// Use ?page_id= format like old Vue system (matching Dashboard-Pro.vue)
-		$url = home_url( '?page_id=' . $item['ID'] );
+		// Use get_permalink() to respect permalink settings
+		// This will show pretty URLs when permalinks are enabled, or ?page_id= when they're not
+		$url = get_permalink( $item['ID'] );
 
 		return sprintf(
 			'<a href="%s" target="_blank">%s</a>',
@@ -306,14 +307,29 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 				'trash'   => 0,
 			);
 
-			// Query to get counts - ONLY landing pages (template_type = 'lp')
+			// Get special page IDs to exclude (Coming Soon, Maintenance, 404, Login)
+			$csp_id    = get_option( 'seedprod_coming_soon_page_id' );
+			$mmp_id    = get_option( 'seedprod_maintenance_mode_page_id' );
+			$p404_id   = get_option( 'seedprod_404_page_id' );
+			$loginp_id = get_option( 'seedprod_login_page_id' );
+
+			// Build exclusion list (only include non-empty IDs)
+			$exclude_ids = array_filter( array( $csp_id, $mmp_id, $p404_id, $loginp_id ) );
+
+			// Build WHERE clause for exclusions
+			$exclude_clause = '';
+			if ( ! empty( $exclude_ids ) ) {
+				$exclude_ids_string = implode( ',', array_map( 'absint', $exclude_ids ) );
+				$exclude_clause     = "AND p.ID NOT IN ($exclude_ids_string)";
+			}
+
+			// Query to get counts - All pages with _seedprod_page (landing pages only, excludes theme pages)
 			$results = $wpdb->get_results(
 				"SELECT p.post_status, COUNT(*) as count
 				FROM {$wpdb->posts} p
-				INNER JOIN {$wpdb->postmeta} pm_uuid ON (p.ID = pm_uuid.post_id AND pm_uuid.meta_key = '_seedprod_page_uuid')
-				INNER JOIN {$wpdb->postmeta} pm_type ON (p.ID = pm_type.post_id AND pm_type.meta_key = '_seedprod_page_template_type')
+				INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id AND pm.meta_key = '_seedprod_page')
 				WHERE p.post_type = 'page'
-				AND pm_type.meta_value = 'lp'
+				$exclude_clause
 				GROUP BY p.post_status",
 				ARRAY_A
 			);
@@ -353,27 +369,29 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 		$current_page = $this->get_pagenum();
 		$offset       = ( $current_page - 1 ) * $per_page;
 
-		// Build query args - ONLY show landing pages (template_type = 'lp')
+		// Get special page IDs to exclude (Coming Soon, Maintenance, 404, Login)
+		$csp_id    = get_option( 'seedprod_coming_soon_page_id' );
+		$mmp_id    = get_option( 'seedprod_maintenance_mode_page_id' );
+		$p404_id   = get_option( 'seedprod_404_page_id' );
+		$loginp_id = get_option( 'seedprod_login_page_id' );
+
+		// Build exclusion list (only include non-empty IDs)
+		$exclude_ids = array_filter( array( $csp_id, $mmp_id, $p404_id, $loginp_id ) );
+
+		// Build query args - All pages with _seedprod_page (landing pages only, excludes theme pages)
 		$args = array(
 			'post_type'      => 'page',
 			'posts_per_page' => $per_page,
 			'offset'         => $offset,
 			'post_status'    => 'any',
+			'post__not_in'   => $exclude_ids,
 			'meta_query'     => array(
-				'relation' => 'AND',
 				array(
-					'key'     => '_seedprod_page_uuid',
+					'key'     => '_seedprod_page',
 					'compare' => 'EXISTS',
-				),
-				array(
-					'key'     => '_seedprod_page_template_type',
-					'value'   => 'lp',
-					'compare' => '=',
 				),
 			),
 		);
-
-		// Note: No need to exclude special pages anymore - they have template_type cs/mm/404/loginpage, not 'lp'
 
 		// Filter by status
 		if ( ! empty( $_REQUEST['post_status'] ) ) {

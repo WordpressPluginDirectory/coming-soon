@@ -120,7 +120,8 @@ function seedprod_lite_v2_get_dashboard_stats() {
 	$stats['maintenance_count']     = $maintenance_id ? 1 : 0;
 	$stats['theme_templates_count'] = $wpdb->get_var( "SELECT COUNT(DISTINCT post_id) FROM $tablename WHERE meta_key = '_seedprod_is_theme_template' AND meta_value = '1'" );
 
-	// Count landing pages: pages with _seedprod_page_uuid that are NOT special pages and NOT theme templates
+	// Count landing pages: pages with _seedprod_page that are NOT special pages
+	// Using _seedprod_page (not _seedprod_page_uuid) ensures we only count landing pages, not theme pages
 	// Match the logic from class-seedprod-landing-pages-table.php
 	if ( ! empty( $exclude_ids ) ) {
 		$exclude_ids_string           = implode( ',', $exclude_ids );
@@ -128,7 +129,7 @@ function seedprod_lite_v2_get_dashboard_stats() {
 			"SELECT COUNT(DISTINCT pm.post_id)
 			FROM $tablename pm
 			INNER JOIN $posts_table p ON pm.post_id = p.ID
-			WHERE pm.meta_key = '_seedprod_page_uuid'
+			WHERE pm.meta_key = '_seedprod_page'
 			AND p.post_type = 'page'
 			AND p.post_status != 'trash'
 			AND pm.post_id NOT IN ($exclude_ids_string)"
@@ -138,7 +139,7 @@ function seedprod_lite_v2_get_dashboard_stats() {
 			"SELECT COUNT(DISTINCT pm.post_id)
 			FROM $tablename pm
 			INNER JOIN $posts_table p ON pm.post_id = p.ID
-			WHERE pm.meta_key = '_seedprod_page_uuid'
+			WHERE pm.meta_key = '_seedprod_page'
 			AND p.post_type = 'page'
 			AND p.post_status != 'trash'"
 		);

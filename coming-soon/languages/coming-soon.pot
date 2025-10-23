@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Coming Soon Page, Maintenance Mode, Landing Pages & WordPress Website Builder by SeedProd 6.19.1\n"
+"Project-Id-Version: Coming Soon Page, Maintenance Mode, Landing Pages & WordPress Website Builder by SeedProd 6.19.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/coming-soon\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-10-21T15:30:02+00:00\n"
+"POT-Creation-Date: 2025-10-22T16:11:14+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: coming-soon\n"
@@ -1277,71 +1277,71 @@ msgid "Duplicate"
 msgstr ""
 
 #: admin/includes/class-seedprod-landing-pages-table.php:123
-#: admin/includes/class-seedprod-landing-pages-table.php:172
-#: admin/includes/class-seedprod-landing-pages-table.php:284
+#: admin/includes/class-seedprod-landing-pages-table.php:173
+#: admin/includes/class-seedprod-landing-pages-table.php:285
 #: admin/includes/class-seedprod-theme-templates-table.php:199
 #: admin/partials/seedprod-admin-website-builder.php:230
 msgid "Trash"
 msgstr ""
 
 #: admin/includes/class-seedprod-landing-pages-table.php:130
-#: admin/includes/class-seedprod-landing-pages-table.php:225
+#: admin/includes/class-seedprod-landing-pages-table.php:226
 #: admin/includes/class-seedprod-theme-templates-table.php:186
 #: admin/includes/class-seedprod-theme-templates-table.php:240
 msgid "Restore"
 msgstr ""
 
 #: admin/includes/class-seedprod-landing-pages-table.php:137
-#: admin/includes/class-seedprod-landing-pages-table.php:226
+#: admin/includes/class-seedprod-landing-pages-table.php:227
 #: admin/includes/class-seedprod-theme-templates-table.php:192
 #: admin/includes/class-seedprod-theme-templates-table.php:241
 msgid "Delete Permanently"
 msgstr ""
 
-#: admin/includes/class-seedprod-landing-pages-table.php:170
-#: admin/includes/class-seedprod-landing-pages-table.php:260
+#: admin/includes/class-seedprod-landing-pages-table.php:171
+#: admin/includes/class-seedprod-landing-pages-table.php:261
 #: admin/includes/class-seedprod-theme-templates-table.php:45
 #: admin/partials/seedprod-admin-website-builder.php:216
 msgid "Published"
 msgstr ""
 
-#: admin/includes/class-seedprod-landing-pages-table.php:171
+#: admin/includes/class-seedprod-landing-pages-table.php:172
 #: languages/seedprod-lite.php:948
 msgid "Draft"
 msgstr ""
 
-#: admin/includes/class-seedprod-landing-pages-table.php:173
+#: admin/includes/class-seedprod-landing-pages-table.php:174
 msgid "Private"
 msgstr ""
 
-#: admin/includes/class-seedprod-landing-pages-table.php:193
+#: admin/includes/class-seedprod-landing-pages-table.php:194
 msgid "Unpublished"
 msgstr ""
 
-#: admin/includes/class-seedprod-landing-pages-table.php:200
+#: admin/includes/class-seedprod-landing-pages-table.php:201
 #, php-format
 msgid "%s ago"
 msgstr ""
 
-#: admin/includes/class-seedprod-landing-pages-table.php:202
+#: admin/includes/class-seedprod-landing-pages-table.php:203
 #: languages/seedprod-lite.php:8902
 msgid "F j, Y"
 msgstr ""
 
-#: admin/includes/class-seedprod-landing-pages-table.php:204
+#: admin/includes/class-seedprod-landing-pages-table.php:205
 msgid "F j, Y \\a\\t g:i a"
 msgstr ""
 
-#: admin/includes/class-seedprod-landing-pages-table.php:209
+#: admin/includes/class-seedprod-landing-pages-table.php:210
 msgid "Last Modified"
 msgstr ""
 
-#: admin/includes/class-seedprod-landing-pages-table.php:219
+#: admin/includes/class-seedprod-landing-pages-table.php:220
 #: admin/includes/class-seedprod-theme-templates-table.php:243
 msgid "Move to Trash"
 msgstr ""
 
-#: admin/includes/class-seedprod-landing-pages-table.php:249
+#: admin/includes/class-seedprod-landing-pages-table.php:250
 #: admin/partials/seedprod-admin-template-selection.php:138
 #: admin/partials/seedprod-admin-theme-kits-selection.php:56
 #: admin/partials/seedprod-admin-website-builder.php:209
@@ -1349,16 +1349,16 @@ msgstr ""
 msgid "All"
 msgstr ""
 
-#: admin/includes/class-seedprod-landing-pages-table.php:272
+#: admin/includes/class-seedprod-landing-pages-table.php:273
 #: admin/partials/seedprod-admin-website-builder.php:223
 msgid "Drafts"
 msgstr ""
 
-#: admin/includes/class-seedprod-landing-pages-table.php:453
+#: admin/includes/class-seedprod-landing-pages-table.php:471
 msgid "No landing pages found for your search."
 msgstr ""
 
-#: admin/includes/class-seedprod-landing-pages-table.php:455
+#: admin/includes/class-seedprod-landing-pages-table.php:473
 msgid "No landing pages found."
 msgstr ""
 
@@ -1464,10 +1464,10 @@ msgstr ""
 #: admin/includes/debug-functions.php:25
 #: admin/includes/license-functions.php:173
 #: admin/includes/template-functions.php:551
-#: admin/includes/template-functions.php:645
-#: admin/includes/template-functions.php:680
-#: admin/includes/template-functions.php:715
-#: admin/includes/template-functions.php:750
+#: admin/includes/template-functions.php:646
+#: admin/includes/template-functions.php:681
+#: admin/includes/template-functions.php:716
+#: admin/includes/template-functions.php:751
 msgid "Security check failed."
 msgstr ""
 
@@ -2179,9 +2179,9 @@ msgid "You do not have permission to duplicate pages."
 msgstr ""
 
 #: admin/includes/template-functions.php:563
-#: admin/includes/template-functions.php:657
-#: admin/includes/template-functions.php:692
-#: admin/includes/template-functions.php:727
+#: admin/includes/template-functions.php:658
+#: admin/includes/template-functions.php:693
+#: admin/includes/template-functions.php:728
 msgid "Invalid page ID."
 msgstr ""
 
@@ -2189,71 +2189,71 @@ msgstr ""
 msgid "Page not found."
 msgstr ""
 
-#: admin/includes/template-functions.php:629
+#: admin/includes/template-functions.php:630
 msgid "Page duplicated successfully."
 msgstr ""
 
-#: admin/includes/template-functions.php:650
+#: admin/includes/template-functions.php:651
 msgid "You do not have permission to trash pages."
 msgstr ""
 
-#: admin/includes/template-functions.php:664
+#: admin/includes/template-functions.php:665
 msgid "Failed to trash page."
 msgstr ""
 
-#: admin/includes/template-functions.php:669
+#: admin/includes/template-functions.php:670
 msgid "Page moved to trash."
 msgstr ""
 
-#: admin/includes/template-functions.php:685
+#: admin/includes/template-functions.php:686
 msgid "You do not have permission to restore pages."
 msgstr ""
 
-#: admin/includes/template-functions.php:699
+#: admin/includes/template-functions.php:700
 msgid "Failed to restore page."
 msgstr ""
 
-#: admin/includes/template-functions.php:704
+#: admin/includes/template-functions.php:705
 msgid "Page restored successfully."
 msgstr ""
 
-#: admin/includes/template-functions.php:720
+#: admin/includes/template-functions.php:721
 msgid "You do not have permission to delete pages."
 msgstr ""
 
-#: admin/includes/template-functions.php:734
+#: admin/includes/template-functions.php:735
 msgid "Failed to delete page."
 msgstr ""
 
-#: admin/includes/template-functions.php:739
+#: admin/includes/template-functions.php:740
 msgid "Page deleted permanently."
 msgstr ""
 
-#: admin/includes/template-functions.php:755
+#: admin/includes/template-functions.php:756
 msgid "You do not have permission to perform bulk actions."
 msgstr ""
 
-#: admin/includes/template-functions.php:763
+#: admin/includes/template-functions.php:764
 #: admin/includes/theme-functions.php:578
 msgid "Invalid request."
 msgstr ""
 
-#: admin/includes/template-functions.php:794
+#: admin/includes/template-functions.php:795
 #, php-format
 msgid "%d pages moved to trash."
 msgstr ""
 
-#: admin/includes/template-functions.php:797
+#: admin/includes/template-functions.php:798
 #, php-format
 msgid "%d pages restored."
 msgstr ""
 
-#: admin/includes/template-functions.php:800
+#: admin/includes/template-functions.php:801
 #, php-format
 msgid "%d pages deleted permanently."
 msgstr ""
 
-#: admin/includes/template-functions.php:805
+#: admin/includes/template-functions.php:806
 #, php-format
 msgid "%d pages failed."
 msgstr ""
