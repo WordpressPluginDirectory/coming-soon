@@ -20,10 +20,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 7.0.0
  */
 function seedprod_lite_v2_init_review_request() {
+	// Temporarily disabled - will be converted to trigger-based system
+	return;
+
 	// Only show for Lite builds
 	if ( 'lite' !== SEEDPROD_BUILD ) {
 		return;
 	}
+
+	// Enqueue review notice JavaScript
+	add_action( 'admin_enqueue_scripts', 'seedprod_lite_v2_enqueue_review_scripts' );
 
 	// Admin notice requesting review
 	add_action( 'admin_notices', 'seedprod_lite_v2_review_request' );
@@ -32,6 +38,44 @@ function seedprod_lite_v2_init_review_request() {
 	add_action( 'wp_ajax_seedprod_v2_review_dismiss', 'seedprod_lite_v2_review_dismiss' );
 }
 add_action( 'admin_init', 'seedprod_lite_v2_init_review_request' );
+
+/**
+ * Enqueue review notice JavaScript
+ *
+ * Only loads on pages where review notice might display.
+ *
+ * @since 7.0.0
+ */
+function seedprod_lite_v2_enqueue_review_scripts() {
+	// Only enqueue for super admins (same check as review display)
+	if ( ! is_super_admin() ) {
+		return;
+	}
+
+	// Don't load on SeedProd pages (review notice doesn't show there)
+	$screen = get_current_screen();
+	if ( $screen && strpos( $screen->id, 'seedprod' ) !== false ) {
+		return;
+	}
+
+	// Enqueue the review notice handler
+	wp_enqueue_script(
+		'seedprod-review-notice',
+		plugin_dir_url( dirname( __FILE__ ) ) . 'js/review-notice.js',
+		array( 'jquery' ),
+		SEEDPROD_VERSION,
+		true
+	);
+
+	// Localize script with nonce for AJAX security
+	wp_localize_script(
+		'seedprod-review-notice',
+		'seedprodReviewNotice',
+		array(
+			'nonce' => wp_create_nonce( 'seedprod_review_dismiss' ),
+		)
+	);
+}
 
 /**
  * Display review request admin notice
@@ -179,13 +223,16 @@ function seedprod_lite_v2_display_review_notice() {
  * @since 7.0.0
  */
 function seedprod_lite_v2_review_dismiss() {
-	// Security check
+	// Verify nonce for security
+	check_ajax_referer( 'seedprod_review_dismiss', 'nonce' );
+
+	// Security check - verify user capability
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_die();
 	}
 
-	// Check if this is a permanent dismissal
-	$permanent = isset( $_POST['permanent'] ) && $_POST['permanent'] === 'true';
+	// Check if this is a permanent dismissal (sanitize input)
+	$permanent = isset( $_POST['permanent'] ) && sanitize_text_field( wp_unslash( $_POST['permanent'] ) ) === 'true';
 
 	if ( $permanent ) {
 		// User already reviewed - don't ask again
