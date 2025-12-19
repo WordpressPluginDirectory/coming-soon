@@ -17,14 +17,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Include V2 utility functions
 require_once __DIR__ . '/import-export-utilities.php';
 
-/* ==============================================
+/*
+==============================================
 	HELPER FUNCTIONS FOR IMPORT/EXPORT OPERATIONS
 	============================================== */
 
 /**
- * Validate AJAX request with nonce and permissions
+ * Validate AJAX request with nonce and permissions.
  *
- * @param string $capability The capability to check
+ * @param string $capability The capability to check.
  */
 function seedprod_lite_v2_validate_ajax_request( $capability = 'export' ) {
 	if ( ! check_ajax_referer( 'seedprod_v2_nonce', 'nonce', false ) ) {
@@ -37,9 +38,9 @@ function seedprod_lite_v2_validate_ajax_request( $capability = 'export' ) {
 }
 
 /**
- * Initialize WordPress filesystem
+ * Initialize WordPress filesystem.
  *
- * @return object WP_Filesystem instance
+ * @return object WP_Filesystem instance.
  */
 function seedprod_lite_v2_init_filesystem() {
 	if ( ! function_exists( 'WP_Filesystem' ) ) {
@@ -61,10 +62,10 @@ function seedprod_lite_v2_init_filesystem() {
 }
 
 /**
- * Get upload error message
+ * Get upload error message.
  *
- * @param integer $error_code The PHP upload error code
- * @return string The error message
+ * @param int $error_code The PHP upload error code.
+ * @return string The error message.
  */
 function seedprod_lite_v2_get_upload_error_message( $error_code ) {
 	switch ( $error_code ) {
@@ -81,28 +82,28 @@ function seedprod_lite_v2_get_upload_error_message( $error_code ) {
 }
 
 /**
- * Validate ZIP file upload
+ * Validate ZIP file upload.
  *
- * @param string $file_key The $_FILES array key
- * @return array File information or sends JSON error
+ * @param string $file_key The $_FILES array key.
+ * @return array File information or sends JSON error.
  */
 function seedprod_lite_v2_validate_zip_upload( $file_key ) {
-	// Check if file was uploaded
+	// Check if file was uploaded.
 	if ( ! isset( $_FILES[ $file_key ] ) ) {
 		wp_send_json_error( __( 'No file uploaded', 'coming-soon' ) );
 	}
 
-	// Check for upload errors
-	if ( $_FILES[ $file_key ]['error'] !== UPLOAD_ERR_OK ) {
+	// Check for upload errors.
+	if ( UPLOAD_ERR_OK !== $_FILES[ $file_key ]['error'] ) {
 		$error_message = seedprod_lite_v2_get_upload_error_message( $_FILES[ $file_key ]['error'] );
 		wp_send_json_error( $error_message );
 	}
 
-	$filename = wp_unslash( $_FILES[ $file_key ]['name'] ); // phpcs:ignore
-	$source = $_FILES[ $file_key ]['tmp_name']; // phpcs:ignore
-	$type = $_FILES[ $file_key ]['type']; // phpcs:ignore
+	$filename = wp_unslash( $_FILES[ $file_key ]['name'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	$source = $_FILES[ $file_key ]['tmp_name']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+	$type = $_FILES[ $file_key ]['type']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 
-	// Validate ZIP file type
+	// Validate ZIP file type.
 	$accepted_types = array(
 		'application/zip',
 		'application/x-zip-compressed',
@@ -119,16 +120,16 @@ function seedprod_lite_v2_validate_zip_upload( $file_key ) {
 
 	return array(
 		'filename' => $filename,
-		'source' => $source,
-		'type' => $type,
+		'source'   => $source,
+		'type'     => $type,
 	);
 }
 
 /**
- * Setup import/export directories
+ * Setup import/export directories.
  *
- * @param string $folder_name The folder name to create
- * @return array Directory paths
+ * @param string $folder_name The folder name to create.
+ * @return array Directory paths.
  */
 function seedprod_lite_v2_setup_directories( $folder_name ) {
 	$upload_dir = wp_upload_dir();
@@ -138,33 +139,33 @@ function seedprod_lite_v2_setup_directories( $folder_name ) {
 	$target_dir = $path . $folder_name;
 	$target_url = $url . $folder_name;
 
-	// Clean up existing directory
+	// Clean up existing directory.
 	if ( is_dir( $target_dir ) ) {
-		// Directory cleanup handled by V2 function
+		// Directory cleanup handled by V2 function.
 		seedprod_lite_v2_recursive_rmdir( $target_dir );
 	}
 
-	// Create fresh directory
+	// Create fresh directory.
 	mkdir( $target_dir, 0755 );
 
 	return array(
-		'path' => $path,
-		'url' => $url,
+		'path'       => $path,
+		'url'        => $url,
 		'target_dir' => $target_dir,
 		'target_url' => $target_url,
 	);
 }
 
 /**
- * Extract ZIP file with validation
+ * Extract ZIP file with validation.
  *
- * @param string  $zip_path   Path to ZIP file
- * @param string  $extract_to Directory to extract to
- * @param boolean $is_theme   Whether this is a theme import
- * @return boolean|WP_Error True on success, WP_Error on failure
+ * @param string $zip_path   Path to ZIP file.
+ * @param string $extract_to Directory to extract to.
+ * @param bool   $is_theme   Whether this is a theme import.
+ * @return bool|WP_Error True on success, WP_Error on failure.
  */
 function seedprod_lite_v2_extract_zip( $zip_path, $extract_to, $is_theme = true ) {
-	// Validate ZIP contents
+	// Validate ZIP contents.
 	$validation = seedprod_lite_v2_validate_import_zip( $zip_path, $is_theme );
 	if ( is_wp_error( $validation ) ) {
 		return $validation;
@@ -178,7 +179,7 @@ function seedprod_lite_v2_extract_zip( $zip_path, $extract_to, $is_theme = true 
 	}
 
 	$zip = new ZipArchive();
-	if ( $zip->open( $zip_path ) === true ) {
+	if ( true === $zip->open( $zip_path ) ) {
 		$zip->extractTo( $extract_to );
 		$zip->close();
 		return true;
@@ -188,17 +189,17 @@ function seedprod_lite_v2_extract_zip( $zip_path, $extract_to, $is_theme = true 
 }
 
 /**
- * Read JSON file with HTTP/filesystem fallback
+ * Read JSON file with HTTP/filesystem fallback.
  *
- * @param string $file_path Local file path
- * @param string $url_path  Optional URL for HTTP attempt
- * @return object|WP_Error Decoded JSON data or WP_Error
+ * @param string $file_path Local file path.
+ * @param string $url_path  Optional URL for HTTP attempt.
+ * @return object|WP_Error Decoded JSON data or WP_Error.
  */
 function seedprod_lite_v2_read_json_file( $file_path, $url_path = null ) {
 	global $wp_filesystem;
 	$json_data = null;
 
-	// Try HTTP first if URL provided
+	// Try HTTP first if URL provided.
 	if ( $url_path ) {
 		$response = wp_remote_get( $url_path, array( 'sslverify' => false ) );
 		if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
@@ -206,7 +207,7 @@ function seedprod_lite_v2_read_json_file( $file_path, $url_path = null ) {
 		}
 	}
 
-	// Fallback to direct filesystem reading
+	// Fallback to direct filesystem reading.
 	if ( ! $json_data && $wp_filesystem && $wp_filesystem->exists( $file_path ) ) {
 		$json_data = $wp_filesystem->get_contents( $file_path );
 	}
@@ -215,9 +216,9 @@ function seedprod_lite_v2_read_json_file( $file_path, $url_path = null ) {
 		return new WP_Error( 'read_failed', __( 'Unable to read data file.', 'coming-soon' ) );
 	}
 
-	// Decode and validate JSON
+	// Decode and validate JSON.
 	$data = json_decode( $json_data );
-	if ( null === $data && json_last_error() !== JSON_ERROR_NONE ) {
+	if ( null === $data && JSON_ERROR_NONE !== json_last_error() ) {
 		return new WP_Error( 'invalid_json', __( 'Invalid data format.', 'coming-soon' ) );
 	}
 
@@ -225,12 +226,12 @@ function seedprod_lite_v2_read_json_file( $file_path, $url_path = null ) {
 }
 
 /**
- * Process and prepare export data for themes/pages
+ * Process and prepare export data for themes/pages.
  *
- * @param array  $results Database results
- * @param string $type    Export type ('theme' or 'page')
- * @param mixed  $ptype   Page type for landing pages
- * @return array Processed export data
+ * @param array  $results Database results.
+ * @param string $type    Export type ('theme' or 'page').
+ * @param mixed  $ptype   Page type for landing pages.
+ * @return array Processed export data.
  */
 function seedprod_lite_v2_process_export_data( $results, $type = 'theme', $ptype = null ) {
 	$processed_data    = array();
@@ -286,7 +287,7 @@ function seedprod_lite_v2_process_export_data( $results, $type = 'theme', $ptype
 			);
 		} else {
 			$processed_result = seedprod_lite_v2_process_image_filenames( $content_filtered, $content );
-			
+
 			// Ensure the result has the expected structure
 			$processed_data[ $k ] = array(
 				'data'   => isset( $processed_result['data'] ) ? $processed_result['data'] : $content_filtered,
@@ -296,7 +297,7 @@ function seedprod_lite_v2_process_export_data( $results, $type = 'theme', $ptype
 		}
 
 		// Safely get processed data with fallbacks
-		$processed_html = isset( $processed_data[ $k ]['html'] ) ? $processed_data[ $k ]['html'] : '';
+		$processed_html         = isset( $processed_data[ $k ]['html'] ) ? $processed_data[ $k ]['html'] : '';
 		$processed_data_content = isset( $processed_data[ $k ]['data'] ) ? $processed_data[ $k ]['data'] : '';
 
 		// Build export entry
@@ -312,7 +313,30 @@ function seedprod_lite_v2_process_export_data( $results, $type = 'theme', $ptype
 		if ( 'page' === $type ) {
 			$entry['post_type'] = base64_encode( $v->post_type ); // phpcs:ignore
 			$entry['post_status'] = base64_encode( $v->post_status ); // phpcs:ignore
-			$entry['ptype'] = base64_encode( $ptype ?? '' ); // phpcs:ignore
+
+			// Determine page type: check both meta field AND WordPress options
+			// Special pages are identified by options, not meta
+			$actual_ptype = get_post_meta( $v->ID, '_seedprod_page_type', true );
+
+			// If no meta, check if this is a special page by checking WordPress options
+			if ( empty( $actual_ptype ) ) {
+				$coming_soon_id = get_option( 'seedprod_coming_soon_page_id' );
+				$maintenance_id = get_option( 'seedprod_maintenance_mode_page_id' );
+				$login_id       = get_option( 'seedprod_login_page_id' );
+				$fourohfour_id  = get_option( 'seedprod_404_page_id' );
+
+				if ( $v->ID == $coming_soon_id ) {
+					$actual_ptype = 'cs';
+				} elseif ( $v->ID == $maintenance_id ) {
+					$actual_ptype = 'mm';
+				} elseif ( $v->ID == $login_id ) {
+					$actual_ptype = 'loginp';
+				} elseif ( $v->ID == $fourohfour_id ) {
+					$actual_ptype = 'p404';
+				}
+			}
+
+			$entry['ptype'] = base64_encode( $actual_ptype ?? '' ); // phpcs:ignore
 		}
 
 		$export['theme'][] = $entry;
@@ -338,13 +362,14 @@ function seedprod_lite_v2_process_export_data( $results, $type = 'theme', $ptype
 	}
 
 	return array(
-		'export' => $export,
-		'processed_data' => $processed_data,
+		'export'            => $export,
+		'processed_data'    => $processed_data,
 		'shortcode_exports' => $shortcode_exports,
 	);
 }
 
-/* ==============================================
+/*
+==============================================
 	MAIN EXPORT/IMPORT FUNCTIONS
 	============================================== */
 
@@ -480,7 +505,7 @@ function seedprod_lite_v2_export_theme_files() {
 	// Save images locally and track failed ones
 	$all_failed_images = array();
 	if ( count( $export_data_images ) > 0 ) {
-		$failed_images = seedprod_lite_v2_save_images_locally( $export_data_images );
+		$failed_images     = seedprod_lite_v2_save_images_locally( $export_data_images );
 		$all_failed_images = array_merge( $all_failed_images, $failed_images );
 	}
 
@@ -506,13 +531,15 @@ function seedprod_lite_v2_export_theme_files() {
 
 			// Send response with warning about failed images
 			$warning_message = sprintf( __( '%d images could not be downloaded and were excluded from the export.', 'coming-soon' ), count( $all_failed_images ) );
-			wp_send_json_success( array(
-				'success' => true,
-				'message' => __( 'Export completed successfully', 'coming-soon' ),
-				'warning' => $warning_message,
-				'failed_images' => count( $all_failed_images ),
-				'download_url' => admin_url( 'admin-ajax.php?action=seedprod_lite_v2_download_export&file=' . basename( $zip_path ) )
-			) );
+			wp_send_json_success(
+				array(
+					'success'       => true,
+					'message'       => __( 'Export completed successfully', 'coming-soon' ),
+					'warning'       => $warning_message,
+					'failed_images' => count( $all_failed_images ),
+					'download_url'  => admin_url( 'admin-ajax.php?action=seedprod_lite_v2_download_export&file=' . basename( $zip_path ) ),
+				)
+			);
 		} else {
 			// Send file for download
 			header( 'Content-Type: application/zip' );
@@ -639,7 +666,7 @@ function seedprod_lite_v2_import_theme_by_url( $theme_url = null ) {
 	$is_direct_ajax = ( $theme_url === null );
 
 	// Helper function to handle errors for both AJAX and internal calls
-	$handle_error = function( $message, $code = 'error' ) use ( $is_direct_ajax ) {
+	$handle_error = function ( $message, $code = 'error' ) use ( $is_direct_ajax ) {
 		if ( $is_direct_ajax ) {
 			wp_send_json_error( $message );
 		} else {
@@ -684,7 +711,7 @@ function seedprod_lite_v2_import_theme_by_url( $theme_url = null ) {
 		$source,
 		array(
 			'sslverify' => false,
-			'timeout' => 60,
+			'timeout'   => 60,
 		)
 	);
 
@@ -802,7 +829,7 @@ function seedprod_lite_v2_import_theme_by_url( $theme_url = null ) {
  * Exports all landing pages as a downloadable ZIP file
  */
 function seedprod_lite_v2_export_landing_pages() {
-	
+
 	// Validate request and permissions
 	try {
 		seedprod_lite_v2_validate_ajax_request( 'export' );
@@ -824,15 +851,51 @@ function seedprod_lite_v2_export_landing_pages() {
 	$tablename      = $wpdb->prefix . 'posts';
 	$meta_tablename = $wpdb->prefix . 'postmeta';
 
-	// Get list of landing pages
-	$sql  = "SELECT * FROM $tablename p LEFT JOIN $meta_tablename pm ON (pm.post_id = p.ID)";
-	$sql .= " WHERE post_status != 'trash' AND post_type IN ('page', 'seedprod') AND meta_key = '_seedprod_page_uuid' ";
-	if ( 0 !== $page_id ) {
-		$sql .= " AND p.ID = $page_id ";
+	// Get list of landing pages - EXACT same logic as dropdown query
+	// Get special page IDs (Coming Soon, Maintenance Mode, Login, 404)
+	$coming_soon_id = get_option( 'seedprod_coming_soon_page_id' );
+	$maintenance_id = get_option( 'seedprod_maintenance_mode_page_id' );
+	$login_id       = get_option( 'seedprod_login_page_id' );
+	$fourohfour_id  = get_option( 'seedprod_404_page_id' );
+
+	$special_page_ids = array();
+	if ( ! empty( $coming_soon_id ) ) {
+		$special_page_ids[] = $coming_soon_id;
 	}
-	
+	if ( ! empty( $maintenance_id ) ) {
+		$special_page_ids[] = $maintenance_id;
+	}
+	if ( ! empty( $login_id ) ) {
+		$special_page_ids[] = $login_id;
+	}
+	if ( ! empty( $fourohfour_id ) ) {
+		$special_page_ids[] = $fourohfour_id;
+	}
+
+	$special_pages_condition = '';
+	if ( ! empty( $special_page_ids ) ) {
+		$special_ids_string      = implode( ',', array_map( 'intval', $special_page_ids ) );
+		$special_pages_condition = " OR p.ID IN ($special_ids_string)";
+	}
+
+	$sql  = "SELECT p.*, pm.meta_key, pm.meta_value FROM $tablename p ";
+	$sql .= "LEFT JOIN $meta_tablename pm ON (pm.post_id = p.ID AND pm.meta_key = '_seedprod_page_uuid') ";
+	$sql .= "LEFT JOIN $meta_tablename pm4 ON (pm4.post_id = p.ID AND pm4.meta_key = '_seedprod_page_template_type') ";
+	$sql .= "LEFT JOIN $meta_tablename pm5 ON (pm5.post_id = p.ID AND pm5.meta_key = '_seedprod_page') ";
+	$sql .= "WHERE p.post_status != 'trash' ";
+	$sql .= "AND p.post_type IN ('page', 'seedprod') ";
+	$sql .= "AND ((p.post_type = 'page' AND pm4.meta_value = 'lp') OR (p.post_type = 'page' AND pm5.meta_value IS NOT NULL) $special_pages_condition) ";
+	$sql .= "AND (pm.meta_value IS NOT NULL OR pm5.meta_value IS NOT NULL $special_pages_condition) ";
+
+	if ( 0 !== $page_id ) {
+		$sql .= "AND p.ID = $page_id ";
+	}
+
+	$sql .= 'GROUP BY p.ID ';
+	$sql .= 'ORDER BY p.post_date DESC';
+
 	$results = $wpdb->get_results( $sql ); // phpcs:ignore
-	
+
 	if ( $wpdb->last_error ) {
 		wp_send_json_error( 'Database error: ' . $wpdb->last_error );
 	}
@@ -856,18 +919,18 @@ function seedprod_lite_v2_export_landing_pages() {
 			wp_send_json_error( __( 'Export data structure is invalid.', 'coming-soon' ) );
 		}
 
-		$export = $export_result['export'];
-		$processed_data = $export_result['processed_data'];
+		$export            = $export_result['export'];
+		$processed_data    = $export_result['processed_data'];
 		$shortcode_exports = $export_result['shortcode_exports'];
-		
+
 	} catch ( Exception $e ) {
 		wp_send_json_error( sprintf( __( 'Export failed during processing: %s', 'coming-soon' ), $e->getMessage() ) );
 	}
 
 	// Process shortcode mapping for landing pages (restored from old logic)
 	foreach ( $shortcode_exports as $k => $sc_val ) {
-		$shortcode_page_id  = $sc_val['id'];  // Use different variable name to avoid overwriting original $page_id
-		$page_shortcode     = $sc_val['shortcode'];
+		$shortcode_page_id = $sc_val['id'];  // Use different variable name to avoid overwriting original $page_id
+		$page_shortcode    = $sc_val['shortcode'];
 
 		$sql      = "SELECT p.post_title FROM $tablename p LEFT JOIN $meta_tablename pm ON (pm.post_id = p.ID)";
 		$sql     .= " WHERE p.ID = %d and post_status != 'trash' AND post_type IN ('page','seedprod') AND meta_key = '_seedprod_page_uuid' ";
@@ -884,25 +947,25 @@ function seedprod_lite_v2_export_landing_pages() {
 	}
 
 	$export_json = wp_json_encode( $export );
-	
+
 	// Check if JSON encoding failed
 	if ( false === $export_json ) {
 		$json_error = json_last_error_msg();
 		wp_send_json_error( __( 'Failed to encode export data. The page data may be too large or contain invalid characters.', 'coming-soon' ) . ' Error: ' . $json_error );
 	}
-	
+
 	$files_to_download = array();
 
 	global $wp_filesystem;
 	$upload_dir = wp_upload_dir();
-	$path = trailingslashit( $upload_dir['basedir'] ) . 'seedprod-themes-exports/';
-	$targetdir = $path;
+	$path       = trailingslashit( $upload_dir['basedir'] ) . 'seedprod-themes-exports/';
+	$targetdir  = $path;
 
 	// Setup export directory
 	if ( is_dir( $targetdir ) ) {
 		seedprod_lite_v2_recursive_rmdir( $targetdir );
 	}
-	
+
 	// Create directory if it doesn't exist
 	if ( ! is_dir( $targetdir ) ) {
 		if ( ! mkdir( $targetdir, 0755, true ) ) {
@@ -912,14 +975,14 @@ function seedprod_lite_v2_export_landing_pages() {
 
 	// Save images locally
 	$all_failed_images = array();
-	
+
 	// Process images
 	try {
 		foreach ( $processed_data as $k1 => $v1 ) {
 			// Check if images key exists and has items
 			if ( isset( $processed_data[ $k1 ]['images'] ) && is_array( $processed_data[ $k1 ]['images'] ) && count( $processed_data[ $k1 ]['images'] ) > 0 ) {
 				$failed_images = seedprod_lite_v2_save_images_locally( $processed_data[ $k1 ]['images'] );
-				
+
 				if ( is_array( $failed_images ) ) {
 					$all_failed_images = array_merge( $all_failed_images, $failed_images );
 				}
@@ -931,7 +994,7 @@ function seedprod_lite_v2_export_landing_pages() {
 					if ( ! isset( $image['filename'] ) ) {
 						continue;
 					}
-					
+
 					$image_path = trailingslashit( $upload_dir['basedir'] ) . 'seedprod-themes-exports/' . $image['filename'];
 
 					if ( file_exists( $image_path ) ) {
@@ -940,7 +1003,6 @@ function seedprod_lite_v2_export_landing_pages() {
 				}
 			}
 		}
-		
 	} catch ( Exception $e ) {
 		wp_send_json_error( sprintf( __( 'Export failed during image processing: %s', 'coming-soon' ), $e->getMessage() ) );
 	}
@@ -948,7 +1010,7 @@ function seedprod_lite_v2_export_landing_pages() {
 	// Create zip and return download URL
 	try {
 		$zip_result = seedprod_lite_v2_prepare_zip( $files_to_download, $export_json, 'page' );
-		
+
 		if ( $zip_result && isset( $zip_result['download_url'] ) ) {
 			wp_send_json_success( $zip_result );
 		} else {

@@ -1,7 +1,7 @@
 <?php
 /**
  * Growth Tool promotional page template
- * 
+ *
  * This template displays promotional content for partner plugins.
  * It expects a $growth_tool_config array to be set with the following keys:
  * - partner_name: Name of the partner (e.g., 'OptinMonster', 'WPCode')
@@ -14,7 +14,7 @@
  * - image: Image filename in growth-tools folder
  * - plugin_slug: Full plugin path (e.g., 'optinmonster/optin-monster-wp-api.php')
  * - plugin_id: Plugin ID for installation (e.g., 'optinmonster')
- * 
+ *
  * @package SeedProd
  */
 
@@ -23,40 +23,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Ensure config is set
+// Ensure config is set.
 if ( ! isset( $growth_tool_config ) ) {
 	return;
 }
 
-// Extract config for easier use
+// Extract config for easier use.
 $config = $growth_tool_config;
 
-// Get plugin status
+// Get plugin status.
 $is_installed = false;
-$is_active = false;
-$status_code = 0; // 0 = not installed, 1 = active, 2 = inactive
+$is_active    = false;
+$status_code  = 0; // 0 = not installed, 1 = active, 2 = inactive
 
 if ( file_exists( WP_PLUGIN_DIR . '/' . $config['plugin_slug'] ) ) {
 	$is_installed = true;
 	if ( is_plugin_active( $config['plugin_slug'] ) ) {
-		$is_active = true;
+		$is_active   = true;
 		$status_code = 1;
 	} else {
 		$status_code = 2;
 	}
 }
 
-// Set button text and class based on status
-$button_text = sprintf( __( 'Install %s Now', 'coming-soon' ), $config['partner_name'] );
+// Set button text and class based on status.
+/* translators: %s: Partner name (e.g., OptinMonster, WPCode) */
+$button_text  = sprintf( __( 'Install %s Now', 'coming-soon' ), $config['partner_name'] );
 $button_class = 'button button-primary seedprod-button-primary seedprod-plugin-button';
 
-if ( $status_code === 2 ) {
-	// Installed but not active
-	$button_text = sprintf( __( 'Activate %s', 'coming-soon' ), $config['partner_name'] );
+if ( 2 === $status_code ) {
+	// Installed but not active.
+	/* translators: %s: Partner name (e.g., OptinMonster, WPCode) */
+	$button_text  = sprintf( __( 'Activate %s', 'coming-soon' ), $config['partner_name'] );
 	$button_class = 'button button-primary seedprod-button-primary seedprod-plugin-button';
-} elseif ( $status_code === 1 ) {
-	// Active - show deactivate
-	$button_text = __( 'Deactivate', 'coming-soon' );
+} elseif ( 1 === $status_code ) {
+	// Active - show deactivate.
+	$button_text  = __( 'Deactivate', 'coming-soon' );
 	$button_class = 'button seedprod-button-secondary seedprod-plugin-button';
 }
 ?>
@@ -91,8 +93,8 @@ if ( $status_code === 2 ) {
 
 			<!-- Hero Image Section -->
 			<div class="seedprod-growth-hero">
-				<img src="<?php echo esc_url( plugin_dir_url( dirname( __FILE__ ) ) . 'images/growth-tools/' . $config['image'] ); ?>" 
-					 alt="<?php echo esc_attr( $config['partner_name'] ); ?>">
+				<img src="<?php echo esc_url( plugin_dir_url( __DIR__ ) . 'images/growth-tools/' . $config['image'] ); ?>" 
+					alt="<?php echo esc_attr( $config['partner_name'] ); ?>">
 			</div>
 
 			<!-- Benefit Points Section -->

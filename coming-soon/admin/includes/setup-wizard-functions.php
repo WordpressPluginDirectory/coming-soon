@@ -29,7 +29,7 @@ function seedprod_lite_v2_complete_setup_wizard() {
 
 		$wizard_id = isset( $_POST['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_POST['wizard_id'] ) ) : null;
 
-		// Get the wizard data with id and token
+		// Get the wizard data with id and token.
 		$site_token = get_option( 'seedprod_token' );
 
 		$data = array(
@@ -58,9 +58,9 @@ function seedprod_lite_v2_complete_setup_wizard() {
 
 		$status_code = wp_remote_retrieve_response_code( $response );
 
-		// Handle errors
+		// Handle errors.
 		if ( is_wp_error( $response ) ) {
-			// Load utility functions for get_ip if needed
+			// Load utility functions for get_ip if needed.
 			if ( ! function_exists( 'seedprod_lite_v2_get_ip' ) ) {
 				require_once plugin_dir_path( __FILE__ ) . 'utility-functions.php';
 			}
@@ -73,7 +73,7 @@ function seedprod_lite_v2_complete_setup_wizard() {
 		}
 
 		if ( 200 !== $status_code ) {
-			// Load utility functions for get_ip if needed
+			// Load utility functions for get_ip if needed.
 			if ( ! function_exists( 'seedprod_lite_v2_get_ip' ) ) {
 				require_once plugin_dir_path( __FILE__ ) . 'utility-functions.php';
 			}
@@ -91,26 +91,26 @@ function seedprod_lite_v2_complete_setup_wizard() {
 			$body = json_decode( $body );
 		}
 
-		// Store the wizard id and data locally
+		// Store the wizard id and data locally.
 		$onboarding = $body->onboarding;
 
-		// Store the wizard verify plugins
+		// Store the wizard verify plugins.
 		update_option( 'seedprod_verify_wizard_options', $onboarding->options );
 
-		// Mark wizard as completed/dismissed so it won't show again
+		// Mark wizard as completed/dismissed so it won't show again.
 		update_option( 'seedprod_dismiss_setup_wizard', 1 );
 
-		// Set tracking if they have opted in
+		// Set tracking if they have opted in.
 		if ( ! empty( $onboarding->allow_usagetracking ) ) {
 			update_option( 'seedprod_allow_usage_tracking', true );
 		}
 
-		// Free templates
+		// Free templates.
 		if ( ! empty( $onboarding->email ) ) {
 			update_option( 'seedprod_free_templates_subscribed', true );
 		}
 
-		// Get template type that was setup in the onboarding
+		// Get template type that was setup in the onboarding.
 		$type = 'lp';
 		if ( ! empty( $onboarding->sp_type ) ) {
 			$type = $onboarding->sp_type;
@@ -118,12 +118,12 @@ function seedprod_lite_v2_complete_setup_wizard() {
 
 		$id = null;
 
-		// Create a landing page/coming soon/maintenance/404/login page
-		if ( $type == 'lp' || $type == 'cs' || $type == 'mm' || $type == 'p404' || $type == 'loginp' ) {
+		// Create a landing page/coming soon/maintenance/404/login page.
+		if ( 'lp' === $type || 'cs' === $type || 'mm' === $type || 'p404' === $type || 'loginp' === $type ) {
 
-			// Install template
+			// Install template.
 			$cpt = 'page';
-			// SeedProd CPT types
+			// SeedProd CPT types.
 			$cpt_types = array(
 				'cs',
 				'mm',
@@ -135,50 +135,50 @@ function seedprod_lite_v2_complete_setup_wizard() {
 				'page',
 			);
 
-			if ( in_array( $type, $cpt_types ) ) {
+			if ( in_array( $type, $cpt_types, true ) ) {
 				$cpt = 'seedprod';
 			}
 
-			// Base page settings
+			// Base page settings.
 			require_once SEEDPROD_PLUGIN_PATH . 'resources/data-templates/basic-page.php';
 			$basic_settings              = json_decode( $seedprod_basic_lpage, true );
 			$basic_settings['is_new']    = true;
 			$basic_settings['page_type'] = $type;
 
-			// Set slug based on type
+			// Set slug based on type.
 			$slug       = '';
 			$lpage_name = '';
 
-			if ( 'cs' == $type ) {
+			if ( 'cs' === $type ) {
 				$slug                               = 'sp-cs';
 				$lpage_name                         = $slug;
 				$basic_settings['no_conflict_mode'] = true;
 			}
-			if ( 'mm' == $type ) {
+			if ( 'mm' === $type ) {
 				$slug                               = 'sp-mm';
 				$lpage_name                         = $slug;
 				$basic_settings['no_conflict_mode'] = true;
 			}
-			if ( 'p404' == $type ) {
+			if ( 'p404' === $type ) {
 				$slug                               = 'sp-p404';
 				$lpage_name                         = $slug;
 				$basic_settings['no_conflict_mode'] = true;
 			}
-			if ( 'loginp' == $type ) {
+			if ( 'loginp' === $type ) {
 				$slug                               = 'sp-login';
 				$lpage_name                         = $slug;
 				$basic_settings['no_conflict_mode'] = true;
 			}
 
-			// Insert page code
+			// Insert page code.
 			$code = '';
 			if ( ! empty( $onboarding->code ) ) {
-				$code = base64_decode( $onboarding->code );
+				$code = base64_decode( $onboarding->code ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- Used for decoding template data, not obfuscation.
 			}
 
 			$code = json_decode( $code, true );
 
-			// Merge in code
+			// Merge in code.
 			if ( ! empty( $slug ) ) {
 				$basic_settings['post_title'] = $slug;
 				$basic_settings['post_name']  = $slug;
@@ -187,7 +187,7 @@ function seedprod_lite_v2_complete_setup_wizard() {
 			$basic_settings['template_id'] = intval( $onboarding->template_id );
 
 			$new_settings = $basic_settings;
-			if ( 99999 != $onboarding->template_id ) {
+			if ( 99999 !== $onboarding->template_id ) {
 				unset( $basic_settings['document'] );
 				if ( is_array( $code ) ) {
 					$new_settings = $basic_settings + $code;
@@ -215,7 +215,7 @@ function seedprod_lite_v2_complete_setup_wizard() {
 				true
 			);
 
-			// Reinsert settings because wp_insert screws up json (following old working logic)
+			// Reinsert settings because wp_insert screws up json (following old working logic).
 			if ( ! is_wp_error( $id ) && ! empty( $encoded_settings ) ) {
 				global $wpdb;
 				$tablename = $wpdb->prefix . 'posts';
@@ -224,22 +224,22 @@ function seedprod_lite_v2_complete_setup_wizard() {
 				$wpdb->query( $safe_sql );
 			}
 
-			// Update pointer - record page IDs for each type
-			if ( 'cs' == $type ) {
+			// Update pointer - record page IDs for each type.
+			if ( 'cs' === $type ) {
 				update_option( 'seedprod_coming_soon_page_id', $id );
 			}
-			if ( 'mm' == $type ) {
+			if ( 'mm' === $type ) {
 				update_option( 'seedprod_maintenance_mode_page_id', $id );
 			}
-			if ( 'p404' == $type ) {
+			if ( 'p404' === $type ) {
 				update_option( 'seedprod_404_page_id', $id );
 			}
-			if ( 'loginp' == $type ) {
+			if ( 'loginp' === $type ) {
 				update_option( 'seedprod_login_page_id', $id );
 			}
 
-			// If landing page set a temp name
-			if ( 'lp' == $type ) {
+			// If landing page set a temp name.
+			if ( 'lp' === $type ) {
 				if ( is_numeric( $id ) ) {
 					$lpage_name = esc_html__( 'New Page', 'coming-soon' ) . " (ID #$id)";
 				} else {
@@ -255,46 +255,46 @@ function seedprod_lite_v2_complete_setup_wizard() {
 			);
 		}
 
-		// Install theme if theme is the type
-		if ( $type == 'websitebuilder' || $type == 'woocommerce' ) {
+		// Install theme if theme is the type.
+		if ( 'websitebuilder' === $type || 'woocommerce' === $type ) {
 			$template_id = $onboarding->template_id;
 
-			// Call theme import function if it exists
+			// Call theme import function if it exists.
 			if ( function_exists( 'seedprod_lite_theme_import' ) ) {
 				seedprod_lite_theme_import( $template_id );
 			}
 		}
 
-		// Filter out already installed plugins
+		// Filter out already installed plugins.
 		$filtered_options = array();
 		if ( ! empty( $onboarding->options ) ) {
 			$options_array = json_decode( $onboarding->options, true );
 			if ( is_array( $options_array ) ) {
 				$all_plugins = get_plugins();
-				
-				// Check each recommended plugin
+
+				// Check each recommended plugin.
 				foreach ( $options_array as $plugin_key ) {
 					$needs_install = false;
-					
+
 					switch ( $plugin_key ) {
 						case 'rafflepress':
-							if ( ! isset( $all_plugins['rafflepress/rafflepress.php'] ) && 
-								 ! isset( $all_plugins['rafflepress-pro/rafflepress-pro.php'] ) ) {
+							if ( ! isset( $all_plugins['rafflepress/rafflepress.php'] ) &&
+								! isset( $all_plugins['rafflepress-pro/rafflepress-pro.php'] ) ) {
 								$needs_install = true;
 							}
 							break;
 						case 'allinoneseo':
-							if ( ! isset( $all_plugins['all-in-one-seo-pack/all_in_one_seo_pack.php'] ) && 
-								 ! isset( $all_plugins['all-in-one-seo-pack-pro/all_in_one_seo_pack.php'] ) &&
-								 ! isset( $all_plugins['seo-by-rank-math/rank-math.php'] ) &&
-								 ! isset( $all_plugins['wordpress-seo/wp-seo.php'] ) &&
-								 ! isset( $all_plugins['wordpress-seo-premium/wp-seo-premium.php'] ) ) {
+							if ( ! isset( $all_plugins['all-in-one-seo-pack/all_in_one_seo_pack.php'] ) &&
+								! isset( $all_plugins['all-in-one-seo-pack-pro/all_in_one_seo_pack.php'] ) &&
+								! isset( $all_plugins['seo-by-rank-math/rank-math.php'] ) &&
+								! isset( $all_plugins['wordpress-seo/wp-seo.php'] ) &&
+								! isset( $all_plugins['wordpress-seo-premium/wp-seo-premium.php'] ) ) {
 								$needs_install = true;
 							}
 							break;
 						case 'wpforms':
-							if ( ! isset( $all_plugins['wpforms-lite/wpforms.php'] ) && 
-								 ! isset( $all_plugins['wpforms/wpforms.php'] ) ) {
+							if ( ! isset( $all_plugins['wpforms-lite/wpforms.php'] ) &&
+								! isset( $all_plugins['wpforms/wpforms.php'] ) ) {
 								$needs_install = true;
 							}
 							break;
@@ -305,13 +305,13 @@ function seedprod_lite_v2_complete_setup_wizard() {
 							break;
 						case 'ga':
 						case 'monsterinsights':
-							if ( ! isset( $all_plugins['google-analytics-for-wordpress/googleanalytics.php'] ) && 
-								 ! isset( $all_plugins['google-analytics-premium/googleanalytics-premium.php'] ) ) {
+							if ( ! isset( $all_plugins['google-analytics-for-wordpress/googleanalytics.php'] ) &&
+								! isset( $all_plugins['google-analytics-premium/googleanalytics-premium.php'] ) ) {
 								$needs_install = true;
 							}
 							break;
 					}
-					
+
 					if ( $needs_install ) {
 						$filtered_options[] = $plugin_key;
 					}
@@ -319,12 +319,12 @@ function seedprod_lite_v2_complete_setup_wizard() {
 			}
 		}
 
-		// Return response
+		// Return response.
 		$response = array(
 			'status'  => 'true',
 			'type'    => $type,
 			'id'      => $id,
-			'options' => $filtered_options,  // Return filtered array, not JSON string
+			'options' => $filtered_options,  // Return filtered array, not JSON string.
 		);
 
 		wp_send_json_success( $response );
@@ -346,34 +346,34 @@ function seedprod_lite_v2_install_addon_setup() {
 		wp_send_json_error();
 	}
 
-	// Plugin mapping
+	// Plugin mapping.
 	$paths_map = array(
-		'rafflepress'   => array(
+		'rafflepress'  => array(
 			'slug' => 'rafflepress/rafflepress.php',
-			'url' => 'https://downloads.wordpress.org/plugin/rafflepress.zip',
+			'url'  => 'https://downloads.wordpress.org/plugin/rafflepress.zip',
 		),
-		'allinoneseo'   => array(
+		'allinoneseo'  => array(
 			'slug' => 'all-in-one-seo-pack/all_in_one_seo_pack.php',
-			'url' => 'https://downloads.wordpress.org/plugin/all-in-one-seo-pack.zip',
+			'url'  => 'https://downloads.wordpress.org/plugin/all-in-one-seo-pack.zip',
 		),
-		'ga'            => array(
+		'ga'           => array(
 			'slug' => 'google-analytics-for-wordpress/googleanalytics.php',
-			'url' => 'https://downloads.wordpress.org/plugin/google-analytics-for-wordpress.zip',
+			'url'  => 'https://downloads.wordpress.org/plugin/google-analytics-for-wordpress.zip',
 		),
-		'wpforms'       => array(
+		'wpforms'      => array(
 			'slug' => 'wpforms-lite/wpforms.php',
-			'url' => 'https://downloads.wordpress.org/plugin/wpforms-lite.zip',
+			'url'  => 'https://downloads.wordpress.org/plugin/wpforms-lite.zip',
 		),
-		'optinmonster'  => array(
+		'optinmonster' => array(
 			'slug' => 'optinmonster/optin-monster-wp-api.php',
-			'url' => 'https://downloads.wordpress.org/plugin/optinmonster.zip',
+			'url'  => 'https://downloads.wordpress.org/plugin/optinmonster.zip',
 		),
 	);
 
 	$options = get_option( 'seedprod_verify_wizard_options' );
 	$options = json_decode( $options );
 
-	// This allows us to do one at a time
+	// This allows us to do one at a time.
 	if ( isset( $_POST['plugin'] ) ) {
 		$plugin  = sanitize_text_field( wp_unslash( $_POST['plugin'] ) );
 		$options = array( $plugin );
@@ -382,8 +382,8 @@ function seedprod_lite_v2_install_addon_setup() {
 	$install_plugins = array();
 	$all_plugins     = get_plugins();
 
-	// Purge options to make sure we don't install plugins with conflicts
-	if ( in_array( 'allinoneseo', $options ) ) {
+	// Purge options to make sure we don't install plugins with conflicts.
+	if ( in_array( 'allinoneseo', $options, true ) ) {
 		if (
 			isset( $all_plugins['all-in-one-seo-pack/all_in_one_seo_pack.php'] ) ||
 			isset( $all_plugins['all-in-one-seo-pack-pro/all_in_one_seo_pack.php'] ) ||
@@ -392,46 +392,50 @@ function seedprod_lite_v2_install_addon_setup() {
 			isset( $all_plugins['wordpress-seo-premium/wp-seo-premium.php'] ) ||
 			isset( $all_plugins['autodescription/autodescription.php'] )
 		) {
-			if ( ( $key = array_search( 'allinoneseo', $options ) ) !== false ) {
+			$key = array_search( 'allinoneseo', $options, true );
+			if ( false !== $key ) {
 				unset( $options[ $key ] );
 			}
 		}
 	}
 
-	if ( in_array( 'rafflepress', $options ) ) {
+	if ( in_array( 'rafflepress', $options, true ) ) {
 		if (
 			isset( $all_plugins['rafflepress/rafflepress.php'] ) ||
 			isset( $all_plugins['rafflepress-pro/rafflepress-pro.php'] )
 		) {
-			if ( ( $key = array_search( 'rafflepress', $options ) ) !== false ) {
+			$key = array_search( 'rafflepress', $options, true );
+			if ( false !== $key ) {
 				unset( $options[ $key ] );
 			}
 		}
 	}
 
-	if ( in_array( 'wpforms', $options ) ) {
+	if ( in_array( 'wpforms', $options, true ) ) {
 		if (
 			isset( $all_plugins['wpforms-lite/wpforms.php'] ) ||
 			isset( $all_plugins['wpforms/wpforms.php'] )
 		) {
-			if ( ( $key = array_search( 'wpforms', $options ) ) !== false ) {
+			$key = array_search( 'wpforms', $options, true );
+			if ( false !== $key ) {
 				unset( $options[ $key ] );
 			}
 		}
 	}
 
-	if ( in_array( 'monsterinsights', $options ) ) {
+	if ( in_array( 'monsterinsights', $options, true ) ) {
 		if (
 			isset( $all_plugins['google-analytics-for-wordpress/googleanalytics.php'] ) ||
 			isset( $all_plugins['google-analytics-premium/googleanalytics-premium.php'] )
 		) {
-			if ( ( $key = array_search( 'monsterinsights', $options ) ) !== false ) {
+			$key = array_search( 'monsterinsights', $options, true );
+			if ( false !== $key ) {
 				unset( $options[ $key ] );
 			}
 		}
 	}
 
-	// Install plugins
+	// Install plugins.
 	if ( ! empty( $options ) ) {
 		foreach ( $options as $p ) {
 			if ( ! empty( $paths_map[ $p ] ) ) {
@@ -470,7 +474,7 @@ function seedprod_lite_v2_install_addon_setup() {
 				// We do not need any extra credentials if we have gotten this far, so let's install the plugin.
 				require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
-				// Check for skin files
+				// Check for skin files.
 				global $wp_version;
 				if ( version_compare( $wp_version, '5.3.0' ) >= 0 ) {
 					$skin_file = plugin_dir_path( __DIR__ ) . 'includes/skin53.php';
@@ -498,7 +502,7 @@ function seedprod_lite_v2_install_addon_setup() {
 		}
 	}
 
-	// Activate plugins
+	// Activate plugins.
 	foreach ( $install_plugins as $ip ) {
 		activate_plugin( $ip, '', false, true );
 	}
@@ -512,15 +516,15 @@ function seedprod_lite_v2_install_addon_setup() {
  * Called when user clicks "Exit Setup" on welcome page
  */
 function seedprod_lite_v2_dismiss_setup_wizard() {
-	// Verify nonce
+	// Verify nonce.
 	check_ajax_referer( 'seedprod_v2_nonce' );
 
-	// Check capabilities
+	// Check capabilities.
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_send_json_error( 'Insufficient permissions' );
 	}
 
-	// Set the dismiss option
+	// Set the dismiss option.
 	update_option( 'seedprod_dismiss_setup_wizard', 1 );
 
 	wp_send_json_success();

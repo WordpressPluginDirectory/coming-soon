@@ -8,31 +8,31 @@
  * @package SeedProd_Lite
  */
 
-// Exit if accessed directly
+// Exit if accessed directly.
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-// Get active tab
-$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'all-templates';
+// Get active tab.
+$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'all-templates'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only parameter for tab display.
 ?>
 
 <div class="seedprod-dashboard-page seedprod-theme-kits-selection-page">
 	<?php
-	// Include header with page title
+	// Include header with page title.
 	$page_title = __( 'Choose a Website Theme Kit', 'coming-soon' );
 	require_once plugin_dir_path( __FILE__ ) . 'seedprod-admin-header.php';
 	?>
-	
+
 	<div class="seedprod-dashboard-container">
 		<!-- WordPress Native Tabs -->
 		<nav class="nav-tab-wrapper">
-			<a href="?page=seedprod_lite_theme_kits_selection&tab=all-templates" 
-				class="nav-tab <?php echo $active_tab === 'all-templates' ? 'nav-tab-active' : ''; ?>">
+			<a href="?page=seedprod_lite_theme_kits_selection&tab=all-templates"
+				class="nav-tab <?php echo 'all-templates' === $active_tab ? 'nav-tab-active' : ''; ?>">
 				<?php esc_html_e( 'All Themes', 'coming-soon' ); ?>
 			</a>
-			<a href="?page=seedprod_lite_theme_kits_selection&tab=favorite-templates" 
-				class="nav-tab <?php echo $active_tab === 'favorite-templates' ? 'nav-tab-active' : ''; ?>">
+			<a href="?page=seedprod_lite_theme_kits_selection&tab=favorite-templates"
+				class="nav-tab <?php echo 'favorite-templates' === $active_tab ? 'nav-tab-active' : ''; ?>">
 				<?php esc_html_e( 'Favorite Themes', 'coming-soon' ); ?>
 			</a>
 		</nav>
@@ -208,10 +208,10 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
 <script>
 // Store theme kits data
 var seedprodThemeKitsData = {
-	activeTab: <?php echo json_encode( $active_tab ); ?>,
-	ajaxUrl: <?php echo json_encode( admin_url( 'admin-ajax.php' ) ); ?>,
-	nonce: <?php echo json_encode( wp_create_nonce( 'seedprod_v2_nonce' ) ); ?>,
-	apiUrl: <?php echo json_encode( SEEDPROD_API_URL ); ?>,
+	activeTab: <?php echo wp_json_encode( $active_tab ); ?>,
+	ajaxUrl: <?php echo wp_json_encode( admin_url( 'admin-ajax.php' ) ); ?>,
+	nonce: <?php echo wp_json_encode( wp_create_nonce( 'seedprod_v2_nonce' ) ); ?>,
+	apiUrl: <?php echo wp_json_encode( SEEDPROD_API_URL ); ?>,
 	currentPage: 1,
 	totalPages: 1,
 	currentFilter: 'all',
@@ -222,7 +222,7 @@ var seedprodThemeKitsData = {
 // Add missing strings for JavaScript
 var seedprod_admin = window.seedprod_admin || {};
 seedprod_admin.strings = seedprod_admin.strings || {};
-seedprod_admin.strings.loading_templates = <?php echo json_encode( __( 'Loading theme kits...', 'coming-soon' ) ); ?>;
-seedprod_admin.strings.no_templates_found = <?php echo json_encode( __( 'No theme kits found.', 'coming-soon' ) ); ?>;
-seedprod_admin.strings.error_loading_templates = <?php echo json_encode( __( 'Error loading theme kits. Please try again.', 'coming-soon' ) ); ?>;
+seedprod_admin.strings.loading_templates = <?php echo wp_json_encode( __( 'Loading theme kits...', 'coming-soon' ) ); ?>;
+seedprod_admin.strings.no_templates_found = <?php echo wp_json_encode( __( 'No theme kits found.', 'coming-soon' ) ); ?>;
+seedprod_admin.strings.error_loading_templates = <?php echo wp_json_encode( __( 'Error loading theme kits. Please try again.', 'coming-soon' ) ); ?>;
 </script>

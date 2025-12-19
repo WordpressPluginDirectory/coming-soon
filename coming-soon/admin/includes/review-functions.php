@@ -9,7 +9,7 @@
  * @since      7.0.0
  */
 
-// Exit if accessed directly
+// Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -20,21 +20,21 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 7.0.0
  */
 function seedprod_lite_v2_init_review_request() {
-	// Temporarily disabled - will be converted to trigger-based system
+	// Temporarily disabled - will be converted to trigger-based system.
 	return;
 
-	// Only show for Lite builds
+	// Only show for Lite builds.
 	if ( 'lite' !== SEEDPROD_BUILD ) {
 		return;
 	}
 
-	// Enqueue review notice JavaScript
+	// Enqueue review notice JavaScript.
 	add_action( 'admin_enqueue_scripts', 'seedprod_lite_v2_enqueue_review_scripts' );
 
-	// Admin notice requesting review
+	// Admin notice requesting review.
 	add_action( 'admin_notices', 'seedprod_lite_v2_review_request' );
 
-	// AJAX handler for dismissing review
+	// AJAX handler for dismissing review.
 	add_action( 'wp_ajax_seedprod_v2_review_dismiss', 'seedprod_lite_v2_review_dismiss' );
 }
 add_action( 'admin_init', 'seedprod_lite_v2_init_review_request' );
@@ -47,27 +47,27 @@ add_action( 'admin_init', 'seedprod_lite_v2_init_review_request' );
  * @since 7.0.0
  */
 function seedprod_lite_v2_enqueue_review_scripts() {
-	// Only enqueue for super admins (same check as review display)
+	// Only enqueue for super admins (same check as review display).
 	if ( ! is_super_admin() ) {
 		return;
 	}
 
-	// Don't load on SeedProd pages (review notice doesn't show there)
+	// Don't load on SeedProd pages (review notice doesn't show there).
 	$screen = get_current_screen();
-	if ( $screen && strpos( $screen->id, 'seedprod' ) !== false ) {
+	if ( $screen && false !== strpos( $screen->id, 'seedprod' ) ) {
 		return;
 	}
 
-	// Enqueue the review notice handler
+	// Enqueue the review notice handler.
 	wp_enqueue_script(
 		'seedprod-review-notice',
-		plugin_dir_url( dirname( __FILE__ ) ) . 'js/review-notice.js',
+		plugin_dir_url( __DIR__ ) . 'js/review-notice.js',
 		array( 'jquery' ),
 		SEEDPROD_VERSION,
 		true
 	);
 
-	// Localize script with nonce for AJAX security
+	// Localize script with nonce for AJAX security.
 	wp_localize_script(
 		'seedprod-review-notice',
 		'seedprodReviewNotice',
@@ -83,23 +83,23 @@ function seedprod_lite_v2_enqueue_review_scripts() {
  * @since 7.0.0
  */
 function seedprod_lite_v2_review_request() {
-	// Only consider showing the review request to admin users
+	// Only consider showing the review request to admin users.
 	if ( ! is_super_admin() ) {
 		return;
 	}
 
-	// Don't show on SeedProd pages - too intrusive
+	// Don't show on SeedProd pages - too intrusive.
 	$screen = get_current_screen();
-	if ( $screen && strpos( $screen->id, 'seedprod' ) !== false ) {
+	if ( $screen && false !== strpos( $screen->id, 'seedprod' ) ) {
 		return;
 	}
 
-	// If the user has opted out of product announcement notifications
+	// If the user has opted out of product announcement notifications.
 	if ( get_option( 'seedprod_hide_review' ) ) {
 		return;
 	}
 
-	// Verify that we can do a check for reviews
+	// Verify that we can do a check for reviews.
 	$review = get_option( 'seedprod_review' );
 	$time   = time();
 	$load   = false;
@@ -110,35 +110,33 @@ function seedprod_lite_v2_review_request() {
 			'dismissed' => false,
 		);
 		update_option( 'seedprod_review', $review );
-	} else {
-		// Check if it has been dismissed or not (show after 1 day)
-		if ( ( isset( $review['dismissed'] ) && ! $review['dismissed'] ) &&
-			 ( isset( $review['time'] ) && ( ( $review['time'] + DAY_IN_SECONDS ) <= $time ) ) ) {
-			$load = true;
-		}
+	} elseif ( ( isset( $review['dismissed'] ) && ! $review['dismissed'] ) &&
+		( isset( $review['time'] ) && ( ( $review['time'] + DAY_IN_SECONDS ) <= $time ) ) ) {
+		// Check if it has been dismissed or not (show after 1 day).
+		$load = true;
 	}
 
-	// If we cannot load, return early
+	// If we cannot load, return early.
 	if ( ! $load ) {
 		return;
 	}
 
-	// Check if plugin has been installed for at least 7 days
+	// Check if plugin has been installed for at least 7 days.
 	$activated = get_option( 'seedprod_over_time', array() );
 
 	if ( ! empty( $activated['installed_date'] ) ) {
-		// Only continue if plugin has been installed for at least 7 days
+		// Only continue if plugin has been installed for at least 7 days.
 		if ( ( $activated['installed_date'] + ( DAY_IN_SECONDS * 7 ) ) > time() ) {
 			return;
 		}
 
-		// Only if version greater than or equal to 6.0.8.5
+		// Only if version greater than or equal to 6.0.8.5.
 		if ( ! empty( $activated['installed_version'] ) &&
-			 version_compare( $activated['installed_version'], '6.0.8.5' ) < 0 ) {
+			version_compare( $activated['installed_version'], '6.0.8.5' ) < 0 ) {
 			return;
 		}
 	} else {
-		// First time tracking installation
+		// First time tracking installation.
 		$data = array(
 			'installed_version' => SEEDPROD_VERSION,
 			'installed_date'    => time(),
@@ -147,7 +145,7 @@ function seedprod_lite_v2_review_request() {
 		return;
 	}
 
-	// Display the review notice
+	// Display the review notice.
 	seedprod_lite_v2_display_review_notice();
 }
 
@@ -181,9 +179,9 @@ function seedprod_lite_v2_display_review_notice() {
 			<p><?php esc_html_e( 'We\'re sorry to hear you aren\'t enjoying SeedProd. We would love a chance to improve. Could you take a minute and let us know what we can do better?', 'coming-soon' ); ?></p>
 			<p>
 				<a href="<?php echo esc_url( $feedback_url ); ?>"
-				   class="button button-primary seedprod-dismiss-review-notice seedprod-review-out"
-				   target="_blank"
-				   rel="noopener noreferrer">
+					class="button button-primary seedprod-dismiss-review-notice seedprod-review-out"
+					target="_blank"
+					rel="noopener noreferrer">
 					<?php esc_html_e( 'Give Feedback', 'coming-soon' ); ?>
 				</a>
 				&nbsp;
@@ -198,9 +196,9 @@ function seedprod_lite_v2_display_review_notice() {
 			<p><strong><?php echo wp_kses( __( '~ John Turner<br>Co-Founder of SeedProd', 'coming-soon' ), array( 'br' => array() ) ); ?></strong></p>
 			<p>
 				<a href="https://wordpress.org/support/plugin/coming-soon/reviews/?filter=5#new-post"
-				   class="button button-primary seedprod-dismiss-review-notice seedprod-review-out"
-				   target="_blank"
-				   rel="noopener noreferrer">
+					class="button button-primary seedprod-dismiss-review-notice seedprod-review-out"
+					target="_blank"
+					rel="noopener noreferrer">
 					<?php esc_html_e( 'Ok, you deserve it', 'coming-soon' ); ?>
 				</a>
 				&nbsp;
@@ -223,23 +221,23 @@ function seedprod_lite_v2_display_review_notice() {
  * @since 7.0.0
  */
 function seedprod_lite_v2_review_dismiss() {
-	// Verify nonce for security
+	// Verify nonce for security.
 	check_ajax_referer( 'seedprod_review_dismiss', 'nonce' );
 
-	// Security check - verify user capability
+	// Security check - verify user capability.
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_die();
 	}
 
-	// Check if this is a permanent dismissal (sanitize input)
-	$permanent = isset( $_POST['permanent'] ) && sanitize_text_field( wp_unslash( $_POST['permanent'] ) ) === 'true';
+	// Check if this is a permanent dismissal (sanitize input).
+	$permanent = isset( $_POST['permanent'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['permanent'] ) );
 
 	if ( $permanent ) {
-		// User already reviewed - don't ask again
+		// User already reviewed - don't ask again.
 		update_option( 'seedprod_hide_review', true );
 	} else {
-		// Temporary dismissal - ask again later
-		$review = get_option( 'seedprod_review', array() );
+		// Temporary dismissal - ask again later.
+		$review              = get_option( 'seedprod_review', array() );
 		$review['time']      = time();
 		$review['dismissed'] = true;
 		update_option( 'seedprod_review', $review );

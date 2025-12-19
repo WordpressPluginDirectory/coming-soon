@@ -1,7 +1,7 @@
 <?php
 /**
  * Product Education page template
- * 
+ *
  * This template displays educational content for Pro features to Lite users.
  * It expects a $product_education_config array to be set with the following keys:
  * - feature_name: Name of the feature (e.g., 'Website Builder')
@@ -15,7 +15,7 @@
  * - testimonial: Optional testimonial array with 'text', 'author', 'company'
  * - cta_headline: Call-to-action headline
  * - feature_slug: Feature identifier for tracking
- * 
+ *
  * @package SeedProd
  */
 
@@ -24,30 +24,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Ensure config is set
+// Ensure config is set.
 if ( ! isset( $product_education_config ) ) {
 	return;
 }
 
-// Extract config for easier use
+// Extract config for easier use.
 $config = $product_education_config;
 
-// Get upgrade URL with proper tracking
-if ( isset( $config['use_exact_utm_medium'] ) && $config['use_exact_utm_medium'] === true ) {
-	// Use exact UTM medium without 'plugin' prefix for legacy tracking compatibility
-	$medium = isset( $config['cta_context'] ) ? $config['cta_context'] : 'product-education';
+// Get upgrade URL with proper tracking.
+if ( isset( $config['use_exact_utm_medium'] ) && true === $config['use_exact_utm_medium'] ) {
+	// Use exact UTM medium without 'plugin' prefix for legacy tracking compatibility.
+	$medium      = isset( $config['cta_context'] ) ? $config['cta_context'] : 'product-education';
 	$upgrade_url = seedprod_lite_get_external_link(
 		'https://www.seedprod.com/lite-upgrade/',
 		$medium,
 		'liteplugin'
 	);
-	// Add utm_content if feature_slug is set
+	// Add utm_content if feature_slug is set.
 	if ( ! empty( $config['feature_slug'] ) ) {
 		$upgrade_url = add_query_arg( 'utm_content', $config['feature_slug'], $upgrade_url );
 	}
 } else {
-	// Default: use the standard function which adds 'plugin' prefix
-	$context = isset( $config['cta_context'] ) ? $config['cta_context'] : 'product-education';
+	// Default: use the standard function which adds 'plugin' prefix.
+	$context     = isset( $config['cta_context'] ) ? $config['cta_context'] : 'product-education';
 	$upgrade_url = seedprod_lite_v2_get_upgrade_url( $config['feature_slug'], $context );
 }
 ?>
@@ -100,29 +100,27 @@ if ( isset( $config['use_exact_utm_medium'] ) && $config['use_exact_utm_medium']
 					<!-- CTA Button -->
 					<div class="seedprod-product-education-cta">
 						<a href="<?php echo esc_url( $upgrade_url ); ?>"
-						   target="_blank"
-						   rel="noopener"
-						   class="button button-hero seedprod-upgrade-button">
+							target="_blank"
+							rel="noopener"
+							class="button button-hero seedprod-upgrade-button">
 							<span class="dashicons dashicons-star-filled seedprod-upgrade-icon"></span>
 							<?php
-							// Use custom button text if provided, otherwise default to "Unlock [Feature]"
+							// Use custom button text if provided, otherwise default to "Unlock [Feature]".
 							if ( ! empty( $config['primary_button']['text'] ) ) {
 								$button_text = $config['primary_button']['text'];
 							} else {
-								$button_text = sprintf(
-									__( 'Unlock %s', 'coming-soon' ),
-									$config['feature_name']
-								);
+								/* translators: %s: Feature name (e.g., Website Builder, Login Page) */
+								$button_text = sprintf( __( 'Unlock %s', 'coming-soon' ), $config['feature_name'] );
 							}
 							echo esc_html( $button_text );
 							?>
 						</a>
 
-						<?php // Secondary button (optional) - for alternative actions like community support ?>
+						<?php // Secondary button (optional) - for alternative actions like community support. ?>
 						<?php if ( ! empty( $config['secondary_button'] ) ) : ?>
 							<a href="<?php echo esc_url( $config['secondary_button']['url'] ); ?>"
-							   <?php echo ! empty( $config['secondary_button']['new_tab'] ) ? 'target="_blank" rel="noopener"' : ''; ?>
-							   class="button button-hero seedprod-button-secondary seedprod-secondary-button">
+								<?php echo ! empty( $config['secondary_button']['new_tab'] ) ? 'target="_blank" rel="noopener"' : ''; ?>
+								class="button button-hero seedprod-button-secondary seedprod-secondary-button">
 								<?php if ( ! empty( $config['secondary_button']['icon'] ) ) : ?>
 									<span class="dashicons <?php echo esc_attr( $config['secondary_button']['icon'] ); ?>"></span>
 								<?php endif; ?>
@@ -152,9 +150,9 @@ if ( isset( $config['use_exact_utm_medium'] ) && $config['use_exact_utm_medium']
 						<?php if ( ! empty( $config['image_link'] ) ) : ?>
 							<a href="<?php echo esc_url( $config['image_link'] ); ?>" target="_blank" rel="noopener">
 						<?php endif; ?>
-						<img src="<?php echo esc_url( plugin_dir_url( dirname( __FILE__ ) ) . 'images/' . $config['image'] ); ?>"
-							 alt="<?php echo esc_attr( $config['feature_name'] ); ?>"
-							 class="seedprod-product-education-screenshot">
+						<img src="<?php echo esc_url( plugin_dir_url( __DIR__ ) . 'images/' . $config['image'] ); ?>"
+							alt="<?php echo esc_attr( $config['feature_name'] ); ?>"
+							class="seedprod-product-education-screenshot">
 						<?php if ( ! empty( $config['image_link'] ) ) : ?>
 							</a>
 							<div class="seedprod-template-link-wrapper" style="text-align: center; margin-top: 15px;">

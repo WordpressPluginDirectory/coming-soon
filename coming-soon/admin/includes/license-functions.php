@@ -36,14 +36,14 @@ function seedprod_lite_v2_save_api_key( $api_key = null ) {
 			$slug = SEEDPROD_SLUG;
 		}
 
-		// get token and generate one if one does not exist
+		// Get token and generate one if one does not exist.
 		$token = get_option( 'seedprod_token' );
 		if ( empty( $token ) ) {
 			$token = strtolower( wp_generate_password( 32, false, false ) );
 			update_option( 'seedprod_token', $token );
 		}
 
-		// Validate the api key
+		// Validate the api key.
 		$data = array(
 			'action'            => 'info',
 			'license_key'       => $api_key,
@@ -85,7 +85,7 @@ function seedprod_lite_v2_save_api_key( $api_key = null ) {
 		$status_code = wp_remote_retrieve_response_code( $response );
 
 		if ( is_wp_error( $response ) ) {
-			// Load utility functions for get_ip
+			// Load utility functions for get_ip.
 			if ( ! function_exists( 'seedprod_lite_v2_get_ip' ) ) {
 				require_once plugin_dir_path( __FILE__ ) . 'utility-functions.php';
 			}
@@ -98,7 +98,7 @@ function seedprod_lite_v2_save_api_key( $api_key = null ) {
 		}
 
 		if ( 200 !== $status_code ) {
-			// Load utility functions for get_ip
+			// Load utility functions for get_ip.
 			if ( ! function_exists( 'seedprod_lite_v2_get_ip' ) ) {
 				require_once plugin_dir_path( __FILE__ ) . 'utility-functions.php';
 			}
@@ -117,7 +117,7 @@ function seedprod_lite_v2_save_api_key( $api_key = null ) {
 		}
 
 		if ( ! empty( $body->valid ) && true === $body->valid ) {
-			// Store API key
+			// Store API key.
 			update_option( 'seedprod_user_id', $body->user_id );
 			update_option( 'seedprod_api_token', $body->api_token );
 			update_option( 'seedprod_api_key', $data['license_key'] );
@@ -134,7 +134,7 @@ function seedprod_lite_v2_save_api_key( $api_key = null ) {
 			);
 		} elseif ( isset( $body->valid ) && false === $body->valid ) {
 			$api_msg = __( 'Invalid License Key.', 'coming-soon' );
-			if ( 'Unauthenticated.' != $body->message ) {
+			if ( 'Unauthenticated.' !== $body->message ) {
 				$api_msg = $body->message;
 			}
 			update_option( 'seedprod_license_name', '' );
@@ -151,7 +151,7 @@ function seedprod_lite_v2_save_api_key( $api_key = null ) {
 			);
 		}
 
-		// Send Response
+		// Send Response.
 		if ( ! empty( $_POST['api_key'] ) ) {
 			wp_send_json( $response );
 			exit;
@@ -180,27 +180,27 @@ function seedprod_lite_v2_save_app_settings() {
 	if ( ! empty( $_POST['app_settings'] ) ) {
 		$app_settings = wp_unslash( $_POST['app_settings'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
-		// Get existing settings first
+		// Get existing settings first.
 		$existing_settings_json = get_option( 'seedprod_app_settings' );
 		$existing_settings      = ! empty( $existing_settings_json ) ? json_decode( $existing_settings_json, true ) : array();
 
-		// Merge with existing settings to preserve any settings not in this form
+		// Merge with existing settings to preserve any settings not in this form.
 		$new_app_settings = is_array( $existing_settings ) ? $existing_settings : array();
 
-		// Edit Button - properly handle boolean values from JavaScript
+		// Edit Button - properly handle boolean values from JavaScript.
 		$new_app_settings['disable_seedprod_button'] = isset( $app_settings['disable_seedprod_button'] ) &&
-			( $app_settings['disable_seedprod_button'] === true || $app_settings['disable_seedprod_button'] === 'true' || $app_settings['disable_seedprod_button'] === '1' || $app_settings['disable_seedprod_button'] === 1 );
+			( true === $app_settings['disable_seedprod_button'] || 'true' === $app_settings['disable_seedprod_button'] || '1' === $app_settings['disable_seedprod_button'] || 1 === $app_settings['disable_seedprod_button'] );
 
-		// Usage Tracking - properly handle boolean values from JavaScript
+		// Usage Tracking - properly handle boolean values from JavaScript.
 		$new_app_settings['enable_usage_tracking'] = isset( $app_settings['enable_usage_tracking'] ) &&
-			( $app_settings['enable_usage_tracking'] === true || $app_settings['enable_usage_tracking'] === 'true' || $app_settings['enable_usage_tracking'] === '1' || $app_settings['enable_usage_tracking'] === 1 );
+			( true === $app_settings['enable_usage_tracking'] || 'true' === $app_settings['enable_usage_tracking'] || '1' === $app_settings['enable_usage_tracking'] || 1 === $app_settings['enable_usage_tracking'] );
 		update_option( 'seedprod_allow_usage_tracking', $new_app_settings['enable_usage_tracking'] );
 
-		// Notifications - properly handle boolean values from JavaScript
+		// Notifications - properly handle boolean values from JavaScript.
 		$new_app_settings['disable_seedprod_notification'] = isset( $app_settings['disable_seedprod_notification'] ) &&
-			( $app_settings['disable_seedprod_notification'] === true || $app_settings['disable_seedprod_notification'] === 'true' || $app_settings['disable_seedprod_notification'] === '1' || $app_settings['disable_seedprod_notification'] === 1 );
+			( true === $app_settings['disable_seedprod_notification'] || 'true' === $app_settings['disable_seedprod_notification'] || '1' === $app_settings['disable_seedprod_notification'] || 1 === $app_settings['disable_seedprod_notification'] );
 
-		// API Keys (Pro only)
+		// API Keys (Pro only).
 		$is_lite_view = seedprod_lite_v2_is_lite_view();
 		if ( ! $is_lite_view ) {
 			$new_app_settings['facebook_g_app_id']     = isset( $app_settings['facebook_g_app_id'] ) ? sanitize_text_field( $app_settings['facebook_g_app_id'] ) : '';
@@ -208,7 +208,7 @@ function seedprod_lite_v2_save_app_settings() {
 			$new_app_settings['yelp_app_api_key']      = isset( $app_settings['yelp_app_api_key'] ) ? sanitize_text_field( $app_settings['yelp_app_api_key'] ) : '';
 		}
 
-		// Save settings
+		// Save settings.
 		$app_settings_json = wp_json_encode( $new_app_settings );
 		update_option( 'seedprod_app_settings', $app_settings_json );
 

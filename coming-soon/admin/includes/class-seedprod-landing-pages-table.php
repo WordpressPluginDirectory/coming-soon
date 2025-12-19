@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Load WP_List_Table if not loaded
+// Load WP_List_Table if not loaded.
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
@@ -28,7 +28,7 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 			array(
 				'singular' => __( 'Landing Page', 'coming-soon' ),
 				'plural'   => __( 'Landing Pages', 'coming-soon' ),
-				'ajax'     => false, // We'll implement AJAX manually for better control
+				'ajax'     => false, // We'll implement AJAX manually for better control.
 			)
 		);
 	}
@@ -61,6 +61,9 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 
 	/**
 	 * Get default column value
+	 *
+	 * @param array  $item        The current item.
+	 * @param string $column_name The column name.
 	 */
 	protected function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
@@ -77,6 +80,8 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 
 	/**
 	 * Checkbox column
+	 *
+	 * @param array $item The current item.
 	 */
 	protected function column_cb( $item ) {
 		return sprintf(
@@ -87,12 +92,14 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 
 	/**
 	 * Title column with row actions
+	 *
+	 * @param array $item The current item.
 	 */
 	protected function column_title( $item ) {
-		// Build row actions
+		// Build row actions.
 		$actions = array();
 
-		// Edit action
+		// Edit action.
 		$edit_url        = admin_url( 'admin.php?page=seedprod_lite_builder&id=' . $item['ID'] );
 		$actions['edit'] = sprintf(
 			'<a href="%s">%s</a>',
@@ -100,7 +107,7 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 			__( 'Edit', 'coming-soon' )
 		);
 
-		// Preview action
+		// Preview action.
 		$preview_url        = get_preview_post_link( $item['ID'] );
 		$actions['preview'] = sprintf(
 			'<a href="%s" target="_blank">%s</a>',
@@ -108,29 +115,29 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 			__( 'Preview', 'coming-soon' )
 		);
 
-		// Duplicate action
+		// Duplicate action.
 		$actions['duplicate'] = sprintf(
 			'<a href="#" class="seedprod-duplicate-page" data-id="%s">%s</a>',
 			$item['ID'],
 			__( 'Duplicate', 'coming-soon' )
 		);
 
-		// Trash action
-		if ( $item['post_status'] !== 'trash' ) {
+		// Trash action.
+		if ( 'trash' !== $item['post_status'] ) {
 			$actions['trash'] = sprintf(
 				'<a href="#" class="seedprod-trash-page" data-id="%s">%s</a>',
 				$item['ID'],
 				__( 'Trash', 'coming-soon' )
 			);
 		} else {
-			// Restore action for trashed items
+			// Restore action for trashed items.
 			$actions['restore'] = sprintf(
 				'<a href="#" class="seedprod-restore-page" data-id="%s">%s</a>',
 				$item['ID'],
 				__( 'Restore', 'coming-soon' )
 			);
 
-			// Delete permanently
+			// Delete permanently.
 			$actions['delete'] = sprintf(
 				'<a href="#" class="seedprod-delete-page" data-id="%s" style="color:#a00;">%s</a>',
 				$item['ID'],
@@ -138,7 +145,7 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 			);
 		}
 
-		// Return title with actions
+		// Return title with actions.
 		return sprintf(
 			'<strong><a href="%s">%s</a></strong>%s',
 			esc_url( $edit_url ),
@@ -149,10 +156,12 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 
 	/**
 	 * URL column
+	 *
+	 * @param array $item The current item.
 	 */
 	protected function column_url( $item ) {
-		// Use get_permalink() to respect permalink settings
-		// This will show pretty URLs when permalinks are enabled, or ?page_id= when they're not
+		// Use get_permalink() to respect permalink settings.
+		// This will show pretty URLs when permalinks are enabled, or ?page_id= when they're not.
 		$url = get_permalink( $item['ID'] );
 
 		return sprintf(
@@ -164,6 +173,8 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 
 	/**
 	 * Status column
+	 *
+	 * @param array $item The current item.
 	 */
 	protected function column_status( $item ) {
 		$status        = $item['post_status'];
@@ -186,6 +197,8 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 
 	/**
 	 * Date column
+	 *
+	 * @param array $item The current item.
 	 */
 	protected function column_date( $item ) {
 		$modified = $item['post_modified'];
@@ -198,6 +211,7 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 			$time_diff = time() - $time;
 
 			if ( $time_diff > 0 && $time_diff < DAY_IN_SECONDS ) {
+				/* translators: %s: Human-readable time difference */
 				$h_time = sprintf( __( '%s ago', 'coming-soon' ), human_time_diff( $time ) );
 			} else {
 				$h_time = mysql2date( __( 'F j, Y', 'coming-soon' ), $modified );
@@ -217,11 +231,11 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 	 */
 	public function get_bulk_actions() {
 		$actions = array(
-			'trash'  => __( 'Move to Trash', 'coming-soon' ),
+			'trash' => __( 'Move to Trash', 'coming-soon' ),
 		);
 
-		// If viewing trash, show different actions
-		if ( isset( $_REQUEST['post_status'] ) && 'trash' === $_REQUEST['post_status'] ) {
+		// If viewing trash, show different actions.
+		if ( isset( $_REQUEST['post_status'] ) && 'trash' === $_REQUEST['post_status'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$actions = array(
 				'restore' => __( 'Restore', 'coming-soon' ),
 				'delete'  => __( 'Delete Permanently', 'coming-soon' ),
@@ -236,13 +250,13 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 	 */
 	protected function get_views() {
 		$views   = array();
-		$current = ( ! empty( $_REQUEST['post_status'] ) ) ? sanitize_text_field( $_REQUEST['post_status'] ) : 'all';
+		$current = ( ! empty( $_REQUEST['post_status'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['post_status'] ) ) : 'all'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		// Get counts
+		// Get counts.
 		$counts = $this->get_post_counts();
 
-		// All link
-		$class        = ( $current === 'all' ) ? ' class="current"' : '';
+		// All link.
+		$class        = ( 'all' === $current ) ? ' class="current"' : '';
 		$views['all'] = sprintf(
 			'<a href="%s"%s>%s <span class="count">(%d)</span></a>',
 			esc_url( remove_query_arg( 'post_status' ) ),
@@ -251,9 +265,9 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 			$counts['all']
 		);
 
-		// Published
+		// Published.
 		if ( $counts['publish'] > 0 ) {
-			$class            = ( $current === 'publish' ) ? ' class="current"' : '';
+			$class            = ( 'publish' === $current ) ? ' class="current"' : '';
 			$views['publish'] = sprintf(
 				'<a href="%s"%s>%s <span class="count">(%d)</span></a>',
 				esc_url( add_query_arg( 'post_status', 'publish' ) ),
@@ -263,9 +277,9 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 			);
 		}
 
-		// Draft
+		// Draft.
 		if ( $counts['draft'] > 0 ) {
-			$class          = ( $current === 'draft' ) ? ' class="current"' : '';
+			$class          = ( 'draft' === $current ) ? ' class="current"' : '';
 			$views['draft'] = sprintf(
 				'<a href="%s"%s>%s <span class="count">(%d)</span></a>',
 				esc_url( add_query_arg( 'post_status', 'draft' ) ),
@@ -275,9 +289,9 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 			);
 		}
 
-		// Trash
+		// Trash.
 		if ( $counts['trash'] > 0 ) {
-			$class          = ( $current === 'trash' ) ? ' class="current"' : '';
+			$class          = ( 'trash' === $current ) ? ' class="current"' : '';
 			$views['trash'] = sprintf(
 				'<a href="%s"%s>%s <span class="count">(%d)</span></a>',
 				esc_url( add_query_arg( 'post_status', 'trash' ) ),
@@ -307,16 +321,16 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 				'trash'   => 0,
 			);
 
-			// Get special page IDs to exclude (Coming Soon, Maintenance, 404, Login)
+			// Get special page IDs to exclude (Coming Soon, Maintenance, 404, Login).
 			$csp_id    = get_option( 'seedprod_coming_soon_page_id' );
 			$mmp_id    = get_option( 'seedprod_maintenance_mode_page_id' );
 			$p404_id   = get_option( 'seedprod_404_page_id' );
 			$loginp_id = get_option( 'seedprod_login_page_id' );
 
-			// Build exclusion list (only include non-empty IDs)
+			// Build exclusion list (only include non-empty IDs).
 			$exclude_ids = array_filter( array( $csp_id, $mmp_id, $p404_id, $loginp_id ) );
 
-			// Build WHERE clause for exclusions
+			// Build query with dynamic exclusions.
 			$exclude_clause = '';
 			if ( ! empty( $exclude_ids ) ) {
 				$exclude_ids_string = implode( ',', array_map( 'absint', $exclude_ids ) );
@@ -342,13 +356,13 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 					$counts[ $status ] = $count;
 				}
 
-				// Add to all count (except trash)
+				// Add to all count (except trash).
 				if ( 'trash' !== $status ) {
 					$counts['all'] += $count;
 				}
 			}
 
-			wp_cache_set( $cache_key, $counts, '', 300 ); // Cache for 5 minutes
+			wp_cache_set( $cache_key, $counts, '', 300 ); // Cache for 5 minutes.
 		}
 
 		return $counts;
@@ -358,27 +372,27 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 	 * Prepare items for display
 	 */
 	public function prepare_items() {
-		// Set column headers
+		// Set column headers.
 		$columns               = $this->get_columns();
 		$hidden                = array();
 		$sortable              = $this->get_sortable_columns();
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		// Get data
+		// Get data.
 		$per_page     = $this->get_items_per_page( 'seedprod_landing_pages_per_page', 20 );
 		$current_page = $this->get_pagenum();
 		$offset       = ( $current_page - 1 ) * $per_page;
 
-		// Get special page IDs to exclude (Coming Soon, Maintenance, 404, Login)
+		// Get special page IDs to exclude (Coming Soon, Maintenance, 404, Login).
 		$csp_id    = get_option( 'seedprod_coming_soon_page_id' );
 		$mmp_id    = get_option( 'seedprod_maintenance_mode_page_id' );
 		$p404_id   = get_option( 'seedprod_404_page_id' );
 		$loginp_id = get_option( 'seedprod_login_page_id' );
 
-		// Build exclusion list (only include non-empty IDs)
+		// Build exclusion list (only include non-empty IDs).
 		$exclude_ids = array_filter( array( $csp_id, $mmp_id, $p404_id, $loginp_id ) );
 
-		// Build query args - All pages with _seedprod_page (landing pages only, excludes theme pages)
+		// Build query args - All pages with _seedprod_page (landing pages only, excludes theme pages).
 		$args = array(
 			'post_type'      => 'page',
 			'posts_per_page' => $per_page,
@@ -393,26 +407,26 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 			),
 		);
 
-		// Filter by status
-		if ( ! empty( $_REQUEST['post_status'] ) ) {
-			$status = sanitize_text_field( $_REQUEST['post_status'] );
+		// Filter by status.
+		if ( ! empty( $_REQUEST['post_status'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$status = sanitize_text_field( wp_unslash( $_REQUEST['post_status'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			if ( 'all' !== $status ) {
 				$args['post_status'] = $status;
 			}
 		} else {
-			// Default: exclude trash
+			// Default: exclude trash.
 			$args['post_status'] = array( 'publish', 'draft', 'private', 'pending' );
 		}
 
-		// Handle search
-		if ( ! empty( $_REQUEST['s'] ) ) {
-			$args['s'] = sanitize_text_field( $_REQUEST['s'] );
+		// Handle search.
+		if ( ! empty( $_REQUEST['s'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$args['s'] = sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 
-		// Handle sorting
-		if ( ! empty( $_REQUEST['orderby'] ) ) {
-			$orderby = sanitize_text_field( $_REQUEST['orderby'] );
-			$order   = ! empty( $_REQUEST['order'] ) ? sanitize_text_field( $_REQUEST['order'] ) : 'asc';
+		// Handle sorting.
+		if ( ! empty( $_REQUEST['orderby'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$orderby = sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$order   = ! empty( $_REQUEST['order'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['order'] ) ) : 'asc'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			switch ( $orderby ) {
 				case 'title':
@@ -430,29 +444,29 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 
 			$args['order'] = strtoupper( $order );
 		} else {
-			// Default sorting
+			// Default sorting.
 			$args['orderby'] = 'date';
 			$args['order']   = 'DESC';
 		}
 
-		// Get posts
+		// Get posts.
 		$query = new WP_Query( $args );
 		$items = array();
 
 		foreach ( $query->posts as $post ) {
 			$items[] = array(
-				'ID'           => $post->ID,
-				'title'        => get_the_title( $post->ID ),
-				'post_status'  => $post->post_status,
-				'post_date'    => $post->post_date,
+				'ID'            => $post->ID,
+				'title'         => get_the_title( $post->ID ),
+				'post_status'   => $post->post_status,
+				'post_date'     => $post->post_date,
 				'post_modified' => $post->post_modified,
-				'url'          => get_permalink( $post->ID ),
+				'url'           => get_permalink( $post->ID ),
 			);
 		}
 
 		$this->items = $items;
 
-		// Set pagination
+		// Set pagination.
 		$total_items = $query->found_posts;
 		$this->set_pagination_args(
 			array(
@@ -467,7 +481,7 @@ class SeedProd_Landing_Pages_Table extends WP_List_Table {
 	 * Message to display when no items found
 	 */
 	public function no_items() {
-		if ( ! empty( $_REQUEST['s'] ) ) {
+		if ( ! empty( $_REQUEST['s'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			esc_html_e( 'No landing pages found for your search.', 'coming-soon' );
 		} else {
 			esc_html_e( 'No landing pages found.', 'coming-soon' );

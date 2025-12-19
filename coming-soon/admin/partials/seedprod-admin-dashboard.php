@@ -11,24 +11,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Check if we have a valid license (Pro version)
+// Check if we have a valid license (Pro version).
 $license_key       = get_option( 'seedprod_api_key' );
 $license_status    = get_option( 'seedprod_api_message' );
 $has_valid_license = ! empty( $license_key ) && ! empty( get_option( 'seedprod_api_token' ) );
-// Use utility function to check for Lite view (includes test parameter)
+// Use utility function to check for Lite view (includes test parameter).
 $is_lite_view = seedprod_lite_v2_is_lite_view();
 $is_pro       = ! $is_lite_view;
 
-// Check if returning from wizard (query parameter format)
-$wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GET['wizard_id'] ) ) : null;
-// Note: Laravel currently returns admin.php?page=seedprod_lite#/setup/{wizard_id}
-// We'll handle the hash format in JavaScript since PHP can't read URL fragments
+// Check if returning from wizard (query parameter format).
+$wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GET['wizard_id'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only parameter for display logic.
+// Note: Laravel currently returns admin.php?page=seedprod_lite#/setup/{wizard_id}.
+// We'll handle the hash format in JavaScript since PHP can't read URL fragments.
 
 ?>
 
 <div class="seedprod-dashboard-page <?php echo ( $is_pro && ! $has_valid_license ) ? 'seedprod-license-activation-view' : ''; ?> <?php echo $is_lite_view ? 'seedprod-lite' : ''; ?>">
 	<?php
-	// Include header with page title
+	// Include header with page title.
 	$page_title = __( 'Dashboard', 'coming-soon' );
 	require_once plugin_dir_path( __FILE__ ) . 'seedprod-admin-header.php';
 	?>
@@ -112,10 +112,10 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 			</div>
 			<?php
 		else :
-			// Get stats data using V2 function
+			// Get stats data using V2 function.
 			$stats = seedprod_lite_v2_get_dashboard_stats();
 
-			// Extract stats for easier use in template
+			// Extract stats for easier use in template.
 			$coming_soon_count     = $stats['coming_soon_count'];
 			$maintenance_count     = $stats['maintenance_count'];
 			$landing_pages_count   = $stats['landing_pages_count'];
@@ -123,7 +123,7 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 			$total_subscribers     = $stats['total_subscribers'];
 			$recent_subscribers    = $stats['recent_subscribers'];
 
-			// Check if theme builder is enabled (checks both old and new format)
+			// Check if theme builder is enabled (checks both old and new format).
 			$theme_builder_enabled = seedprod_lite_v2_is_theme_enabled();
 			?>
 			<!-- Main Dashboard Content -->
@@ -137,11 +137,11 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 							<?php esc_html_e( 'Setup & Status', 'coming-soon' ); ?>
 						</h2>
 						<div class="inside">
-							<?php
-							// Check if user just activated their license
-							$just_activated = isset( $_GET['activated'] ) && $_GET['activated'] === 'true';
-							if ( $just_activated ) :
-								?>
+						<?php
+						// Check if user just activated their license.
+						$just_activated = isset( $_GET['activated'] ) && 'true' === $_GET['activated']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only parameter for display logic.
+						if ( true === $just_activated ) :
+							?>
 								<div class="seedprod-welcome-activated">
 									<h3>🎉 <?php esc_html_e( 'Welcome to SeedProd Lite!', 'coming-soon' ); ?></h3>
 									<p><?php esc_html_e( 'Your license is activated! Now choose what you\'d like to create first:', 'coming-soon' ); ?></p>
@@ -151,7 +151,7 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 							<?php endif; ?>
 							
 							<?php
-							// Use stats from V2 function
+							// Use stats from V2 function.
 							$csp_id           = $stats['csp_id'];
 							$csp_setup_status = $stats['csp_setup_status'];
 							$csp_active       = $stats['csp_active'];
@@ -165,8 +165,8 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 							$p404_id     = $stats['p404_id'];
 							$p404_active = $stats['p404_active'];
 
-							// Check if returning from wizard (URL parameter indicates wizard completion)
-							$is_wizard_return = isset( $_GET['seedprod_wizard_complete'] ) || isset( $_GET['id'] );
+							// Check if returning from wizard (URL parameter indicates wizard completion).
+							$is_wizard_return = isset( $_GET['seedprod_wizard_complete'] ) || isset( $_GET['id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only parameter for display logic.
 							?>
 							
 							<!-- Coming Soon Mode -->
@@ -194,7 +194,7 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 												</label>
 											<?php endif; ?>
 											<?php if ( ! $csp_id ) : ?>
-												<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=cs&name=' . urlencode( __( 'Coming Soon Page', 'coming-soon' ) ) . '&slug=coming-soon-page' ) ); ?>" class="button button-primary button-small seedprod-button-primary">
+												<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=cs&name=' . rawurlencode( __( 'Coming Soon Page', 'coming-soon' ) ) . '&slug=coming-soon-page' ) ); ?>" class="button button-primary button-small seedprod-button-primary">
 													<?php esc_html_e( 'Setup', 'coming-soon' ); ?>
 												</a>
 											<?php elseif ( $is_wizard_return && ! $csp_setup_status ) : ?>
@@ -240,7 +240,7 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 												</label>
 											<?php endif; ?>
 											<?php if ( ! $mmp_id ) : ?>
-												<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=mm&name=' . urlencode( __( 'Maintenance Mode Page', 'coming-soon' ) ) . '&slug=maintenance-mode-page' ) ); ?>" class="button button-primary button-small seedprod-button-primary">
+												<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=mm&name=' . rawurlencode( __( 'Maintenance Mode Page', 'coming-soon' ) ) . '&slug=maintenance-mode-page' ) ); ?>" class="button button-primary button-small seedprod-button-primary">
 													<?php esc_html_e( 'Setup', 'coming-soon' ); ?>
 												</a>
 											<?php else : ?>
@@ -293,7 +293,7 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 											<span class="seedprod-setup-title-text">
 												<?php esc_html_e( 'Website Builder', 'coming-soon' ); ?>
 												<?php if ( $is_lite_view ) : ?>
-													<?php echo seedprod_lite_v2_get_pro_badge( 'inline' ); ?>
+													<?php echo wp_kses_post( seedprod_lite_v2_get_pro_badge( 'inline' ) ); ?>
 													<span class="seedprod-pro-value"><?php esc_html_e( 'Build custom themes', 'coming-soon' ); ?></span>
 												<?php endif; ?>
 												<span class="dashicons dashicons-info seedprod-info-icon"></span>
@@ -302,7 +302,7 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 										</h3>
 										<div class="seedprod-setup-item-controls">
 											<?php if ( $is_lite_view ) : ?>
-												<?php echo seedprod_lite_v2_get_setup_item_upgrade( 'website-builder' ); ?>
+												<?php echo wp_kses_post( seedprod_lite_v2_get_setup_item_upgrade( 'website-builder' ) ); ?>
 											<?php else : ?>
 												<?php if ( $theme_builder_enabled ) : ?>
 													<span class="seedprod-status-badge seedprod-status-active"><?php esc_html_e( 'ACTIVE', 'coming-soon' ); ?></span>
@@ -329,7 +329,7 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 											<span class="seedprod-setup-title-text">
 												<?php esc_html_e( 'Login Page', 'coming-soon' ); ?>
 												<?php if ( $is_lite_view ) : ?>
-													<?php echo seedprod_lite_v2_get_pro_badge( 'inline' ); ?>
+													<?php echo wp_kses_post( seedprod_lite_v2_get_pro_badge( 'inline' ) ); ?>
 													<span class="seedprod-pro-value"><?php esc_html_e( 'Match your brand', 'coming-soon' ); ?></span>
 												<?php endif; ?>
 												<span class="dashicons dashicons-info seedprod-info-icon"></span>
@@ -338,7 +338,7 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 										</h3>
 										<div class="seedprod-setup-item-controls">
 											<?php if ( $is_lite_view ) : ?>
-												<?php echo seedprod_lite_v2_get_setup_item_upgrade( 'login-page' ); ?>
+												<?php echo wp_kses_post( seedprod_lite_v2_get_setup_item_upgrade( 'login-page' ) ); ?>
 											<?php else : ?>
 												<?php if ( $loginp_id && $loginp_active ) : ?>
 													<span class="seedprod-status-badge seedprod-status-active"><?php esc_html_e( 'ACTIVE', 'coming-soon' ); ?></span>
@@ -352,7 +352,7 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 													</label>
 												<?php endif; ?>
 												<?php if ( ! $loginp_id ) : ?>
-													<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=loginp&name=' . urlencode( __( 'Login Page', 'coming-soon' ) ) . '&slug=login-page' ) ); ?>" class="button button-primary button-small seedprod-button-primary">
+													<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=loginp&name=' . rawurlencode( __( 'Login Page', 'coming-soon' ) ) . '&slug=login-page' ) ); ?>" class="button button-primary button-small seedprod-button-primary">
 														<?php esc_html_e( 'Setup', 'coming-soon' ); ?>
 													</a>
 												<?php else : ?>
@@ -378,7 +378,7 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 											<span class="seedprod-setup-title-text">
 												<?php esc_html_e( '404 Page', 'coming-soon' ); ?>
 												<?php if ( $is_lite_view ) : ?>
-													<?php echo seedprod_lite_v2_get_pro_badge( 'inline' ); ?>
+													<?php echo wp_kses_post( seedprod_lite_v2_get_pro_badge( 'inline' ) ); ?>
 													<span class="seedprod-pro-value"><?php esc_html_e( 'Convert lost visitors', 'coming-soon' ); ?></span>
 												<?php endif; ?>
 												<span class="dashicons dashicons-info seedprod-info-icon"></span>
@@ -387,7 +387,7 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 										</h3>
 										<div class="seedprod-setup-item-controls">
 											<?php if ( $is_lite_view ) : ?>
-												<?php echo seedprod_lite_v2_get_setup_item_upgrade( '404-page' ); ?>
+												<?php echo wp_kses_post( seedprod_lite_v2_get_setup_item_upgrade( '404-page' ) ); ?>
 											<?php else : ?>
 												<?php if ( $p404_id && $p404_active ) : ?>
 													<span class="seedprod-status-badge seedprod-status-active"><?php esc_html_e( 'ACTIVE', 'coming-soon' ); ?></span>
@@ -401,7 +401,7 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 													</label>
 												<?php endif; ?>
 												<?php if ( ! $p404_id ) : ?>
-													<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=p404&name=' . urlencode( __( '404 Page', 'coming-soon' ) ) . '&slug=404-page' ) ); ?>" class="button button-primary button-small seedprod-button-primary">
+													<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=p404&name=' . rawurlencode( __( '404 Page', 'coming-soon' ) ) . '&slug=404-page' ) ); ?>" class="button button-primary button-small seedprod-button-primary">
 														<?php esc_html_e( 'Setup', 'coming-soon' ); ?>
 													</a>
 												<?php else : ?>
@@ -427,14 +427,14 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 											<span class="seedprod-setup-title-text">
 												<?php esc_html_e( 'Subscribers', 'coming-soon' ); ?>
 												<?php if ( $is_lite_view ) : ?>
-													<?php echo seedprod_lite_v2_get_pro_badge( 'inline' ); ?>
+													<?php echo wp_kses_post( seedprod_lite_v2_get_pro_badge( 'inline' ) ); ?>
 													<span class="seedprod-pro-value"><?php esc_html_e( 'Grow your email list', 'coming-soon' ); ?></span>
 												<?php endif; ?>
 											</span>
 										</h3>
 										<div class="seedprod-setup-item-controls">
 											<?php if ( $is_lite_view ) : ?>
-												<?php echo seedprod_lite_v2_get_setup_item_upgrade( 'subscribers' ); ?>
+												<?php echo wp_kses_post( seedprod_lite_v2_get_setup_item_upgrade( 'subscribers' ) ); ?>
 											<?php else : ?>
 												<span class="seedprod-subscriber-count">
 													<strong><?php echo esc_html( number_format( $total_subscribers ) ); ?></strong> <?php esc_html_e( 'total', 'coming-soon' ); ?>
@@ -462,44 +462,44 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 							<?php esc_html_e( 'Recommended Plugins', 'coming-soon' ); ?>
 						</h2>
 						<div class="inside">
-							<div class="seedprod-plugins-grid">
-								<?php
-								// Get dashboard specific recommended plugins
-								$recommended_plugins = seedprod_lite_v2_get_dashboard_recommended_plugins();
+						<div class="seedprod-plugins-grid">
+							<?php
+							// Get dashboard specific recommended plugins.
+							$recommended_plugins = seedprod_lite_v2_get_dashboard_recommended_plugins();
 
-								foreach ( $recommended_plugins as $plugin_key => $plugin ) :
-									// Check if pro version is installed
-									$has_pro      = seedprod_lite_v2_has_pro_version( $plugin_key );
-									$button_text  = seedprod_lite_v2_get_plugin_action_text( $plugin );
-									$button_class = '';
+							foreach ( $recommended_plugins as $plugin_key => $plugin_info ) :
+								// Check if pro version is installed.
+								$has_pro      = seedprod_lite_v2_has_pro_version( $plugin_key );
+								$button_text  = seedprod_lite_v2_get_plugin_action_text( $plugin_info );
+								$button_class = '';
 
-									// Determine button class based on status
-									if ( $has_pro ) {
-										$button_text  = __( 'PRO Version Installed', 'coming-soon' );
-										$button_class = 'button-small button-disabled';
-									} elseif ( $plugin['status_code'] === 1 ) {
-										// Active - show deactivate as secondary button (WordPress .button + SeedProd modifier)
-										$button_class = 'button-small seedprod-button-secondary';
-									} elseif ( $plugin['status_code'] === 2 ) {
-										// Inactive - show activate as primary button (WordPress .button-primary + SeedProd modifier)
-										$button_class = 'button-primary button-small seedprod-button-primary';
-									} else {
-										// Not installed - show install as primary button (WordPress .button-primary + SeedProd modifier)
-										$button_class = 'button-primary button-small seedprod-button-primary';
-									}
-									?>
+								// Determine button class based on status.
+								if ( $has_pro ) {
+									$button_text  = __( 'PRO Version Installed', 'coming-soon' );
+									$button_class = 'button-small button-disabled';
+								} elseif ( 1 === $plugin_info['status_code'] ) {
+									// Active - show deactivate as secondary button (WordPress .button + SeedProd modifier).
+									$button_class = 'button-small seedprod-button-secondary';
+								} elseif ( 2 === $plugin_info['status_code'] ) {
+									// Inactive - show activate as primary button (WordPress .button-primary + SeedProd modifier).
+									$button_class = 'button-primary button-small seedprod-button-primary';
+								} else {
+									// Not installed - show install as primary button (WordPress .button-primary + SeedProd modifier).
+									$button_class = 'button-primary button-small seedprod-button-primary';
+								}
+								?>
 								<div class="seedprod-plugin-card" data-plugin="<?php echo esc_attr( $plugin_key ); ?>">
 									<div class="seedprod-plugin-card-header">
-										<img src="<?php echo esc_url( $plugin['icon'] ); ?>" alt="<?php echo esc_attr( $plugin['name'] ); ?>" class="seedprod-plugin-icon">
-										<h4 class="seedprod-plugin-name"><?php echo esc_html( $plugin['name'] ); ?></h4>
+										<img src="<?php echo esc_url( $plugin_info['icon'] ); ?>" alt="<?php echo esc_attr( $plugin_info['name'] ); ?>" class="seedprod-plugin-icon">
+										<h4 class="seedprod-plugin-name"><?php echo esc_html( $plugin_info['name'] ); ?></h4>
 									</div>
-									<p class="seedprod-plugin-desc"><?php echo esc_html( $plugin['desc'] ); ?></p>
+									<p class="seedprod-plugin-desc"><?php echo esc_html( $plugin_info['desc'] ); ?></p>
 									<div class="seedprod-plugin-action">
 										<?php if ( ! $has_pro ) : ?>
-											<button class="button <?php echo esc_attr( $button_class ); ?> seedprod-plugin-button" 
-												data-plugin-slug="<?php echo esc_attr( $plugin['slug'] ); ?>"
+											<button class="button <?php echo esc_attr( $button_class ); ?> seedprod-plugin-button"
+												data-plugin-slug="<?php echo esc_attr( $plugin_info['slug'] ); ?>"
 												data-plugin-id="<?php echo esc_attr( $plugin_key ); ?>"
-												data-status="<?php echo esc_attr( $plugin['status_code'] ); ?>">
+												data-status="<?php echo esc_attr( $plugin_info['status_code'] ); ?>">
 												<span class="button-text"><?php echo esc_html( $button_text ); ?></span>
 												<span class="button-spinner" style="display:none;">
 													<span class="dashicons dashicons-update-alt"></span>
@@ -591,7 +591,7 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 									<span class="dashicons dashicons-admin-generic seedprod-resource-icon"></span>
 									<div class="seedprod-resource-content">
 										<span class="seedprod-resource-title"><?php esc_html_e( 'Settings', 'coming-soon' ); ?></span>
-										<a href="<?php echo admin_url( 'admin.php?page=seedprod_lite_settings' ); ?>" class="seedprod-resource-action">
+										<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_settings' ) ); ?>" class="seedprod-resource-action">
 											<?php esc_html_e( 'Manage', 'coming-soon' ); ?> →
 										</a>
 									</div>
@@ -631,31 +631,29 @@ $wizard_id = isset( $_GET['wizard_id'] ) ? sanitize_text_field( wp_unslash( $_GE
 							<span class="dashicons dashicons-megaphone"></span>
 							<?php esc_html_e( "What's New", 'coming-soon' ); ?>
 						</h2>
-						<div class="inside">
-							<?php
-							// Get only 2 news items from RSS feed
-							$news_items = seedprod_lite_v2_get_news_feed( 2 );
-
-							if ( ! empty( $news_items ) ) :
-								?>
+					<div class="inside">
+						<?php
+						// Get only 2 news items from RSS feed.
+						$news_items = seedprod_lite_v2_get_news_feed( 2 );                           if ( ! empty( $news_items ) ) :
+							?>
 								<div class="seedprod-news-items">
 									<?php foreach ( $news_items as $item ) : ?>
 										<div class="seedprod-news-item <?php echo ! empty( $item['thumbnail'] ) ? 'has-thumbnail' : ''; ?>">
 											<?php if ( ! empty( $item['thumbnail'] ) ) : ?>
 												<div class="seedprod-news-thumbnail">
-													<img src="<?php echo $item['thumbnail']; ?>" alt="<?php echo esc_attr( $item['title'] ); ?>" />
+													<img src="<?php echo esc_url( $item['thumbnail'] ); ?>" alt="<?php echo esc_attr( $item['title'] ); ?>" />
 												</div>
 											<?php endif; ?>
 											<div class="seedprod-news-content">
-												<h4><?php echo $item['title']; ?></h4>
+												<h4><?php echo wp_kses_post( $item['title'] ); ?></h4>
 												<?php if ( ! empty( $item['description'] ) ) : ?>
-													<p class="seedprod-news-excerpt"><?php echo $item['description']; ?></p>
+													<p class="seedprod-news-excerpt"><?php echo wp_kses_post( $item['description'] ); ?></p>
 												<?php endif; ?>
 												<div class="seedprod-news-meta">
 													<?php if ( ! empty( $item['date'] ) ) : ?>
 														<span class="seedprod-news-date"><?php echo esc_html( $item['date'] ); ?></span>
 													<?php endif; ?>
-													<a href="<?php echo $item['link']; ?>" target="_blank" rel="noopener">
+													<a href="<?php echo esc_url( $item['link'] ); ?>" target="_blank" rel="noopener">
 														<?php esc_html_e( 'Read More →', 'coming-soon' ); ?>
 													</a>
 												</div>

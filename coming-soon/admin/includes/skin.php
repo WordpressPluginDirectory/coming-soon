@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Legacy filename maintained for compatibility.
 /**
  * Skin class.
  *
@@ -9,11 +9,20 @@
  * @author  Chris Christoff
  */
 
-// Exit if accessed directly
+// Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * SeedProd Upgrader Skin
+ *
+ * Custom skin for WordPress plugin upgrader to handle silent installations.
+ *
+ * @since 6.0.0
+ *
+ * phpcs:disable WordPress.Files.FileName.InvalidClassFileName
+ */
 class SeedProd_Skin extends WP_Upgrader_Skin {
 
 
@@ -79,7 +88,7 @@ class SeedProd_Skin extends WP_Upgrader_Skin {
 	 */
 	public function error( $errors ) {
 		if ( ! empty( $errors ) ) {
-			echo json_encode( array( 'error' => esc_html__( 'There was an error installing the addon. Please try again.', 'coming-soon' ) ) );
+			echo wp_json_encode( array( 'error' => esc_html__( 'There was an error installing the addon. Please try again.', 'coming-soon' ) ) );
 			die;
 		}
 	}

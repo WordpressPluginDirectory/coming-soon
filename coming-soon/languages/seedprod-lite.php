@@ -6668,19 +6668,19 @@ page plugin.', 'coming-soon' ),
 	// Reference: src/components/PushNotificationOptions.vue
 	__( 'Documentation', 'coming-soon' ),
 
-	// Reference: src/components/PushNotification-Pro.vue
+	// Reference: src/components/PushNotification.vue
 	__( 'Install Push Notifications Plugin:', 'coming-soon' ),
 
-	// Reference: src/components/PushNotification-Pro.vue
+	// Reference: src/components/PushNotification.vue
 	__( 'PushEngage Installed and Activated', 'coming-soon' ),
 
-	// Reference: src/components/PushNotification-Pro.vue
+	// Reference: src/components/PushNotification.vue
 	__( 'Install PushEngage', 'coming-soon' ),
 
-	// Reference: src/components/PushNotification-Pro.vue
+	// Reference: src/components/PushNotification.vue
 	__( 'Activate PushEngage', 'coming-soon' ),
 
-	// Reference: src/components/PushNotification-Pro.vue
+	// Reference: src/components/PushNotification.vue
 	// Reference: src/components/ContactForm.vue
 	__( 'Contact Form', 'coming-soon' ),
 

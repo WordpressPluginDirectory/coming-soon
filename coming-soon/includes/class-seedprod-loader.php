@@ -1,5 +1,14 @@
 <?php
 /**
+ * Loader for actions and filters.
+ *
+ * @package    SeedProd
+ * @subpackage SeedProd/includes
+ *
+ * phpcs:ignore WordPress.Files.FileName -- Legacy filename retained for compatibility.
+ */
+
+/**
  * Register all actions and filters for the plugin
  *
  * @package    SeedProd

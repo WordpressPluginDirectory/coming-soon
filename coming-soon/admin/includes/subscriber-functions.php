@@ -24,68 +24,72 @@ function seedprod_lite_v2_get_subscribers_datatable() {
 		global $wpdb;
 		$tablename = $wpdb->prefix . 'csp3_subscribers';
 
-		// Get parameters
+		// Get parameters.
 		$page        = isset( $_POST['page'] ) ? absint( $_POST['page'] ) : 1;
 		$per_page    = isset( $_POST['per_page'] ) ? absint( $_POST['per_page'] ) : 25;
 		$search      = isset( $_POST['search'] ) ? sanitize_text_field( wp_unslash( $_POST['search'] ) ) : '';
 		$page_filter = isset( $_POST['page_filter'] ) ? sanitize_text_field( wp_unslash( $_POST['page_filter'] ) ) : 'all';
 		$sort_by     = isset( $_POST['sort_by'] ) ? sanitize_text_field( wp_unslash( $_POST['sort_by'] ) ) : 'created';
-		$sort_order  = isset( $_POST['sort_order'] ) && in_array( strtoupper( $_POST['sort_order'] ), array( 'ASC', 'DESC' ) ) ? strtoupper( $_POST['sort_order'] ) : 'DESC';
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Validated against allowed values (ASC/DESC) immediately after.
+		$sort_order = isset( $_POST['sort_order'] ) && in_array( strtoupper( wp_unslash( $_POST['sort_order'] ) ), array( 'ASC', 'DESC' ), true ) ? strtoupper( wp_unslash( $_POST['sort_order'] ) ) : 'DESC';
 
-		// Build query
+		// Build query.
 		$where_clauses = array( '1=1' );
 
 		if ( ! empty( $search ) ) {
 			$where_clauses[] = $wpdb->prepare( '(email LIKE %s OR fname LIKE %s OR lname LIKE %s)', '%' . $wpdb->esc_like( $search ) . '%', '%' . $wpdb->esc_like( $search ) . '%', '%' . $wpdb->esc_like( $search ) . '%' );
 		}
 
-		if ( $page_filter !== 'all' && ! empty( $page_filter ) ) {
+		if ( 'all' !== $page_filter && ! empty( $page_filter ) ) {
 			$where_clauses[] = $wpdb->prepare( 'page_uuid = %s', $page_filter );
 		}
 
 		$where_sql = implode( ' AND ', $where_clauses );
 
-		// Get total count
-		$total_sql   = "SELECT COUNT(*) FROM $tablename WHERE $where_sql";
-		$total_items = $wpdb->get_var( $total_sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		// Get total count.
+		$total_sql = "SELECT COUNT(*) FROM $tablename WHERE $where_sql";
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- $where_sql built with wpdb->prepare() calls above, custom table query.
+		$total_items = $wpdb->get_var( $total_sql );
 
-		// Get subscribers
+		// Get subscribers.
 		$offset = ( $page - 1 ) * $per_page;
 
-		// Validate sort column
+		// Validate sort column.
 		$allowed_sort_columns = array( 'email', 'fname', 'lname', 'created', 'page_id' );
-		if ( ! in_array( $sort_by, $allowed_sort_columns ) ) {
+		if ( ! in_array( $sort_by, $allowed_sort_columns, true ) ) {
 			$sort_by = 'created';
 		}
 
-		$sql = "SELECT *, UNIX_TIMESTAMP(created) as created_timestamp 
-				FROM $tablename 
-				WHERE $where_sql 
-				ORDER BY $sort_by $sort_order 
+		$sql = "SELECT *, UNIX_TIMESTAMP(created) as created_timestamp
+				FROM $tablename
+				WHERE $where_sql
+				ORDER BY $sort_by $sort_order
 				LIMIT %d OFFSET %d";
 
-		$safe_sql = $wpdb->prepare( $sql, $per_page, $offset ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$results  = $wpdb->get_results( $safe_sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $where_sql built with wpdb->prepare() calls above, $sort_by validated against allowed columns.
+		$safe_sql = $wpdb->prepare( $sql, $per_page, $offset );
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Query prepared above, custom table, transient data.
+		$results = $wpdb->get_results( $safe_sql );
 
-		// Format results
+		// Format results.
 		$subscribers = array();
 		foreach ( $results as $row ) {
 			$subscribers[] = array(
-				'id'         => $row->id,
-				'email'      => $row->email,
-				'name'       => trim( $row->fname . ' ' . $row->lname ),
-				'fname'      => $row->fname,
-				'lname'      => $row->lname,
-				'created'    => get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $row->created_timestamp ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) ),
-				'page_id'    => $row->page_id,
-				'page_uuid'  => $row->page_uuid,
+				'id'        => $row->id,
+				'email'     => $row->email,
+				'name'      => trim( $row->fname . ' ' . $row->lname ),
+				'fname'     => $row->fname,
+				'lname'     => $row->lname,
+				'created'   => get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $row->created_timestamp ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) ),
+				'page_id'   => $row->page_id,
+				'page_uuid' => $row->page_uuid,
 			);
 		}
 
-		// Get pages for filter dropdown
+		// Get pages for filter dropdown.
 		$pages = seedprod_lite_v2_get_subscriber_pages();
 
-		// Get chart data for last 7 days
+		// Get chart data for last 7 days.
 		$chart_data = seedprod_lite_v2_get_subscriber_chart_data( $page_filter );
 
 		wp_send_json_success(
@@ -113,7 +117,7 @@ function seedprod_lite_v2_get_subscriber_pages() {
 
 	$pages = array();
 
-	// Get Coming Soon page
+	// Get Coming Soon page.
 	$csp_id = get_option( 'seedprod_coming_soon_page_id' );
 	if ( ! empty( $csp_id ) ) {
 		$post = get_post( $csp_id );
@@ -130,7 +134,7 @@ function seedprod_lite_v2_get_subscriber_pages() {
 		}
 	}
 
-	// Get Maintenance Mode page
+	// Get Maintenance Mode page.
 	$mmp_id = get_option( 'seedprod_maintenance_mode_page_id' );
 	if ( ! empty( $mmp_id ) ) {
 		$post = get_post( $mmp_id );
@@ -147,7 +151,7 @@ function seedprod_lite_v2_get_subscriber_pages() {
 		}
 	}
 
-	// Get Login page
+	// Get Login page.
 	$loginp_id = get_option( 'seedprod_login_page_id' );
 	if ( ! empty( $loginp_id ) ) {
 		$post = get_post( $loginp_id );
@@ -164,7 +168,7 @@ function seedprod_lite_v2_get_subscriber_pages() {
 		}
 	}
 
-	// Get 404 page
+	// Get 404 page.
 	$p404_id = get_option( 'seedprod_404_page_id' );
 	if ( ! empty( $p404_id ) ) {
 		$post = get_post( $p404_id );
@@ -181,15 +185,15 @@ function seedprod_lite_v2_get_subscriber_pages() {
 		}
 	}
 
-	// Get landing pages
+	// Get landing pages.
 	$args = array(
 		'post_type'      => 'page',
 		'post_status'    => 'publish',
 		'posts_per_page' => -1,
 		'meta_query'     => array(
 			array(
-				'key'     => '_seedprod_page',
-				'value'   => true,
+				'key'   => '_seedprod_page',
+				'value' => true,
 			),
 		),
 	);
@@ -218,7 +222,7 @@ function seedprod_lite_v2_get_subscriber_pages() {
 /**
  * Get subscriber chart data
  *
- * @param string $page_filter Page UUID filter
+ * @param string $page_filter Page UUID filter.
  * @return array
  */
 function seedprod_lite_v2_get_subscriber_chart_data( $page_filter = 'all' ) {
@@ -226,22 +230,23 @@ function seedprod_lite_v2_get_subscriber_chart_data( $page_filter = 'all' ) {
 	$tablename = $wpdb->prefix . 'csp3_subscribers';
 
 	$where = '';
-	if ( $page_filter !== 'all' && ! empty( $page_filter ) ) {
+	if ( 'all' !== $page_filter && ! empty( $page_filter ) ) {
 		$where = $wpdb->prepare( ' WHERE page_uuid = %s AND', $page_filter );
 	} else {
 		$where = ' WHERE';
 	}
 
-	// Get last 7 days of data
-	$sql = "SELECT DATE(created) as date, COUNT(*) as count 
-			FROM $tablename 
-			$where created >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) 
-			GROUP BY DATE(created) 
+	// Get last 7 days of data.
+	$sql = "SELECT DATE(created) as date, COUNT(*) as count
+			FROM $tablename
+			$where created >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+			GROUP BY DATE(created)
 			ORDER BY date ASC";
 
-	$results = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+	// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- $where is built with wpdb->prepare() above, chart data not cached.
+	$results = $wpdb->get_results( $sql );
 
-	// Fill in missing days with 0
+	// Fill in missing days with 0.
 	$chart_data = array();
 	$today      = new DateTime();
 	for ( $i = 6; $i >= 0; $i-- ) {
@@ -252,7 +257,7 @@ function seedprod_lite_v2_get_subscriber_chart_data( $page_filter = 'all' ) {
 
 		$count = 0;
 		foreach ( $results as $row ) {
-			if ( $row->date === $date_str ) {
+			if ( $date_str === $row->date ) {
 				$count = intval( $row->count );
 				break;
 			}
@@ -278,30 +283,34 @@ function seedprod_lite_v2_delete_subscribers() {
 			wp_send_json_error( __( 'You do not have permission to delete subscribers.', 'coming-soon' ) );
 		}
 
-		$ids = isset( $_POST['ids'] ) ? $_POST['ids'] : array();
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Validated as integers with array_map('intval') below.
+		$ids = isset( $_POST['ids'] ) ? wp_unslash( $_POST['ids'] ) : array();
 
 		if ( empty( $ids ) ) {
 			wp_send_json_error( __( 'No subscribers selected.', 'coming-soon' ) );
 		}
 
-		// Ensure all IDs are integers
+		// Ensure all IDs are integers.
 		$ids = array_map( 'intval', $ids );
 
 		global $wpdb;
 		$tablename = $wpdb->prefix . 'csp3_subscribers';
 
-		// Build placeholders
+		// Build placeholders.
 		$placeholders = array_fill( 0, count( $ids ), '%d' );
 		$format       = implode( ', ', $placeholders );
 
-		// Delete subscribers
-		$sql    = $wpdb->prepare( "DELETE FROM $tablename WHERE id IN ($format)", $ids ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$result = $wpdb->query( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		// Delete subscribers.
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- $format is placeholders string, custom table delete operation.
+		$sql    = $wpdb->prepare( "DELETE FROM $tablename WHERE id IN ($format)", $ids );
+		$result = $wpdb->query( $sql );
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		if ( false !== $result ) {
 			wp_send_json_success(
 				array(
 					'deleted' => $result,
+					/* translators: %d: number of subscribers deleted */
 					'message' => sprintf( _n( '%d subscriber deleted.', '%d subscribers deleted.', $result, 'coming-soon' ), $result ),
 				)
 			);
@@ -328,17 +337,18 @@ function seedprod_lite_v2_export_subscribers() {
 		global $wpdb;
 		$tablename = $wpdb->prefix . 'csp3_subscribers';
 
-		// Build query
+		// Build query.
 		$where_sql = '1=1';
-		if ( $page_filter !== 'all' && ! empty( $page_filter ) ) {
+		if ( 'all' !== $page_filter && ! empty( $page_filter ) ) {
 			$where_sql = $wpdb->prepare( 'page_uuid = %s', $page_filter );
 		}
 
-		// Get subscribers
-		$sql     = "SELECT email, fname, lname, created, page_id, page_uuid FROM $tablename WHERE $where_sql ORDER BY created DESC";
-		$results = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		// Get subscribers.
+		$sql = "SELECT email, fname, lname, created, page_id, page_uuid FROM $tablename WHERE $where_sql ORDER BY created DESC";
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- $where_sql built with wpdb->prepare() above, custom table export.
+		$results = $wpdb->get_results( $sql );
 
-		// Generate CSV content
+		// Generate CSV content.
 		$csv_data   = array();
 		$csv_data[] = array( 'Email', 'First Name', 'Last Name', 'Date', 'Page ID' );
 
@@ -352,7 +362,7 @@ function seedprod_lite_v2_export_subscribers() {
 			);
 		}
 
-		// Convert to CSV string
+		// Convert to CSV string.
 		$output = '';
 		foreach ( $csv_data as $row ) {
 			$output .= '"' . implode( '","', array_map( 'esc_attr', $row ) ) . '"' . "\n";
@@ -364,6 +374,7 @@ function seedprod_lite_v2_export_subscribers() {
 			array(
 				'csv'      => $output,
 				'filename' => $filename,
+				/* translators: %d: number of subscribers exported */
 				'message'  => sprintf( _n( '%d subscriber exported.', '%d subscribers exported.', count( $results ), 'coming-soon' ), count( $results ) ),
 			)
 		);
@@ -380,13 +391,16 @@ function seedprod_lite_v2_get_subscriber_stats() {
 	global $wpdb;
 	$tablename = $wpdb->prefix . 'csp3_subscribers';
 
-	// Get total subscribers
+	// Get total subscribers.
+	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table query, stats not cached.
 	$total = $wpdb->get_var( "SELECT COUNT(*) FROM $tablename" );
 
-	// Get subscribers from last 7 days
+	// Get subscribers from last 7 days.
+	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table query, stats not cached.
 	$recent = $wpdb->get_var( "SELECT COUNT(*) FROM $tablename WHERE created >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)" );
 
-	// Get subscribers from last 30 days
+	// Get subscribers from last 30 days.
+	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table query, stats not cached.
 	$monthly = $wpdb->get_var( "SELECT COUNT(*) FROM $tablename WHERE created >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)" );
 
 	return array(

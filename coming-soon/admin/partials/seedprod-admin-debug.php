@@ -10,23 +10,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Handle form submission using V2 functions
+// Handle form submission using V2 functions.
 $update_message = '';
 $update_status  = false;
 
-if ( ! empty( $_POST ) ) {
+if ( ! empty( $_POST ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified inside seedprod_lite_v2_save_debug_settings().
 	$result         = seedprod_lite_v2_save_debug_settings();
 	$update_status  = $result['status'];
 	$update_message = $result['message'];
 }
 
-// Get current settings using V2 function
+// Get current settings using V2 function.
 $seedprod_builder_debug = seedprod_lite_v2_get_builder_debug_status();
 ?>
 
 <div class="seedprod-dashboard-page seedprod-debug-page">
 	<?php
-	// Include header with page title
+	// Include header with page title.
 	$page_title = __( 'Debug Tools', 'coming-soon' );
 	require_once plugin_dir_path( __FILE__ ) . 'seedprod-admin-header.php';
 	?>
@@ -75,6 +75,7 @@ $seedprod_builder_debug = seedprod_lite_v2_get_builder_debug_status();
 					<strong><?php esc_html_e( 'Pro Tip:', 'coming-soon' ); ?></strong>
 					<?php
 					printf(
+						/* translators: %s: Link to Duplicator plugin */
 						esc_html__( 'We recommend creating a backup with %s (free plugin) before proceeding.', 'coming-soon' ),
 						'<a href="' . esc_url( admin_url( 'admin.php?page=seedprod_lite_settings&tab=recommended-plugins&filter=duplicator' ) ) . '">Duplicator</a>'
 					);

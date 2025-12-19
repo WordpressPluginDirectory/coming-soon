@@ -11,33 +11,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Get necessary data
+// Get necessary data.
 $is_pro         = ! seedprod_lite_v2_is_lite_view();
 $page_slug      = $is_pro ? 'seedprod_lite' : 'seedprod_lite';
 $site_token     = get_option( 'seedprod_token' );
 $admin_email    = get_option( 'admin_email' );
 $plugin_version = SEEDPROD_VERSION;
-// Laravel wizard appends 'admin.php?page=seedprod_lite#/setup/{id}', so we only need base admin URL
-$admin_url      = admin_url();
+// Laravel wizard appends 'admin.php?page=seedprod_lite#/setup/{id}', so we only need base admin URL.
+$admin_url = admin_url();
 
-// Build SaaS wizard URL for Lite
+// Build SaaS wizard URL for Lite.
 $wizard_url = '';
 if ( ! $is_pro ) {
 	$upgrade_url = seedprod_lite_v2_get_upgrade_url( 'onboarding', 'welcome' );
 
-	// Build base URL without trailing slash
+	// Build base URL without trailing slash.
 	$base_url = untrailingslashit( SEEDPROD_WEB_API_URL );
 
-	// Build wizard URL - Laravel expects return to be base64 encoded then URL encoded
+	// Build wizard URL - Laravel expects return to be base64 encoded then URL encoded.
 	$wizard_url = sprintf(
 		'%s/setup-wizard-seedprod_lite?token=%s&return=%s&version=%s&utm_campaign=%s&email=%s&upgrade_to_pro_url=%s',
 		$base_url,
-		urlencode( $site_token ),
-		urlencode( base64_encode( $admin_url ) ),  // Base64 encode THEN URL encode
-		urlencode( $plugin_version ),
-		urlencode( 'onboarding_seedprod_lite' ),
-		urlencode( $admin_email ),
-		urlencode( $upgrade_url )
+		rawurlencode( $site_token ),
+		rawurlencode( base64_encode( $admin_url ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Base64 required for Laravel API, not for obfuscation.
+		rawurlencode( $plugin_version ),
+		rawurlencode( 'onboarding_seedprod_lite' ),
+		rawurlencode( $admin_email ),
+		rawurlencode( $upgrade_url )
 	);
 }
 ?>

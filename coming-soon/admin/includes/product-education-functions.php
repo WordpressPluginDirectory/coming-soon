@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function seedprod_lite_v2_get_upgrade_url( $feature = '', $context = 'dashboard' ) {
 	$base_url = 'https://www.seedprod.com/lite-upgrade/';
 
-	// Build UTM parameters
+	// Build UTM parameters.
 	$utm_params = array(
 		'utm_source'   => 'WordPress',
 		'utm_campaign' => 'liteplugin',
@@ -43,14 +43,14 @@ function seedprod_lite_v2_get_upgrade_url( $feature = '', $context = 'dashboard'
  */
 function seedprod_lite_v2_get_pro_badge( $type = 'inline' ) {
 	if ( 'overlay' === $type ) {
-		// Overlay badge with lock icon (for feature cards)
+		// Overlay badge with lock icon (for feature cards).
 		return '<div class="seedprod-pro-overlay-badge">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="seedprod-lock-icon">
 				<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
 			</svg>
 		</div>';
 	} else {
-		// Inline badge for text labels
+		// Inline badge for text labels.
 		return '<span class="seedprod-pro-badge">PRO</span>';
 	}
 }
@@ -83,24 +83,24 @@ function seedprod_lite_v2_get_upgrade_button( $args = array() ) {
 
 	$url = seedprod_lite_v2_get_upgrade_url( $args['feature'], $args['context'] );
 
-	// Build button classes
+	// Build button classes.
 	$button_classes = array( 'button', 'seedprod-upgrade-button' );
 
-	// Size class
+	// Size class.
 	if ( 'large' === $args['size'] ) {
 		$button_classes[] = 'button-hero';
 	} elseif ( 'small' === $args['size'] ) {
 		$button_classes[] = 'button-small';
 	}
 
-	// Custom classes
+	// Custom classes.
 	if ( ! empty( $args['class'] ) ) {
 		$button_classes[] = $args['class'];
 	}
 
 	$button_class = implode( ' ', $button_classes );
 
-	// Build button HTML
+	// Build button HTML.
 	$button_html = '<a href="' . esc_url( $url ) . '" target="_blank" rel="noopener" class="' . esc_attr( $button_class ) . '">';
 
 	if ( $args['show_icon'] ) {
@@ -143,7 +143,7 @@ function seedprod_lite_v2_get_education_card( $args = array() ) {
 	?>
 	<div class="seedprod-education-card seedprod-pro-feature" data-feature="<?php echo esc_attr( $args['feature'] ); ?>">
 		<?php if ( $args['show_badge'] ) : ?>
-			<?php echo seedprod_lite_v2_get_pro_badge( 'overlay' ); ?>
+			<?php echo seedprod_lite_v2_get_pro_badge( 'overlay' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Function returns safe HTML. ?>
 		<?php endif; ?>
 		
 		<div class="seedprod-education-content">
@@ -154,7 +154,7 @@ function seedprod_lite_v2_get_education_card( $args = array() ) {
 			<h3 class="seedprod-education-title">
 				<?php echo esc_html( $args['title'] ); ?>
 				<?php if ( $args['show_badge'] ) : ?>
-					<?php echo seedprod_lite_v2_get_pro_badge( 'inline' ); ?>
+					<?php echo seedprod_lite_v2_get_pro_badge( 'inline' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Function returns safe HTML. ?>
 				<?php endif; ?>
 			</h3>
 			
@@ -175,6 +175,7 @@ function seedprod_lite_v2_get_education_card( $args = array() ) {
 			
 			<div class="seedprod-education-action">
 				<?php
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Function returns safe HTML.
 				echo seedprod_lite_v2_get_upgrade_button(
 					array(
 						'feature' => $args['feature'],
@@ -204,6 +205,7 @@ function seedprod_lite_v2_get_setup_item_upgrade( $feature = '' ) {
 	?>
 	<div class="seedprod-setup-item-upgrade">
 		<?php
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Function returns safe HTML.
 		echo seedprod_lite_v2_get_upgrade_button(
 			array(
 				'feature' => $feature,
@@ -251,6 +253,7 @@ function seedprod_lite_v2_get_blurred_overlay( $args = array() ) {
 				<h2><?php echo esc_html( $args['title'] ); ?></h2>
 				<p><?php echo esc_html( $args['description'] ); ?></p>
 				<?php
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Function returns safe HTML.
 				echo seedprod_lite_v2_get_upgrade_button(
 					array(
 						'feature'   => $args['feature'],
@@ -279,13 +282,13 @@ function seedprod_lite_v2_get_blurred_overlay( $args = array() ) {
  * @return boolean True if we should show product education (Lite version).
  */
 function seedprod_lite_v2_should_show_education( $feature = '' ) {
-	// Check if this is the Lite version
+	// Check if this is the Lite version.
 	$is_lite_view = seedprod_lite_v2_is_lite_view();
 	if ( ! $is_lite_view ) {
 		return false;
 	}
 
-	// List of features that are Pro-only in Lite
+	// List of features that are Pro-only in Lite.
 	$pro_only_features = array(
 		'website-builder',
 		'login-page',
@@ -326,7 +329,7 @@ function seedprod_lite_v2_get_education_content( $feature = '' ) {
 				__( 'WooCommerce integration', 'coming-soon' ),
 			),
 		),
-		'login-page' => array(
+		'login-page'      => array(
 			'title'       => __( 'Custom Login Page', 'coming-soon' ),
 			'description' => __( 'Create a beautiful custom login page that matches your brand.', 'coming-soon' ),
 			'icon'        => 'dashicons-admin-network',
@@ -337,7 +340,7 @@ function seedprod_lite_v2_get_education_content( $feature = '' ) {
 				__( 'Redirect rules', 'coming-soon' ),
 			),
 		),
-		'404-page' => array(
+		'404-page'        => array(
 			'title'       => __( 'Custom 404 Page', 'coming-soon' ),
 			'description' => __( 'Turn lost visitors into customers with a custom 404 page.', 'coming-soon' ),
 			'icon'        => 'dashicons-warning',

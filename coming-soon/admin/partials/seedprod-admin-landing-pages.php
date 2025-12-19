@@ -6,20 +6,20 @@
  * @subpackage SeedProd_Lite/admin/partials
  */
 
-// Exit if accessed directly
+// Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Load admin functions if not already loaded
+// Load admin functions if not already loaded.
 if ( ! function_exists( 'seedprod_lite_v2_is_lite_view' ) ) {
 	require_once plugin_dir_path( __DIR__ ) . 'admin-functions.php';
 }
 
-// Check if we're in Lite view
+// Check if we're in Lite view.
 $is_lite_view = seedprod_lite_v2_is_lite_view();
 
-// Get current settings (stored as JSON string)
+// Get current settings (stored as JSON string).
 $settings_json = get_option( 'seedprod_settings' );
 if ( ! empty( $settings_json ) ) {
 	$settings = json_decode( $settings_json, true );
@@ -30,35 +30,35 @@ if ( ! empty( $settings_json ) ) {
 	$settings = array();
 }
 
-// Get Coming Soon page info
+// Get Coming Soon page info.
 $csp_id     = get_option( 'seedprod_coming_soon_page_id' );
 $csp_active = ! empty( $settings['enable_coming_soon_mode'] );
 
-// Get Maintenance Mode page info
+// Get Maintenance Mode page info.
 $mmp_id     = get_option( 'seedprod_maintenance_mode_page_id' );
 $mmp_active = ! empty( $settings['enable_maintenance_mode'] );
 
-// Get Login page info
+// Get Login page info.
 $loginp_id     = get_option( 'seedprod_login_page_id' );
 $loginp_active = ! empty( $settings['enable_login_mode'] );
 
-// Get 404 page info
+// Get 404 page info.
 $p404_id     = get_option( 'seedprod_404_page_id' );
 $p404_active = ! empty( $settings['enable_404_mode'] );
 
-// Load the table class
+// Load the table class.
 require_once plugin_dir_path( __DIR__ ) . 'includes/class-seedprod-landing-pages-table.php';
 
-// Create an instance of our table class
+// Create an instance of our table class.
 $landing_pages_table = new SeedProd_Landing_Pages_Table();
 
-// Prepare table items
+// Prepare table items.
 $landing_pages_table->prepare_items();
 ?>
 
 <div class="seedprod-dashboard-page seedprod-landing-pages-page <?php echo $is_lite_view ? 'seedprod-lite' : ''; ?>">
 	<?php
-	// Include header
+	// Include header.
 	$page_title = __( 'Landing Pages', 'coming-soon' );
 	require_once plugin_dir_path( __FILE__ ) . 'seedprod-admin-header.php';
 	?>
@@ -82,7 +82,7 @@ $landing_pages_table->prepare_items();
 					</p>
 					<div class="seedprod-mode-card-actions">
 						<?php if ( ! $csp_id ) : ?>
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=cs&name=' . urlencode( __( 'Coming Soon Page', 'coming-soon' ) ) . '&slug=coming-soon-page' ) ); ?>" class="button button-primary seedprod-button-primary">
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=cs&name=' . rawurlencode( __( 'Coming Soon Page', 'coming-soon' ) ) . '&slug=coming-soon-page' ) ); ?>" class="button button-primary seedprod-button-primary">
 								<?php esc_html_e( 'Set up Coming Soon Page', 'coming-soon' ); ?>
 							</a>
 						<?php else : ?>
@@ -124,7 +124,7 @@ $landing_pages_table->prepare_items();
 					</p>
 					<div class="seedprod-mode-card-actions">
 						<?php if ( ! $mmp_id ) : ?>
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=mm&name=' . urlencode( __( 'Maintenance Mode Page', 'coming-soon' ) ) . '&slug=maintenance-mode-page' ) ); ?>" class="button button-primary seedprod-button-primary">
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=mm&name=' . rawurlencode( __( 'Maintenance Mode Page', 'coming-soon' ) ) . '&slug=maintenance-mode-page' ) ); ?>" class="button button-primary seedprod-button-primary">
 								<?php esc_html_e( 'Set up Maintenance Page', 'coming-soon' ); ?>
 							</a>
 						<?php else : ?>
@@ -163,7 +163,7 @@ $landing_pages_table->prepare_items();
 					<h3 class="seedprod-mode-card-title">
 						<?php esc_html_e( 'Login Page', 'coming-soon' ); ?>
 						<?php if ( $is_lite_view ) : ?>
-							<?php echo seedprod_lite_v2_get_pro_badge( 'inline' ); ?>
+							<?php echo wp_kses_post( seedprod_lite_v2_get_pro_badge( 'inline' ) ); ?>
 						<?php endif; ?>
 					</h3>
 					<p class="seedprod-mode-card-description">
@@ -177,7 +177,7 @@ $landing_pages_table->prepare_items();
 							</a>
 						<?php else : ?>
 							<?php if ( ! $loginp_id ) : ?>
-								<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=loginp&name=' . urlencode( __( 'Login Page', 'coming-soon' ) ) . '&slug=login-page' ) ); ?>" class="button button-primary seedprod-button-primary">
+								<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=loginp&name=' . rawurlencode( __( 'Login Page', 'coming-soon' ) ) . '&slug=login-page' ) ); ?>" class="button button-primary seedprod-button-primary">
 									<?php esc_html_e( 'Set up a Login Page', 'coming-soon' ); ?>
 								</a>
 							<?php else : ?>
@@ -214,12 +214,12 @@ $landing_pages_table->prepare_items();
 					<div class="seedprod-mode-card-icon">
 						<img src="<?php echo esc_url( plugin_dir_url( __DIR__ ) . 'images/404-page.svg' ); ?>" alt="<?php esc_attr_e( '404 Page', 'coming-soon' ); ?>" />
 					</div>
-					<h3 class="seedprod-mode-card-title">
-						<?php esc_html_e( '404 Page', 'coming-soon' ); ?>
-						<?php if ( $is_lite_view ) : ?>
-							<?php echo seedprod_lite_v2_get_pro_badge( 'inline' ); ?>
-						<?php endif; ?>
-					</h3>
+				<h3 class="seedprod-mode-card-title">
+					<?php esc_html_e( '404 Page', 'coming-soon' ); ?>
+					<?php if ( $is_lite_view ) : ?>
+						<?php echo wp_kses_post( seedprod_lite_v2_get_pro_badge( 'inline' ) ); ?>
+					<?php endif; ?>
+				</h3>
 					<p class="seedprod-mode-card-description">
 						<?php esc_html_e( 'Replace your default theme 404 page with a custom high converting 404 page.', 'coming-soon' ); ?>
 					</p>
@@ -231,7 +231,7 @@ $landing_pages_table->prepare_items();
 							</a>
 						<?php else : ?>
 							<?php if ( ! $p404_id ) : ?>
-								<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=p404&name=' . urlencode( __( '404 Page', 'coming-soon' ) ) . '&slug=404-page' ) ); ?>" class="button button-primary seedprod-button-primary">
+								<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_template_selection&type=p404&name=' . rawurlencode( __( '404 Page', 'coming-soon' ) ) . '&slug=404-page' ) ); ?>" class="button button-primary seedprod-button-primary">
 									<?php esc_html_e( 'Set up a 404 Page', 'coming-soon' ); ?>
 								</a>
 							<?php else : ?>
@@ -271,11 +271,11 @@ $landing_pages_table->prepare_items();
 			<div class="seedprod-section-header">
 				<div class="seedprod-section-header-buttons">
 					<button id="seedprod-show-new-page-form" class="button button-primary seedprod-button-primary">
-						+ <?php _e( 'Add New Landing Page', 'coming-soon' ); ?>
+						+ <?php esc_html_e( 'Add New Landing Page', 'coming-soon' ); ?>
 					</button>
 					<button id="seedprod-landing-import-export-btn" class="button seedprod-button-secondary">
 						<span class="dashicons dashicons-download"></span>
-						<?php _e( 'Import/Export', 'coming-soon' ); ?>
+						<?php esc_html_e( 'Import/Export', 'coming-soon' ); ?>
 					</button>
 				</div>
 				
@@ -346,16 +346,16 @@ $landing_pages_table->prepare_items();
 				<input type="hidden" name="page" value="seedprod_lite_landing_pages" />
 				
 				<?php
-				// Display search box (WordPress native)
+				// Display search box (WordPress native).
 				$landing_pages_table->search_box( __( 'Search Landing Pages', 'coming-soon' ), 'seedprod-landing-pages' );
 
-				// Display the table with views and pagination
+				// Display the table with views and pagination.
 				$landing_pages_table->views();
 				$landing_pages_table->display();
 
-				// Add upgrade row for Lite users
+				// Add upgrade row for Lite users.
 				if ( $is_lite_view ) :
-				?>
+					?>
 					<script type="text/javascript">
 					jQuery(document).ready(function($) {
 						// Use localized strings from seedprod_admin
@@ -433,16 +433,16 @@ $landing_pages_table->prepare_items();
 							<option value="all"><?php esc_html_e( 'All Landing Pages', 'coming-soon' ); ?></option>
 							<?php
 							global $wpdb;
-							$tablename = $wpdb->prefix . 'posts';
+							$tablename      = $wpdb->prefix . 'posts';
 							$meta_tablename = $wpdb->prefix . 'postmeta';
 
-							// Get special page IDs first
+							// Get special page IDs first.
 							$coming_soon_id = get_option( 'seedprod_coming_soon_page_id' );
 							$maintenance_id = get_option( 'seedprod_maintenance_mode_page_id' );
-							$login_id = get_option( 'seedprod_login_page_id' );
-							$fourohfour_id = get_option( 'seedprod_404_page_id' );
+							$login_id       = get_option( 'seedprod_login_page_id' );
+							$fourohfour_id  = get_option( 'seedprod_404_page_id' );
 
-							// Build list of special page IDs to include
+							// Build list of special page IDs to include.
 							$special_page_ids = array();
 							if ( ! empty( $coming_soon_id ) ) {
 								$special_page_ids[] = $coming_soon_id;
@@ -457,45 +457,47 @@ $landing_pages_table->prepare_items();
 								$special_page_ids[] = $fourohfour_id;
 							}
 
-							// Query for landing pages using _seedprod_page_template_type = 'lp'
-							// Include:
-							// 1. Pages with _seedprod_page_template_type = 'lp' (landing pages)
-							// 2. The 4 special pages (CS, MM, Login, 404) by their specific IDs
-							$where_clause = "p.post_status != 'trash' AND (";
+							// Query for landing pages - include multiple conditions to catch all pages:
+							// 1. Pages with _seedprod_page_template_type = 'lp' (new landing pages).
+							// 2. Pages with _seedprod_page = '1' (legacy/older landing pages).
+							// 3. Special pages (CS, MM, Login, 404) by their specific IDs.
 
-							// Include pages with template type 'lp' (landing pages)
-							$where_clause .= "(pm4.meta_value = 'lp')";
-
-							// Include special pages by ID if they exist
+							// Build special pages condition separately.
+							$special_pages_condition = '';
 							if ( ! empty( $special_page_ids ) ) {
-								$special_ids_string = implode( ',', array_map( 'intval', $special_page_ids ) );
-								$where_clause .= " OR p.ID IN ($special_ids_string)";
+								$special_ids_string      = implode( ',', array_map( 'intval', $special_page_ids ) );
+								$special_pages_condition = " OR p.ID IN ($special_ids_string)";
 							}
 
-							$where_clause .= ")";
-
-							$sql = "SELECT DISTINCT p.ID, p.post_title, p.post_type, pm2.meta_value as page_type
+							$sql = "SELECT DISTINCT p.ID, p.post_title, p.post_type, p.post_status, p.post_date, pm2.meta_value as page_type
 									FROM $tablename p
 									LEFT JOIN $meta_tablename pm ON (pm.post_id = p.ID AND pm.meta_key = '_seedprod_page_uuid')
 									LEFT JOIN $meta_tablename pm2 ON (pm2.post_id = p.ID AND pm2.meta_key = '_seedprod_page_type')
 									LEFT JOIN $meta_tablename pm4 ON (pm4.post_id = p.ID AND pm4.meta_key = '_seedprod_page_template_type')
-									WHERE $where_clause
-									AND pm.meta_value IS NOT NULL
-									ORDER BY p.post_title ASC";
+									LEFT JOIN $meta_tablename pm5 ON (pm5.post_id = p.ID AND pm5.meta_key = '_seedprod_page')
+									WHERE p.post_status != 'trash'
+									AND p.post_type IN ('page', 'seedprod')
+									AND (
+										(p.post_type = 'page' AND pm4.meta_value = 'lp')
+										OR (p.post_type = 'page' AND pm5.meta_value IS NOT NULL)
+										$special_pages_condition
+									)
+									AND (pm.meta_value IS NOT NULL OR pm5.meta_value IS NOT NULL $special_pages_condition)
+									ORDER BY p.post_date DESC";
 
 							$pages = $wpdb->get_results( $sql ); // phpcs:ignore
 
-							// DEBUG: Let's see what we're getting
+							// DEBUG: Let's see what we're getting.
 							if ( current_user_can( 'manage_options' ) && isset( $_GET['debug_landing_pages'] ) ) {
 								echo '<h4>Debug: Landing Pages Query Results</h4>';
 								echo '<pre>';
-								echo "SQL: " . $sql . "\n\n";
-								echo "Results (" . count( $pages ) . " found):\n";
-								print_r( $pages );
+								echo 'SQL: ' . esc_html( $sql ) . "\n\n";
+								echo 'Results (' . count( $pages ) . " found):\n";
+								print_r( $pages ); // phpcs:ignore
 								echo '</pre>';
 
-								// Also show ALL SeedProd pages
-								$debug_sql = "SELECT p.ID, p.post_title, p.post_type, p.post_status,
+								// Also show ALL SeedProd pages.
+								$debug_sql     = "SELECT p.ID, p.post_title, p.post_type, p.post_status,
 											pm1.meta_value as page_uuid,
 											pm2.meta_value as page_type,
 											pm3.meta_value as is_theme_template
@@ -505,37 +507,37 @@ $landing_pages_table->prepare_items();
 											LEFT JOIN $meta_tablename pm3 ON (pm3.post_id = p.ID AND pm3.meta_key = '_seedprod_is_theme_template')
 											WHERE pm1.meta_value IS NOT NULL
 											ORDER BY p.ID";
-								$debug_results = $wpdb->get_results( $debug_sql );
+								$debug_results = $wpdb->get_results( $wpdb->prepare( $debug_sql ) ); // phpcs:ignore
 								echo '<h4>Debug: ALL SeedProd Pages</h4>';
 								echo '<pre>';
-								print_r( $debug_results );
+								print_r( $debug_results ); // phpcs:ignore
 								echo '</pre>';
 							}
 
-							foreach ( $pages as $page ) {
-								$page_label = esc_html( $page->post_title );
-								$page_type = '';
+							foreach ( $pages as $page_item ) {
+								$page_label = esc_html( $page_item->post_title );
+								$page_type  = '';
 
-								// Add page type indicator
-								if ( $page->ID == $coming_soon_id ) {
-									$page_type = 'cs';
+								// Add page type indicator.
+								if ( (int) $page_item->ID === (int) $coming_soon_id ) {
+									$page_type   = 'cs';
 									$page_label .= ' ' . __( '(Coming Soon)', 'coming-soon' );
-								} elseif ( $page->ID == $maintenance_id ) {
-									$page_type = 'mm';
+								} elseif ( (int) $page_item->ID === (int) $maintenance_id ) {
+									$page_type   = 'mm';
 									$page_label .= ' ' . __( '(Maintenance Mode)', 'coming-soon' );
-								} elseif ( $page->ID == $login_id ) {
-									$page_type = 'loginp';
+								} elseif ( (int) $page_item->ID === (int) $login_id ) {
+									$page_type   = 'loginp';
 									$page_label .= ' ' . __( '(Login Page)', 'coming-soon' );
-								} elseif ( $page->ID == $fourohfour_id ) {
-									$page_type = 'p404';
+								} elseif ( (int) $page_item->ID === (int) $fourohfour_id ) {
+									$page_type   = 'p404';
 									$page_label .= ' ' . __( '(404 Page)', 'coming-soon' );
-								} elseif ( ! empty( $page->page_type ) ) {
-									$page_type = $page->page_type;
+								} elseif ( ! empty( $page_item->page_type ) ) {
+									$page_type = $page_item->page_type;
 								} else {
 									$page_type = 'lp';
 								}
 
-								echo '<option value="' . esc_attr( $page->ID ) . '" data-ptype="' . esc_attr( $page_type ) . '">' . $page_label . '</option>';
+								echo '<option value="' . esc_attr( $page_item->ID ) . '" data-ptype="' . esc_attr( $page_type ) . '">' . esc_html( $page_label ) . '</option>';
 							}
 							?>
 						</select>
@@ -590,6 +592,7 @@ $landing_pages_table->prepare_items();
 								<?php esc_html_e( 'Importing will create new landing pages. If you have existing pages with the same names, duplicates will be created. Mode pages (Coming Soon, Maintenance, 404, Login) will replace existing ones if present.', 'coming-soon' ); ?>
 								<?php
 								printf(
+									/* translators: %s: Link to Duplicator plugin. */
 									esc_html__( ' We recommend creating a backup with %s (free plugin) before importing.', 'coming-soon' ),
 									'<a href="' . esc_url( admin_url( 'admin.php?page=seedprod_lite_settings&tab=recommended-plugins&filter=duplicator' ) ) . '">Duplicator</a>'
 								);

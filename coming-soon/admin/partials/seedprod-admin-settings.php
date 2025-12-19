@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Get current tab
-$current_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'general';
+// Get current tab.
+$current_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only parameter for tab display.
 
-// Define tabs
-$tabs = array(
+// Define tabs.
+$tabs_array = array(
 	'general'             => __( 'General', 'coming-soon' ),
 	'subscribers'         => __( 'Subscribers', 'coming-soon' ),
 	'recommended-plugins' => __( 'Recommended Plugins', 'coming-soon' ),
@@ -24,7 +24,7 @@ $tabs = array(
 
 <div class="seedprod-dashboard-page seedprod-settings-page">
 	<?php
-	// Include header with page title
+	// Include header with page title.
 	$page_title = __( 'Settings', 'coming-soon' );
 	require_once plugin_dir_path( __FILE__ ) . 'seedprod-admin-header.php';
 	?>
@@ -32,7 +32,7 @@ $tabs = array(
 	<div class="seedprod-dashboard-container">
 		<!-- Tab Navigation using WordPress native classes -->
 		<nav class="nav-tab-wrapper">
-			<?php foreach ( $tabs as $tab_key => $tab_label ) : ?>
+			<?php foreach ( $tabs_array as $tab_key => $tab_label ) : ?>
 				<a href="<?php echo esc_url( add_query_arg( 'tab', $tab_key, admin_url( 'admin.php?page=seedprod_lite_settings' ) ) ); ?>" 
 					class="nav-tab <?php echo esc_attr( $current_tab === $tab_key ? 'nav-tab-active' : '' ); ?>">
 					<?php echo esc_html( $tab_label ); ?>
@@ -47,7 +47,7 @@ $tabs = array(
 				<!-- General Tab -->
 				<div class="seedprod-tab-panel" id="seedprod-general-tab">
 					<?php
-					// Get app settings and decode if JSON
+					// Get app settings and decode if JSON.
 					$app_settings_json = get_option( 'seedprod_app_settings' );
 					$app_settings      = ! empty( $app_settings_json ) ? json_decode( $app_settings_json, true ) : array();
 					?>
@@ -72,10 +72,8 @@ $tabs = array(
 									'seedprod-license-page',
 									'liteplugin'
 								);
-								printf(
-									wp_kses_post( __( 'To unlock more features consider <a href="%s" target="_blank">upgrading to PRO</a>. As a valued SeedProd Lite user you\'ll receive <strong>a discount off the regular price</strong>, automatically applied at checkout!', 'coming-soon' ) ),
-									esc_url( $upgrade_url )
-								);
+								/* translators: %s: Upgrade URL */
+								printf( wp_kses_post( __( 'To unlock more features consider <a href="%s" target="_blank">upgrading to PRO</a>. As a valued SeedProd Lite user you\'ll receive <strong>a discount off the regular price</strong>, automatically applied at checkout!', 'coming-soon' ) ), esc_url( $upgrade_url ) );
 								?>
 							</p>
 						<?php endif; ?>
@@ -307,26 +305,26 @@ $tabs = array(
 
 			<?php elseif ( 'subscribers' === $current_tab ) : ?>
 				<!-- Subscribers Tab -->
-				<div class="seedprod-tab-panel" id="seedprod-subscribers-tab">
-					<?php
-					// Get subscriber stats
-					$stats = seedprod_lite_v2_get_subscriber_stats();
-					$pages = seedprod_lite_v2_get_subscriber_pages();
+			<div class="seedprod-tab-panel" id="seedprod-subscribers-tab">
+				<?php
+				// Get subscriber stats.
+				$stats      = seedprod_lite_v2_get_subscriber_stats();
+				$pages_list = seedprod_lite_v2_get_subscriber_pages();
 
-					// Check OptinMonster status
+				// Check OptinMonster status.
 					$optinmonster_installed = false;
 					$optinmonster_active    = false;
 					$optinmonster_slug      = 'optinmonster/optin-monster-wp-api.php';
 
-					if ( ! function_exists( 'get_plugins' ) ) {
-						require_once ABSPATH . 'wp-admin/includes/plugin.php';
-					}
+				if ( ! function_exists( 'get_plugins' ) ) {
+					require_once ABSPATH . 'wp-admin/includes/plugin.php';
+				}
 					$all_plugins = get_plugins();
-					if ( isset( $all_plugins[ $optinmonster_slug ] ) ) {
-						$optinmonster_installed = true;
-						$optinmonster_active    = is_plugin_active( $optinmonster_slug );
-					}
-					?>
+				if ( isset( $all_plugins[ $optinmonster_slug ] ) ) {
+					$optinmonster_installed = true;
+					$optinmonster_active    = is_plugin_active( $optinmonster_slug );
+				}
+				?>
 					
 					<script type="text/javascript">
 					window.seedprodOptinMonster = {
@@ -345,18 +343,18 @@ $tabs = array(
 							<button type="button" class="button seedprod-button-secondary" id="seedprod-export-subscribers">
 								<span class="dashicons dashicons-download"></span>
 								<?php esc_html_e( 'Export to CSV', 'coming-soon' ); ?>
-							</button>
-							
-							<select id="seedprod-subscriber-page-filter" class="seedprod-select">
-								<option value="all"><?php esc_html_e( 'All Pages', 'coming-soon' ); ?></option>
-								<?php foreach ( $pages as $page ) : ?>
-									<option value="<?php echo esc_attr( $page['uuid'] ); ?>">
-										<?php echo esc_html( $page['name'] ); ?>
-									</option>
-								<?php endforeach; ?>
-							</select>
-						</div>
-						<?php endif; ?>
+						</button>
+						
+						<select id="seedprod-subscriber-page-filter" class="seedprod-select">
+							<option value="all"><?php esc_html_e( 'All Pages', 'coming-soon' ); ?></option>
+							<?php foreach ( $pages_list as $page_item ) : ?>
+								<option value="<?php echo esc_attr( $page_item['uuid'] ); ?>">
+									<?php echo esc_html( $page_item['name'] ); ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+					<?php endif; ?>
 					</div>
 					
 					<?php if ( $stats['total'] > 0 ) : ?>
@@ -484,66 +482,64 @@ $tabs = array(
 					<?php endif; ?>
 				</div>
 
-			<?php elseif ( 'recommended-plugins' === $current_tab ) : ?>
-				<!-- Recommended Plugins Tab -->
-				<div class="seedprod-tab-panel" id="seedprod-recommended-plugins-tab">
+		<?php elseif ( 'recommended-plugins' === $current_tab ) : ?>
+			<!-- Recommended Plugins Tab -->
+			<div class="seedprod-tab-panel" id="seedprod-recommended-plugins-tab">
+				<?php
+				// Check for filter parameter.
+				$filter = isset( $_GET['filter'] ) ? sanitize_text_field( wp_unslash( $_GET['filter'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only parameter for filtering.
+
+				if ( $filter ) :
+					?>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_settings&tab=recommended-plugins' ) ); ?>" class="button button-link" style="margin-bottom: 10px;">
+						← <?php esc_html_e( 'View All Plugins', 'coming-soon' ); ?>
+					</a>
+				<?php endif; ?>
+				
+				<h2><?php esc_html_e( 'Recommended Plugins', 'coming-soon' ); ?></h2>
+				<p><?php esc_html_e( 'Supercharge your website with our recommended WordPress plugins.', 'coming-soon' ); ?></p>
+				
+				<div class="seedprod-plugins-grid">
 					<?php
-					// Check for filter parameter
-					$filter = isset( $_GET['filter'] ) ? sanitize_text_field( wp_unslash( $_GET['filter'] ) ) : '';
+					// When filtering, get ALL plugins (including active ones).
+					// Otherwise, get only non-active plugins.
+					if ( isset( $_GET['filter'] ) && ! empty( $_GET['filter'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Already sanitized above.
+						$all_plugins = seedprod_lite_v2_get_recommended_plugins();
+					} else {
+						$all_plugins = seedprod_lite_v2_get_all_recommended_plugins();
+					}
 
-					if ( $filter ) :
+					// If filter is set, only show that plugin.
+					if ( $filter && isset( $all_plugins[ $filter ] ) ) {
+						$filtered_plugins = array( $filter => $all_plugins[ $filter ] );
+					} else {
+						// Shuffle the plugins array to randomize order on each page load.
+						$keys = array_keys( $all_plugins );
+						shuffle( $keys );
+						$shuffled_plugins = array();
+						foreach ( $keys as $key ) {
+							$shuffled_plugins[ $key ] = $all_plugins[ $key ];
+						}
+						$filtered_plugins = $shuffled_plugins;
+					}                       foreach ( $filtered_plugins as $plugin_key => $plugin_data ) :
+						$plugin_status = seedprod_lite_v2_get_plugin_status( $plugin_data['slug'] );
 						?>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedprod_lite_settings&tab=recommended-plugins' ) ); ?>" class="button button-link" style="margin-bottom: 10px;">
-							← <?php esc_html_e( 'View All Plugins', 'coming-soon' ); ?>
-						</a>
-					<?php endif; ?>
-					
-					<h2><?php esc_html_e( 'Recommended Plugins', 'coming-soon' ); ?></h2>
-					<p><?php esc_html_e( 'Supercharge your website with our recommended WordPress plugins.', 'coming-soon' ); ?></p>
-					
-					<div class="seedprod-plugins-grid">
-						<?php
-						// When filtering, get ALL plugins (including active ones)
-						// Otherwise, get only non-active plugins
-						if ( isset( $_GET['filter'] ) && ! empty( $_GET['filter'] ) ) {
-							$all_plugins = seedprod_lite_v2_get_recommended_plugins();
-						} else {
-							$all_plugins = seedprod_lite_v2_get_all_recommended_plugins();
-						}
-
-						// If filter is set, only show that plugin
-						if ( $filter && isset( $all_plugins[ $filter ] ) ) {
-							$filtered_plugins = array( $filter => $all_plugins[ $filter ] );
-						} else {
-							// Shuffle the plugins array to randomize order on each page load
-							$keys = array_keys( $all_plugins );
-							shuffle( $keys );
-							$shuffled_plugins = array();
-							foreach ( $keys as $key ) {
-								$shuffled_plugins[ $key ] = $all_plugins[ $key ];
-							}
-							$filtered_plugins = $shuffled_plugins;
-						}
-
-						foreach ( $filtered_plugins as $plugin_key => $plugin ) :
-							$status = seedprod_lite_v2_get_plugin_status( $plugin['slug'] );
-							?>
 							<div class="seedprod-plugin-card" data-plugin="<?php echo esc_attr( $plugin_key ); ?>">
 								<div class="seedprod-plugin-card-content">
 										<div class="seedprod-plugin-header">
-											<img src="<?php echo esc_url( $plugin['icon'] ); ?>" 
-												alt="<?php echo esc_attr( $plugin['name'] ); ?>" 
+											<img src="<?php echo esc_url( $plugin_data['icon'] ); ?>" 
+												alt="<?php echo esc_attr( $plugin_data['name'] ); ?>" 
 												class="seedprod-plugin-icon" />
 											<div class="seedprod-plugin-info">
-												<h4><?php echo esc_html( $plugin['name'] ); ?></h4>
-												<p class="seedprod-plugin-description"><?php echo esc_html( $plugin['desc'] ); ?></p>
+												<h4><?php echo esc_html( $plugin_data['name'] ); ?></h4>
+												<p class="seedprod-plugin-description"><?php echo esc_html( $plugin_data['desc'] ); ?></p>
 											</div>
 										</div>
 										
 										<div class="seedprod-plugin-footer">
 											<div class="seedprod-plugin-status">
 												<?php
-												switch ( $status['status'] ) {
+												switch ( $plugin_status['status'] ) {
 													case 0:
 														echo '<span class="seedprod-status-badge seedprod-status-not-installed">' . esc_html__( 'NOT INSTALLED', 'coming-soon' ) . '</span>';
 														break;
@@ -560,15 +556,15 @@ $tabs = array(
 												?>
 											</div>
 											
-											<?php if ( $status['status'] !== 3 ) : // Not Pro version ?>
+											<?php if ( 3 !== $plugin_status['status'] ) : // Not Pro version. ?>
 												<button class="button seedprod-plugin-button 
-													<?php echo $status['status'] === 1 ? 'seedprod-button-secondary' : 'button-primary seedprod-button-primary'; ?>"
-													data-plugin-slug="<?php echo esc_attr( $plugin['slug'] ); ?>"
+													<?php echo 1 === $plugin_status['status'] ? 'seedprod-button-secondary' : 'button-primary seedprod-button-primary'; ?>"
+													data-plugin-slug="<?php echo esc_attr( $plugin_data['slug'] ); ?>"
 													data-plugin-id="<?php echo esc_attr( $plugin_key ); ?>"
-													data-status="<?php echo esc_attr( $status['status'] ); ?>">
+													data-status="<?php echo esc_attr( $plugin_status['status'] ); ?>">
 													<span class="button-text">
 														<?php
-														switch ( $status['status'] ) {
+														switch ( $plugin_status['status'] ) {
 															case 0:
 																esc_html_e( 'Install', 'coming-soon' );
 																break;
@@ -615,15 +611,8 @@ $tabs = array(
 								
 								<p>
 									<?php
-									printf(
-										esc_html__( 'SeedProd is brought to you by the same team that\'s behind the largest WordPress resource site, %1$s, the most popular lead-generation software, %2$s, the best WordPress analytics plugin, %3$s, the best WordPress forms plugin, %4$s, the best WordPress giveaway plugin, %5$s, and finally the best WordPress FOMO plugin, %6$s.', 'coming-soon' ),
-										'<a href="https://www.wpbeginner.com/?utm_source=seedprodplugin&utm_medium=pluginaboutpage&utm_campaign=aboutseedprod" target="_blank" rel="noopener">WPBeginner</a>',
-										'<a href="https://optinmonster.com/?utm_source=seedprodplugin&utm_medium=pluginaboutpage&utm_campaign=aboutseedprod" target="_blank" rel="noopener">OptinMonster</a>',
-										'<a href="https://www.monsterinsights.com/?utm_source=seedprodplugin&utm_medium=pluginaboutpage&utm_campaign=aboutseedprod" target="_blank" rel="noopener">MonsterInsights</a>',
-										'<a href="https://www.wpforms.com/?utm_source=seedprodplugin&utm_medium=pluginaboutpage&utm_campaign=aboutseedprod" target="_blank" rel="noopener">WPForms</a>',
-										'<a href="https://rafflepress.com/?utm_source=seedprodplugin&utm_medium=pluginaboutpage&utm_campaign=aboutseedprod" target="_blank" rel="noopener">RafflePress</a>',
-										'<a href="https://trustpulse.com/?utm_source=seedprodplugin&utm_medium=pluginaboutpage&utm_campaign=aboutseedprod" target="_blank" rel="noopener">TrustPulse</a>'
-									);
+									/* translators: 1: WPBeginner link, 2: OptinMonster link, 3: MonsterInsights link, 4: WPForms link, 5: RafflePress link, 6: TrustPulse link */
+									printf( esc_html__( 'SeedProd is brought to you by the same team that\'s behind the largest WordPress resource site, %1$s, the most popular lead-generation software, %2$s, the best WordPress analytics plugin, %3$s, the best WordPress forms plugin, %4$s, the best WordPress giveaway plugin, %5$s, and finally the best WordPress FOMO plugin, %6$s.', 'coming-soon' ), '<a href="https://www.wpbeginner.com/?utm_source=seedprodplugin&utm_medium=pluginaboutpage&utm_campaign=aboutseedprod" target="_blank" rel="noopener">WPBeginner</a>', '<a href="https://optinmonster.com/?utm_source=seedprodplugin&utm_medium=pluginaboutpage&utm_campaign=aboutseedprod" target="_blank" rel="noopener">OptinMonster</a>', '<a href="https://www.monsterinsights.com/?utm_source=seedprodplugin&utm_medium=pluginaboutpage&utm_campaign=aboutseedprod" target="_blank" rel="noopener">MonsterInsights</a>', '<a href="https://www.wpforms.com/?utm_source=seedprodplugin&utm_medium=pluginaboutpage&utm_campaign=aboutseedprod" target="_blank" rel="noopener">WPForms</a>', '<a href="https://rafflepress.com/?utm_source=seedprodplugin&utm_medium=pluginaboutpage&utm_campaign=aboutseedprod" target="_blank" rel="noopener">RafflePress</a>', '<a href="https://trustpulse.com/?utm_source=seedprodplugin&utm_medium=pluginaboutpage&utm_campaign=aboutseedprod" target="_blank" rel="noopener">TrustPulse</a>' );
 									?>
 								</p>
 								

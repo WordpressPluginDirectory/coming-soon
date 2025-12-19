@@ -1,13 +1,17 @@
 <?php
-
-
+/**
+ * SeedProd Lite routes.
+ *
+ * @package SeedProd
+ * @subpackage SeedProd/app
+ */
 
 /**
- * Dashboard page - V2 WordPress Native
- * This redirects to our new V2 dashboard
+ * Dashboard page - V2 WordPress native.
+ * This redirects to our new V2 dashboard.
  */
 function seedprod_lite_dashboard_page() {
-	// Load the V2 dashboard directly
+	// Load the V2 dashboard directly.
 	require_once SEEDPROD_PLUGIN_PATH . 'admin/partials/seedprod-admin-dashboard.php';
 }
 
@@ -50,6 +54,8 @@ function seedprod_lite_render_shortcode() {
 }
 
 if ( defined( 'DOING_AJAX' ) ) {
+	// phpcs:ignore Squiz.Commenting.BlockComment
+	// phpcs:ignore Squiz.Commenting.BlockComment
 
 	add_action( 'wp_ajax_seedprod_lite_dismiss_settings_lite_cta', 'seedprod_lite_dismiss_settings_lite_cta' );
 
@@ -57,7 +63,7 @@ if ( defined( 'DOING_AJAX' ) ) {
 	add_action( 'wp_ajax_seedprod_lite_save_api_key', 'seedprod_lite_save_api_key' );
 
 	add_action( 'wp_ajax_seedprod_lite_save_app_settings', 'seedprod_lite_save_app_settings' );
-
+	// phpcs:ignore Squiz.Commenting.BlockComment
 
 	add_action( 'wp_ajax_seedprod_lite_template_subscribe', 'seedprod_lite_template_subscribe' );
 	add_action( 'wp_ajax_seedprod_lite_save_template', 'seedprod_lite_save_template' );
@@ -67,7 +73,7 @@ if ( defined( 'DOING_AJAX' ) ) {
 	add_action( 'wp_ajax_seedprod_lite_get_namespaced_custom_css', 'seedprod_lite_get_namespaced_custom_css' );
 	add_action( 'wp_ajax_seedprod_lite_get_stockimages', 'seedprod_lite_get_stockimages' );
 
-	// Landing pages
+	// Landing pages.
 	add_action( 'wp_ajax_seedprod_lite_slug_exists', 'seedprod_lite_slug_exists' );
 	add_action( 'wp_ajax_seedprod_lite_lpage_datatable', 'seedprod_lite_lpage_datatable' );
 	add_action( 'wp_ajax_seedprod_lite_duplicate_lpage', 'seedprod_lite_duplicate_lpage' );
@@ -76,7 +82,7 @@ if ( defined( 'DOING_AJAX' ) ) {
 	add_action( 'wp_ajax_seedprod_lite_unarchive_selected_lpages', 'seedprod_lite_unarchive_selected_lpages' );
 	add_action( 'wp_ajax_seedprod_lite_delete_archived_lpages', 'seedprod_lite_delete_archived_lpages' );
 
-	// Theme templates
+	// Theme templates.
 
 	add_action( 'wp_ajax_seedprod_lite_update_subscriber_count', 'seedprod_lite_update_subscriber_count' );
 	add_action( 'wp_ajax_seedprod_lite_subscribers_datatable', 'seedprod_lite_subscribers_datatable' );
@@ -100,7 +106,7 @@ if ( defined( 'DOING_AJAX' ) ) {
 	add_action( 'wp_ajax_seedprod_lite_get_wpform', 'seedprod_lite_get_wpform' );
 	add_action( 'wp_ajax_seedprod_lite_get_rafflepress', 'seedprod_lite_get_rafflepress' );
 	add_action( 'wp_ajax_seedprod_lite_get_rafflepress_code', 'seedprod_lite_get_rafflepress_code' );
-	
+
 	add_action( 'wp_ajax_seedprod_lite_get_mypaykit', 'seedprod_lite_get_mypaykit' );
 	add_action( 'wp_ajax_seedprod_lite_get_mypaykit_code', 'seedprod_lite_get_mypaykit_code' );
 
@@ -127,7 +133,6 @@ if ( defined( 'DOING_AJAX' ) ) {
 
 
 }
-
 
 
 

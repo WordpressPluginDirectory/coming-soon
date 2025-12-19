@@ -1,7 +1,7 @@
 <?php
 /**
  * Subscribers page template
- * 
+ *
  * Shows subscriber management for Pro users and product education for Lite users.
  *
  * @package SeedProd
@@ -12,10 +12,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Check if this is the Lite view (or testing with test_lite=1)
-$is_lite_view = seedprod_lite_v2_is_lite_view() || ( isset( $_GET['test_lite'] ) && $_GET['test_lite'] === '1' );
+// Check if this is the Lite view (or testing with test_lite=1).
+$is_lite_view = seedprod_lite_v2_is_lite_view() || ( isset( $_GET['test_lite'] ) && '1' === $_GET['test_lite'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only parameter for display logic.
 
-// If Lite view, show product education
+// If Lite view, show product education.
 if ( $is_lite_view ) {
 	if ( ! class_exists( 'SeedProd_Lite_Admin' ) ) {
 		require_once plugin_dir_path( __DIR__ ) . 'class-seedprod-admin.php';
@@ -25,11 +25,11 @@ if ( $is_lite_view ) {
 	return;
 }
 
-// Pro version: Show actual subscribers functionality
+// Pro version: Show actual subscribers functionality.
 ?>
 <div class="wrap">
 	<div class="seedprod-dashboard-page">
-		<?php 
+		<?php
 		$page_title = __( 'Subscribers', 'coming-soon' );
 		require_once plugin_dir_path( __FILE__ ) . 'seedprod-admin-header.php';
 		?>

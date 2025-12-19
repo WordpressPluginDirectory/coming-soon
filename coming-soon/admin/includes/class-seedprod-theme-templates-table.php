@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Load WP_List_Table if not loaded
+// Load WP_List_Table if not loaded.
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
@@ -38,13 +38,13 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 	 */
 	public function get_columns() {
 		$columns = array(
-			'cb'        => '<input type="checkbox" />',
-			'title'     => __( 'Name', 'coming-soon' ),
-			'type'      => __( 'Type', 'coming-soon' ),
+			'cb'         => '<input type="checkbox" />',
+			'title'      => __( 'Name', 'coming-soon' ),
+			'type'       => __( 'Type', 'coming-soon' ),
 			'conditions' => __( 'Conditions', 'coming-soon' ),
-			'published' => __( 'Published', 'coming-soon' ),
-			'priority'  => __( 'Priority', 'coming-soon' ),
-			'date'      => __( 'Date', 'coming-soon' ),
+			'published'  => __( 'Published', 'coming-soon' ),
+			'priority'   => __( 'Priority', 'coming-soon' ),
+			'date'       => __( 'Date', 'coming-soon' ),
 		);
 		return $columns;
 	}
@@ -64,6 +64,9 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 
 	/**
 	 * Get default column value
+	 *
+	 * @param array  $item        The item data.
+	 * @param string $column_name The column name.
 	 */
 	protected function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
@@ -82,6 +85,8 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 
 	/**
 	 * Format template type
+	 *
+	 * @param string $type The template type.
 	 */
 	private function format_type( $type ) {
 		$type_labels = array(
@@ -101,7 +106,7 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 
 		$label = isset( $type_labels[ $type ] ) ? $type_labels[ $type ] : ucfirst( str_replace( '_', ' ', $type ) );
 
-		// Add icon based on type
+		// Add icon based on type.
 		$icon = '';
 		switch ( $type ) {
 			case 'header':
@@ -122,6 +127,8 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 
 	/**
 	 * Format conditions display
+	 *
+	 * @param string $conditions The conditions HTML.
 	 */
 	private function format_conditions( $conditions ) {
 		if ( empty( $conditions ) ) {
@@ -132,6 +139,8 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 
 	/**
 	 * Checkbox column
+	 *
+	 * @param array $item The item data.
 	 */
 	protected function column_cb( $item ) {
 		return sprintf(
@@ -142,13 +151,15 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 
 	/**
 	 * Title column with row actions
+	 *
+	 * @param array $item The item data.
 	 */
 	protected function column_title( $item ) {
-		// Build row actions
+		// Build row actions.
 		$actions = array();
 
-		// Edit Design action
-		// Check if this is a CSS template and use the appropriate route
+		// Edit Design action.
+		// Check if this is a CSS template and use the appropriate route.
 		if ( 'css' === $item['type'] ) {
 			$edit_url = admin_url( 'admin.php?page=seedprod_lite_builder&id=' . $item['id'] . '#/setup/' . $item['id'] . '/globalcss' );
 		} else {
@@ -160,7 +171,7 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 			__( 'Edit Design', 'coming-soon' )
 		);
 
-		// Edit Conditions action (not for CSS or Part types)
+		// Edit Conditions action (not for CSS or Part types).
 		if ( 'css' !== $item['type'] && 'part' !== $item['type'] ) {
 			$actions['conditions'] = sprintf(
 				'<a href="#" class="seedprod-edit-conditions" data-id="%s">%s</a>',
@@ -169,7 +180,7 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 			);
 		}
 
-		// Duplicate action
+		// Duplicate action.
 		$actions['duplicate'] = sprintf(
 			'<a href="#" class="seedprod-duplicate-template" data-id="%s" data-nonce="%s">%s</a>',
 			$item['id'],
@@ -177,8 +188,8 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 			__( 'Duplicate', 'coming-soon' )
 		);
 
-		// Trash/Delete action
-		if ( $item['status'] === 'trash' ) {
+		// Trash/Delete action.
+		if ( 'trash' === $item['status'] ) {
 			$actions['restore'] = sprintf(
 				'<a href="#" class="seedprod-restore-template" data-id="%s" data-nonce="%s">%s</a>',
 				$item['id'],
@@ -200,7 +211,7 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 			);
 		}
 
-		// Create title with edit link
+		// Create title with edit link.
 		$title = sprintf(
 			'<strong><a href="%s">%s</a></strong>',
 			esc_url( $edit_url ),
@@ -212,9 +223,11 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 
 	/**
 	 * Published column with toggle switch
+	 *
+	 * @param array $item The item data.
 	 */
 	protected function column_published( $item ) {
-		$checked = ( $item['published'] === true ) ? 'checked' : '';
+		$checked = ( true === $item['published'] ) ? 'checked' : '';
 		$nonce   = wp_create_nonce( 'seedprod_toggle_template_' . $item['id'] );
 
 		return sprintf(
@@ -234,7 +247,8 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 	public function get_bulk_actions() {
 		$actions = array();
 
-		$filter = isset( $_GET['filter'] ) ? sanitize_text_field( $_GET['filter'] ) : 'all';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only operation for display.
+		$filter = isset( $_GET['filter'] ) ? sanitize_text_field( wp_unslash( $_GET['filter'] ) ) : 'all';
 
 		if ( 'trash' === $filter ) {
 			$actions['restore'] = __( 'Restore', 'coming-soon' );
@@ -250,38 +264,40 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 	 * Prepare items for display
 	 */
 	public function prepare_items() {
-		// Set column headers
+		// Set column headers.
 		$this->_column_headers = array(
 			$this->get_columns(),
-			array(), // hidden columns
+			array(), // Hidden columns.
 			$this->get_sortable_columns(),
 		);
 
-		// Get data
+		// Get data.
 		$per_page     = 20;
 		$current_page = $this->get_pagenum();
 		$offset       = ( $current_page - 1 ) * $per_page;
 
-		// Get filter
-		$filter = isset( $_GET['filter'] ) ? sanitize_text_field( $_GET['filter'] ) : 'all';
+		// Get filter.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only operation for display.
+		$filter = isset( $_GET['filter'] ) ? sanitize_text_field( wp_unslash( $_GET['filter'] ) ) : 'all';
 
-		// Get search term
-		$search = isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '';
+		// Get search term.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only operation for display.
+		$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 
-		// Query arguments
+		// Query arguments.
 		$args = array(
-			'post_type' => 'seedprod',
+			'post_type'      => 'seedprod',
 			'posts_per_page' => $per_page,
-			'offset' => $offset,
-			'meta_query' => array(
+			'offset'         => $offset,
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary for theme template filtering.
 				array(
-					'key' => '_seedprod_is_theme_template',
+					'key'   => '_seedprod_is_theme_template',
 					'value' => true,
 				),
 			),
 		);
 
-		// Apply filter
+		// Apply filter.
 		if ( 'published' === $filter ) {
 			$args['post_status'] = 'publish';
 		} elseif ( 'drafts' === $filter ) {
@@ -292,14 +308,16 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 			$args['post_status'] = array( 'publish', 'draft', 'future' );
 		}
 
-		// Apply search
+		// Apply search.
 		if ( ! empty( $search ) ) {
 			$args['s'] = $search;
 		}
 
-		// Apply sorting
-		$orderby = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'date';
-		$order   = isset( $_GET['order'] ) ? sanitize_text_field( $_GET['order'] ) : 'desc';
+		// Apply sorting.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only operation for display.
+		$orderby = isset( $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : 'date';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only operation for display.
+		$order = isset( $_GET['order'] ) ? sanitize_text_field( wp_unslash( $_GET['order'] ) ) : 'desc';
 
 		switch ( $orderby ) {
 			case 'title':
@@ -315,7 +333,7 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 		}
 		$args['order'] = strtoupper( $order );
 
-		// Get posts
+		// Get posts.
 		$query     = new WP_Query( $args );
 		$templates = array();
 
@@ -324,42 +342,42 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 				$query->the_post();
 				$post_id = get_the_ID();
 
-				// Get template data
+				// Get template data.
 				$type               = get_post_meta( $post_id, '_seedprod_page_template_type', true );
 				$conditions         = get_post_meta( $post_id, '_seedprod_theme_template_condition', true );
 				$conditions_display = $this->get_conditions_display( $conditions );
 				$priority           = get_post_field( 'menu_order', $post_id );
 
 				$templates[] = array(
-					'id' => $post_id,
-					'title' => get_the_title(),
-					'type' => $type,
-					'conditions' => $conditions,
+					'id'                 => $post_id,
+					'title'              => get_the_title(),
+					'type'               => $type,
+					'conditions'         => $conditions,
 					'conditions_display' => $conditions_display,
-					'published' => ( get_post_status() === 'publish' ),
-					'priority' => $priority,
-					'status' => get_post_status(),
-					'date' => get_the_modified_date( 'Y/m/d' ),
+					'published'          => ( get_post_status() === 'publish' ),
+					'priority'           => $priority,
+					'status'             => get_post_status(),
+					'date'               => get_the_modified_date( 'Y/m/d' ),
 				);
 			}
 			wp_reset_postdata();
 		}
 
-		// Set items
+		// Set items.
 		$this->items = $templates;
 
-		// Get total items for pagination
+		// Get total items for pagination.
 		$total_args = $args;
 		unset( $total_args['posts_per_page'] );
 		unset( $total_args['offset'] );
 		$total_query = new WP_Query( $total_args );
 		$total_items = $total_query->found_posts;
 
-		// Set pagination
+		// Set pagination.
 		$this->set_pagination_args(
 			array(
 				'total_items' => $total_items,
-				'per_page' => $per_page,
+				'per_page'    => $per_page,
 				'total_pages' => ceil( $total_items / $per_page ),
 			)
 		);
@@ -367,6 +385,8 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 
 	/**
 	 * Get conditions display string
+	 *
+	 * @param string $conditions_json The conditions JSON string.
 	 */
 	private function get_conditions_display( $conditions_json ) {
 		if ( empty( $conditions_json ) ) {
@@ -384,17 +404,17 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 		foreach ( $conditions as $condition ) {
 			$text = '';
 
-			// Check if excluded
+			// Check if excluded.
 			$is_excluded = ( isset( $condition->condition ) && 'exclude' === $condition->condition );
 
-			// Get base condition text
+			// Get base condition text.
 			if ( isset( $conditions_map[ $condition->type ] ) ) {
 				$text = $conditions_map[ $condition->type ];
 			} else {
 				$text = $condition->type;
 			}
 
-			// Add value if present
+			// Add value if present.
 			if ( ! empty( $condition->value ) ) {
 				if ( 'custom' === $condition->condition ) {
 					$text = 'Custom : ' . $condition->value;
@@ -403,7 +423,7 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 				}
 			}
 
-			// Apply exclusion styling
+			// Apply exclusion styling.
 			if ( $is_excluded ) {
 				$text = '<span style="text-decoration: line-through;">' . $text . '</span>';
 			}
@@ -418,7 +438,7 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 	 * Message for no items
 	 */
 	public function no_items() {
-		_e( 'No theme templates found.', 'coming-soon' );
+		esc_html_e( 'No theme templates found.', 'coming-soon' );
 	}
 
 	/**
@@ -427,7 +447,7 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 	public function display() {
 		$this->display_tablenav( 'top' );
 		?>
-		<table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>">
+		<table class="wp-list-table <?php echo esc_attr( implode( ' ', $this->get_table_classes() ) ); ?>">
 			<thead>
 				<tr>
 					<?php $this->print_column_headers(); ?>
@@ -448,6 +468,8 @@ class SeedProd_Theme_Templates_Table extends WP_List_Table {
 
 	/**
 	 * Generate the table navigation above or below the table
+	 *
+	 * @param string $which The location (top or bottom).
 	 */
 	protected function display_tablenav( $which ) {
 		?>

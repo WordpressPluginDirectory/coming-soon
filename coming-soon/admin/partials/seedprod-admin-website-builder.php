@@ -6,22 +6,22 @@
  * @subpackage SeedProd_Lite/admin/partials
  */
 
-// Exit if accessed directly
+// Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Load admin functions if not already loaded
+// Load admin functions if not already loaded.
 if ( ! function_exists( 'seedprod_lite_v2_is_lite_view' ) ) {
 	require_once plugin_dir_path( __DIR__ ) . 'admin-functions.php';
 }
 
-// Check if we're in Lite view
+// Check if we're in Lite view.
 $is_lite_view = seedprod_lite_v2_is_lite_view();
 
-// If Lite view, show product education page instead
+// If Lite view, show product education page instead.
 if ( $is_lite_view ) {
-	// Include the admin class if not already loaded
+	// Include the admin class if not already loaded.
 	if ( ! class_exists( 'SeedProd_Lite_Admin' ) ) {
 		require_once plugin_dir_path( __DIR__ ) . 'class-seedprod-admin.php';
 	}
@@ -30,10 +30,10 @@ if ( $is_lite_view ) {
 	return;
 }
 
-// Check if themebuilder feature is available in the license
+// Check if themebuilder feature is available in the license.
 if ( ! function_exists( 'seedprod_lite_cu' ) || ! seedprod_lite_cu( 'themebuilder' ) ) {
-	// Themebuilder not available - show product education page (same as lite version)
-	// Include the admin class if not already loaded
+	// Themebuilder not available - show product education page (same as lite version).
+	// Include the admin class if not already loaded.
 	if ( ! class_exists( 'SeedProd_Lite_Admin' ) ) {
 		require_once plugin_dir_path( __DIR__ ) . 'class-seedprod-admin.php';
 	}
@@ -42,7 +42,7 @@ if ( ! function_exists( 'seedprod_lite_cu' ) || ! seedprod_lite_cu( 'themebuilde
 	return;
 }
 
-// Get current settings (stored as JSON string)
+// Get current settings (stored as JSON string).
 $settings_json = get_option( 'seedprod_settings' );
 if ( ! empty( $settings_json ) ) {
 	$settings = json_decode( $settings_json, true );
@@ -53,33 +53,33 @@ if ( ! empty( $settings_json ) ) {
 	$settings = array();
 }
 
-// Check if theme is enabled (checks both old and new format)
+// Check if theme is enabled (checks both old and new format).
 $theme_enabled = seedprod_lite_v2_is_theme_enabled();
 
-// Ensure theme-templates.php is loaded (contains required functions)
+// Ensure theme-templates.php is loaded (contains required functions).
 if ( ! function_exists( 'seedprod_lite_conditions_map' ) ) {
 	require_once SEEDPROD_PLUGIN_PATH . 'app/theme-templates.php';
 }
 
-// Get actual theme template counts
+// Get actual theme template counts.
 $template_counts = seedprod_lite_v2_get_theme_template_counts();
 $header_count    = $template_counts['headers'];
 $footer_count    = $template_counts['footers'];
 $template_count  = $template_counts['pages'];
 
-// Load the Theme Templates table class
+// Load the Theme Templates table class.
 require_once plugin_dir_path( __DIR__ ) . 'includes/class-seedprod-theme-templates-table.php';
 
-// Create an instance of our table class
+// Create an instance of our table class.
 $templates_table = new SeedProd_Theme_Templates_Table();
 
-// Prepare table items
+// Prepare table items.
 $templates_table->prepare_items();
 ?>
 
 <div class="seedprod-dashboard-page seedprod-website-builder-page <?php echo $is_lite_view ? 'seedprod-lite' : ''; ?>">
 	<?php
-	// Include header with page title
+	// Include header with page title.
 	$page_title = __( 'Website Builder', 'coming-soon' );
 	require_once plugin_dir_path( __FILE__ ) . 'seedprod-admin-header.php';
 	?>
@@ -113,11 +113,11 @@ $templates_table->prepare_items();
 					<p><?php esc_html_e( 'Activate this to replace your current WordPress theme with your custom SeedProd designs.', 'coming-soon' ); ?></p>
 					<?php if ( $theme_enabled && ( $header_count > 0 || $footer_count > 0 || $template_count > 0 ) ) : ?>
 					<div class="seedprod-theme-stats">
-						<span class="seedprod-stat"><?php printf( esc_html__( '%d Headers', 'coming-soon' ), $header_count ); ?></span>
+						<span class="seedprod-stat"><?php printf( /* translators: %d: Number of headers */ esc_html__( '%d Headers', 'coming-soon' ), esc_html( $header_count ) ); ?></span>
 						<span class="seedprod-stat-separator">•</span>
-						<span class="seedprod-stat"><?php printf( esc_html__( '%d Footers', 'coming-soon' ), $footer_count ); ?></span>
+						<span class="seedprod-stat"><?php printf( /* translators: %d: Number of footers */ esc_html__( '%d Footers', 'coming-soon' ), esc_html( $footer_count ) ); ?></span>
 						<span class="seedprod-stat-separator">•</span>
-						<span class="seedprod-stat"><?php printf( esc_html__( '%d Page Templates', 'coming-soon' ), $template_count ); ?></span>
+						<span class="seedprod-stat"><?php printf( /* translators: %d: Number of page templates */ esc_html__( '%d Page Templates', 'coming-soon' ), esc_html( $template_count ) ); ?></span>
 					</div>
 					<?php endif; ?>
 				</div>
@@ -156,49 +156,49 @@ $templates_table->prepare_items();
 				<input type="hidden" name="page" value="seedprod_lite_website_builder" />
 				
 				<?php
-				// Get filter counts
+				// Get filter counts.
 				$all_count       = 0;
 				$published_count = 0;
 				$draft_count     = 0;
 				$trash_count     = 0;
 
-				// Query counts
+				// Query counts.
 				$count_args = array(
-					'post_type' => 'seedprod',
-					'post_status' => array( 'publish', 'draft', 'future', 'trash' ),
+					'post_type'      => 'seedprod',
+					'post_status'    => array( 'publish', 'draft', 'future', 'trash' ),
 					'posts_per_page' => -1,
-					'meta_query' => array(
+					'meta_query'     => array(
 						array(
-							'key' => '_seedprod_is_theme_template',
+							'key'   => '_seedprod_is_theme_template',
 							'value' => true,
 						),
 					),
-					'fields' => 'ids',
+					'fields'         => 'ids',
 				);
 
 				$all_templates = new WP_Query( $count_args );
 				$all_count     = $all_templates->found_posts;
 
-				// Published count
+				// Published count.
 				$count_args['post_status'] = 'publish';
 				$published_templates       = new WP_Query( $count_args );
 				$published_count           = $published_templates->found_posts;
 
-				// Draft count
+				// Draft count.
 				$count_args['post_status'] = 'draft';
 				$draft_templates           = new WP_Query( $count_args );
 				$draft_count               = $draft_templates->found_posts;
 
-				// Trash count
+				// Trash count.
 				$count_args['post_status'] = 'trash';
 				$trash_templates           = new WP_Query( $count_args );
 				$trash_count               = $trash_templates->found_posts;
 
-				// Calculate non-trash count
+				// Calculate non-trash count.
 				$active_count = $all_count - $trash_count;
 
-				// Get current filter
-				$current_filter = isset( $_GET['filter'] ) ? sanitize_text_field( $_GET['filter'] ) : 'all';
+				// Get current filter.
+				$current_filter = isset( $_GET['filter'] ) ? sanitize_text_field( wp_unslash( $_GET['filter'] ) ) : 'all';
 				?>
 				
 				<!-- Filter Tabs -->
@@ -239,7 +239,7 @@ $templates_table->prepare_items();
 						<?php esc_html_e( 'Search Theme Templates', 'coming-soon' ); ?>
 					</label>
 					<input type="search" id="seedprod-search-input" name="s" 
-							value="<?php echo isset( $_GET['s'] ) ? esc_attr( $_GET['s'] ) : ''; ?>" />
+							value="<?php echo isset( $_GET['s'] ) ? esc_attr( sanitize_text_field( wp_unslash( $_GET['s'] ) ) ) : ''; ?>" />
 					<input type="submit" id="search-submit" class="button" 
 							value="<?php esc_attr_e( 'Search Theme Templates', 'coming-soon' ); ?>" />
 				</p>

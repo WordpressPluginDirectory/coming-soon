@@ -24,17 +24,16 @@ function seedprod_lite_lppage_render( $template ) {
  */
 function seedprod_lite_deregister_styles() {
 	global $wp_styles;
-	//var_dump($wp_styles->registered);
+	// var_dump($wp_styles->registered);
 	foreach ( $wp_styles->queue as $handle ) {
-		//echo '<br> '.$handle;
-        if (!empty($wp_styles->registered[ $handle ]->src)) {
-            if (strpos($wp_styles->registered[ $handle ]->src, 'wp-content/themes') !== false) {
-                //var_dump($wp_styles->registered[$handle]->src);
-                wp_dequeue_style($handle);
-                wp_deregister_style($handle);
-            }
-        }
+		// echo '<br> '.$handle;
+		if ( ! empty( $wp_styles->registered[ $handle ]->src ) ) {
+			if ( strpos( $wp_styles->registered[ $handle ]->src, 'wp-content/themes' ) !== false ) {
+				// var_dump($wp_styles->registered[$handle]->src);
+				wp_dequeue_style( $handle );
+				wp_deregister_style( $handle );
+			}
+		}
 	}
-};
-
+}
 

@@ -18,47 +18,47 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array Response with status and message
  */
 function seedprod_lite_v2_save_debug_settings() {
-	// Verify nonce
-	if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'seedprod-debug-reset' ) ) {
+	// Verify nonce.
+	if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'seedprod-debug-reset' ) ) {
 		return array(
-			'status' => false,
+			'status'  => false,
 			'message' => __( 'Security check failed.', 'coming-soon' ),
 		);
 	}
 
-	// Check permissions
+	// Check permissions.
 	if ( ! current_user_can( apply_filters( 'seedprod_debug_menu_capability', 'edit_others_posts' ) ) ) {
 		return array(
-			'status' => false,
+			'status'  => false,
 			'message' => __( 'Insufficient permissions.', 'coming-soon' ),
 		);
 	}
 
 	$messages = array();
 
-	// Process reset options
-	if ( ! empty( $_POST['sp_reset_cs'] ) && 1 == $_POST['sp_reset_cs'] ) {
+	// Process reset options.
+	if ( ! empty( $_POST['sp_reset_cs'] ) && 1 === (int) $_POST['sp_reset_cs'] ) {
 		delete_option( 'seedprod_coming_soon_page_id' );
 		$messages[] = __( 'Coming Soon page has been reset.', 'coming-soon' );
 	}
 
-	if ( ! empty( $_POST['sp_reset_mm'] ) && 1 == $_POST['sp_reset_mm'] ) {
+	if ( ! empty( $_POST['sp_reset_mm'] ) && 1 === (int) $_POST['sp_reset_mm'] ) {
 		delete_option( 'seedprod_maintenance_mode_page_id' );
 		$messages[] = __( 'Maintenance Mode page has been reset.', 'coming-soon' );
 	}
 
-	if ( ! empty( $_POST['sp_reset_p404'] ) && 1 == $_POST['sp_reset_p404'] ) {
+	if ( ! empty( $_POST['sp_reset_p404'] ) && 1 === (int) $_POST['sp_reset_p404'] ) {
 		delete_option( 'seedprod_404_page_id' );
 		$messages[] = __( '404 page has been reset.', 'coming-soon' );
 	}
 
-	if ( ! empty( $_POST['sp_reset_loginp'] ) && 1 == $_POST['sp_reset_loginp'] ) {
+	if ( ! empty( $_POST['sp_reset_loginp'] ) && 1 === (int) $_POST['sp_reset_loginp'] ) {
 		delete_option( 'seedprod_login_page_id' );
 		$messages[] = __( 'Login page has been reset.', 'coming-soon' );
 	}
 
-	// Handle builder debug toggle
-	if ( ! empty( $_POST['sp_builder_debug'] ) && 1 == $_POST['sp_builder_debug'] ) {
+	// Handle builder debug toggle.
+	if ( ! empty( $_POST['sp_builder_debug'] ) && 1 === (int) $_POST['sp_builder_debug'] ) {
 		update_option( 'seedprod_builder_debug', true );
 		if ( empty( $messages ) ) {
 			$messages[] = __( 'Builder Debug mode enabled.', 'coming-soon' );
@@ -70,16 +70,16 @@ function seedprod_lite_v2_save_debug_settings() {
 		}
 	}
 
-	// Return appropriate message
+	// Return appropriate message.
 	if ( ! empty( $messages ) ) {
 		return array(
-			'status' => true,
+			'status'  => true,
 			'message' => implode( ' ', $messages ),
 		);
 	}
 
 	return array(
-		'status' => true,
+		'status'  => true,
 		'message' => __( 'Settings saved.', 'coming-soon' ),
 	);
 }
