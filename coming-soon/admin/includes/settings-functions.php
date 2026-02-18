@@ -52,9 +52,41 @@ function seedprod_lite_v2_save_settings() {
 		'enable_404_mode',
 	);
 
+	// Map settings to their page ID options.
+	$settings_to_page_options = array(
+		'enable_coming_soon_mode' => 'seedprod_coming_soon_page_id',
+		'enable_maintenance_mode' => 'seedprod_maintenance_mode_page_id',
+		'enable_login_mode'       => 'seedprod_login_page_id',
+		'enable_404_mode'         => 'seedprod_404_page_id',
+	);
+
 	foreach ( $mode_keys as $key ) {
 		if ( isset( $new_settings[ $key ] ) ) {
-			$existing_settings[ $key ] = (bool) $new_settings[ $key ];
+			$new_value = (bool) $new_settings[ $key ];
+
+			// Update the setting.
+			$existing_settings[ $key ] = $new_value;
+
+			// Always ensure page post_status matches the setting.
+			if ( isset( $settings_to_page_options[ $key ] ) ) {
+				$page_id = get_option( $settings_to_page_options[ $key ] );
+
+				if ( $page_id ) {
+					$page = get_post( $page_id );
+					if ( $page ) {
+						$expected_status = $new_value ? 'publish' : 'draft';
+						// Only update if status doesn't match to avoid unnecessary DB writes.
+						if ( $page->post_status !== $expected_status ) {
+							wp_update_post(
+								array(
+									'ID'          => $page_id,
+									'post_status' => $expected_status,
+								)
+							);
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -63,8 +95,28 @@ function seedprod_lite_v2_save_settings() {
 		// If both are true, disable the one that wasn't just enabled.
 		if ( isset( $new_settings['enable_coming_soon_mode'] ) && $new_settings['enable_coming_soon_mode'] ) {
 			$existing_settings['enable_maintenance_mode'] = false;
+			// Set maintenance page to draft since we're disabling it.
+			$mm_page_id = get_option( 'seedprod_maintenance_mode_page_id' );
+			if ( $mm_page_id && get_post( $mm_page_id ) ) {
+				wp_update_post(
+					array(
+						'ID'          => $mm_page_id,
+						'post_status' => 'draft',
+					)
+				);
+			}
 		} else {
 			$existing_settings['enable_coming_soon_mode'] = false;
+			// Set coming soon page to draft since we're disabling it.
+			$cs_page_id = get_option( 'seedprod_coming_soon_page_id' );
+			if ( $cs_page_id && get_post( $cs_page_id ) ) {
+				wp_update_post(
+					array(
+						'ID'          => $cs_page_id,
+						'post_status' => 'draft',
+					)
+				);
+			}
 		}
 	}
 

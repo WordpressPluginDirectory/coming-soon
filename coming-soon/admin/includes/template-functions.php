@@ -355,21 +355,7 @@ function seedprod_lite_v2_create_page_from_template() {
 		$page_slug = 'sp-p404';
 		$page_name = $page_slug;
 	} elseif ( 'loginp' === $page_type ) {
-		// For login pages, prefer 'login' slug but fall back to 'sp-login' if taken.
-		$preferred_slug = 'login';
-		$fallback_slug  = 'sp-login';
-
-		// Check if 'login' slug is available.
-		$existing_post = get_page_by_path( $preferred_slug, OBJECT, array( 'page', 'post', 'seedprod' ) );
-
-		if ( $existing_post ) {
-			// 'login' is taken, use fallback.
-			$page_slug = $fallback_slug;
-		} else {
-			// 'login' is available.
-			$page_slug = $preferred_slug;
-		}
-
+		$page_slug = 'sp-login';
 		$page_name = $page_slug;
 	}
 
@@ -443,12 +429,13 @@ function seedprod_lite_v2_create_page_from_template() {
 
 	// Determine post type based on page type (matching lpage.php logic).
 	$post_type = 'page';
-	// seedprod cpt types - these should be created as 'seedprod' post type
+	// seedprod cpt types - these should be created as 'seedprod' post type.
+	// Note: 'loginp' intentionally excluded - login pages use regular 'page' post type
+	// so they work with any slug without needing custom rewrite rules.
 	$cpt_types = array(
 		'cs',
 		'mm',
 		'p404',
-		'loginp',
 		'header',
 		'footer',
 		'part',
@@ -529,6 +516,7 @@ function seedprod_lite_v2_create_page_from_template() {
 		update_option( 'seedprod_maintenance_mode_page_id', $page_id );
 	} elseif ( 'loginp' === $page_type ) {
 		update_option( 'seedprod_login_page_id', $page_id );
+		update_option( 'seedprod_login_page_slug', $page_slug );
 	} elseif ( 'p404' === $page_type ) {
 		update_option( 'seedprod_404_page_id', $page_id );
 	}

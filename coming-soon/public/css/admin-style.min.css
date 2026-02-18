@@ -585,6 +585,12 @@ svg>g>g:last-child{pointer-events:none}
 .mce-inline-toolbar-grp .mce-primary:hover{color:#fff !important;background:#0b6142 !important;border-color:#0b6142 !important;-webkit-box-shadow:none !important;box-shadow:none !important}
 .mce-inline-toolbar-grp .mce-primary:hover .mce-ico{color:#fff !important}
 .mce-inline-toolbar-grp div.wp-link-preview a{color:#fff !important}
+.mce-inline-toolbar-grp div.wp-link-input input{background:transparent !important;color:#fff !important;border-color:#7b6b7a !important}
+.mce-inline-toolbar-grp div.wp-link-input input::-webkit-input-placeholder{color:rgba(255,255,255,0.5) !important}
+.mce-inline-toolbar-grp div.wp-link-input input::-moz-placeholder{color:rgba(255,255,255,0.5) !important}
+.mce-inline-toolbar-grp div.wp-link-input input:-ms-input-placeholder{color:rgba(255,255,255,0.5) !important}
+.mce-inline-toolbar-grp div.wp-link-input input::-ms-input-placeholder{color:rgba(255,255,255,0.5) !important}
+.mce-inline-toolbar-grp div.wp-link-input input::placeholder{color:rgba(255,255,255,0.5) !important}
 div.mce-inline-toolbar-grp.mce-arrow-up:after{border-bottom-color:#230820 !important}
 .vue-slider-process{background-color:#dd4a1f !important}
 .vue-slider-dot-tooltip-inner{border-color:#dd4a1f !important;background-color:#dd4a1f !important}

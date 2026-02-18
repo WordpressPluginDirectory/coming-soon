@@ -38,31 +38,30 @@ function seedprod_lite_save_settings() {
 			);
 
 			foreach ( $settings_to_update as $setting => $option ) {
-				$has_changed = ( $s->$setting !== $s_old->$setting ? true : false );
-				if ( ! $has_changed ) {
-					continue; } // Do nothing if no change
-
 				$id = get_option( $option );
 
-				$post_exists = ! is_null( get_post( $id ) );
-				if ( ! $post_exists ) {
+				if ( ! $id ) {
+					continue;
+				}
+
+				$page = get_post( $id );
+				if ( ! $page ) {
 					update_option( $option, null );
 					continue;
 				}
 
-				$update       = array();
-				$update['ID'] = $id;
+				// Determine if setting is enabled (handle various truthy values).
+				$is_enabled = ! empty( $s->$setting ) && 'false' !== $s->$setting && '0' !== $s->$setting;
 
-				// Publish page when active.
-				if ( true === $s->$setting || '1' === $s->$setting ) {
-					$update['post_status'] = 'publish';
-					wp_update_post( $update );
-				}
-
-				// Unpublish page when inactive.
-				if ( false === $s->$setting ) {
-					$update['post_status'] = 'draft';
-					wp_update_post( $update );
+				// Always ensure page status matches the setting.
+				$expected_status = $is_enabled ? 'publish' : 'draft';
+				if ( $page->post_status !== $expected_status ) {
+					wp_update_post(
+						array(
+							'ID'          => $id,
+							'post_status' => $expected_status,
+						)
+					);
 				}
 			}
 

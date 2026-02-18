@@ -51,17 +51,9 @@ function seedprod_lite_admin_enqueue_scripts( $hook_suffix ) {
 					SEEDPROD_VERSION,
 					true
 				);
-				wp_register_script(
-					'seedprod_vue_builder_app_3',
-					SEEDPROD_PLUGIN_URL . 'public/' . $vue_app_folder . '/vue-backend/js/chunk-common.js',
-					array( 'wp-i18n' ),
-					SEEDPROD_VERSION,
-					true
-				);
 
 				wp_set_script_translations( 'seedprod_vue_builder_app_1', 'coming-soon' );
 				wp_set_script_translations( 'seedprod_vue_builder_app_2', 'coming-soon' );
-				wp_set_script_translations( 'seedprod_vue_builder_app_3', 'coming-soon' );
 
 				wp_localize_script(
 					'seedprod_vue_builder_app_1',
@@ -73,7 +65,6 @@ function seedprod_lite_admin_enqueue_scripts( $hook_suffix ) {
 
 				wp_enqueue_script( 'seedprod_vue_builder_app_1' );
 				wp_enqueue_script( 'seedprod_vue_builder_app_2' );
-				wp_enqueue_script( 'seedprod_vue_builder_app_3' );
 				wp_enqueue_style( 'seedprod_vue_builder_app_css_1', SEEDPROD_PLUGIN_URL . 'public/' . $vue_app_folder . '/vue-backend/css/chunk-vendors.css', false, SEEDPROD_VERSION );
 			}
 		}
@@ -172,7 +163,13 @@ function seedprod_lite_admin_enqueue_scripts( $hook_suffix ) {
 				// Load EDD default styles if EDD is active.
 			if ( in_array( 'easy-digital-downloads/easy-digital-downloads.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) || in_array( 'easy-digital-downloads-pro/easy-digital-downloads.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
 				$css_suffix = is_rtl() ? '-rtl.min.css' : '.min.css';
-				$url        = trailingslashit( EDD_PLUGIN_URL ) . 'assets/css/edd' . $css_suffix;
+				if ( function_exists( 'edd_get_assets_url' ) ) {
+					// EDD 3.3.0+ with modern asset structure.
+					$url = edd_get_assets_url( 'css/frontend' ) . 'edd' . $css_suffix;
+				} else {
+					// Older EDD versions - use legacy path.
+					$url = trailingslashit( EDD_PLUGIN_URL ) . 'assets/css/edd' . $css_suffix;
+				}
 
 				wp_enqueue_style(
 					'seedprod-edd-general',
@@ -342,73 +339,108 @@ add_action( 'admin_enqueue_scripts', 'seedprod_lite_deregister_backend_styles', 
  * @return void
  */
 function seedprod_lite_deregister_backend_styles() {
-		// Remove scripts registered by the theme so they don't screw up our page's style.
+	// Early exit if not on builder page.
 	$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( null === $page || false === strpos( $page, 'seedprod_lite_builder' ) ) {
+		return;
+	}
 
-	if ( null !== $page && false !== strpos( $page, 'seedprod_lite_builder' ) ) {
-		wp_dequeue_style( 'dashicons', 9999 );
-		$seedprod_builder_debug = get_option( 'seedprod_builder_debug' );
-		if ( empty( $seedprod_builder_debug ) ) {
-			global $wp_styles;
-				// List of styles to keep else remove.
-			$keep_styles = 'media-views|editor-buttons|imgareaselect|buttons|wp-auth-check|wpforms-full|thickbox|wp-mediaelement|wp-util';
-			$s           = explode( '|', $keep_styles );
+	wp_dequeue_style( 'dashicons' );
 
-			$wpforms_url = plugins_url( 'wpforms' );
+	global $wp_styles, $wp_scripts;
 
-			foreach ( $wp_styles->queue as $handle ) {
-				// echo '<br> '.$handle;.
-				if ( ! in_array( $handle, $s, true ) ) {
-					if ( false === strpos( $handle, 'seedprod' ) ) {
+	// ALWAYS remove these typography-breaking admin styles (even in debug mode).
+	// These contain CSS that overrides our custom heading/paragraph fonts.
+	$always_remove_styles = array(
+		'common',       // Contains heading/paragraph typography rules.
+		'forms',        // Contains form element typography.
+		'dashboard',    // Contains widget typography.
+		'edit',         // Contains post editor typography.
+		'list-tables',  // Not needed in builder.
+		'nav-menus',    // Not needed in builder.
+		'themes',       // Not needed in builder.
+		'about',        // Not needed in builder.
+		'revisions',    // Not needed in builder.
+		'admin-menu',   // Not needed in builder.
+	);
+
+	foreach ( $always_remove_styles as $handle ) {
+		wp_dequeue_style( $handle );
+		wp_deregister_style( $handle );
+	}
+
+	// Check if builder debug mode is enabled.
+	$seedprod_builder_debug = get_option( 'seedprod_builder_debug' );
+
+	if ( empty( $seedprod_builder_debug ) ) {
+		// Normal mode: Aggressive cleanup - remove all non-essential styles/scripts.
+
+		// Whitelist of styles to keep for builder functionality.
+		$keep_styles = array( 'media-views', 'editor-buttons', 'imgareaselect', 'buttons', 'wp-auth-check', 'wpforms-full', 'thickbox', 'wp-mediaelement', 'wp-util' );
+
+		// Remove all styles except whitelisted ones and SeedProd styles.
+		foreach ( $wp_styles->queue as $handle ) {
+			if ( ! in_array( $handle, $keep_styles, true ) ) {
+				if ( false === strpos( $handle, 'seedprod' ) ) {
+					wp_dequeue_style( $handle );
+					wp_deregister_style( $handle );
+				}
+			}
+		}
+
+		// Whitelist of scripts to keep for builder functionality.
+		$keep_scripts = array( 'admin-bar', 'common', 'utils', 'wp-auth-check', 'media-upload', 'jquery', 'media-editor', 'media-audiovideo', 'media-models', 'media-views', 'mce-view', 'image-edit', 'wp-tinymce', 'editor', 'quicktags', 'wplink', 'jquery-ui-autocomplete', 'thickbox', 'svg-painter', 'jquery-ui-core', 'jquery-ui-mouse', 'jquery-ui-accordion', 'jquery-ui-datepicker', 'jquery-ui-dialog', 'jquery-ui-slider', 'jquery-ui-sortable', 'jquery-ui-droppable', 'jquery-ui-tabs', 'jquery-ui-widget', 'wp-mediaelement', 'wp-util', 'underscore', 'wp-dom-ready', 'wp-components', 'wp-element', 'wp-i18n', 'wp-polyfill', 'wp-hooks' );
+
+		// Remove all scripts except whitelisted ones and SeedProd scripts.
+		foreach ( $wp_scripts->queue as $handle ) {
+			if ( ! in_array( $handle, $keep_scripts, true ) ) {
+				if ( false === strpos( $handle, 'seedprod' ) ) {
+					wp_dequeue_script( $handle );
+					wp_deregister_script( $handle );
+				}
+			}
+		}
+	} else {
+		// Debug mode: Less aggressive cleanup - keep more styles for troubleshooting.
+		// But typography-breaking styles are still removed (already done above).
+
+		// Remove theme/plugin styles that might conflict.
+		foreach ( $wp_styles->queue as $handle ) {
+			if ( ! empty( $wp_styles->registered[ $handle ]->src ) ) {
+				$src = $wp_styles->registered[ $handle ]->src;
+				// Remove styles from themes and other plugins (except SeedProd and WPForms).
+				if ( ( strpos( $src, 'wp-content/themes' ) !== false || strpos( $src, 'wp-content/plugins' ) !== false ) ) {
+					if ( false === strpos( $handle, 'seedprod' ) && false === strpos( $handle, 'wpforms' ) ) {
 						wp_dequeue_style( $handle );
 						wp_deregister_style( $handle );
 					}
 				}
 			}
-
-				// Remove scripts.
-
-			$s = 'admin-bar|common|utils|wp-auth-check|media-upload|jquery|media-editor|media-audiovideo|mce-view|image-edit|wp-tinymce|editor|quicktags|wplink|jquery-ui-autocomplete|thickbox|svg-painter|jquery-ui-core|jquery-ui-mouse|jquery-ui-accordion|jquery-ui-datepicker|jquery-ui-dialog|jquery-ui-slider|jquery-ui-sortable|jquery-ui-droppable|jquery-ui-tabs|jquery-ui-widget|wp-mediaelement|wp-util|underscore|wp-dom-ready|wp-components|wp-element|wp-i18n|wp-polyfill|wp-hooks';
-			$d = explode( '|', urldecode( $s ) );
-
-			global $wp_scripts;
-			foreach ( $wp_scripts->queue as $handle ) :
-				// echo '<br>removed '.$handle;.
-
-				if ( ! empty( $d ) ) {
-					if ( ! in_array( $handle, $d, true ) ) {
-						if ( false === strpos( $handle, 'seedprod' ) ) {
-							wp_dequeue_script( $handle );
-							wp_deregister_script( $handle );
-							// echo '<br>removed '.$handle;.
-						}
-					}
-				}
-			endforeach;
-
-			$suffix = '.min';
-			$wp_scripts->add( 'media-widgets', "/wp-admin/js/widgets/media-widgets$suffix.js", array( 'jquery', 'media-models', 'media-views' ) );
-			$wp_scripts->add_inline_script( 'media-widgets', 'wp.mediaWidgets.init();', 'after' );
-
-			$wp_scripts->add( 'media-audio-widget', "/wp-admin/js/widgets/media-audio-widget$suffix.js", array( 'media-widgets', 'media-audiovideo' ) );
-			$wp_scripts->add( 'media-image-widget', "/wp-admin/js/widgets/media-image-widget$suffix.js", array( 'media-widgets' ) );
-			$wp_scripts->add( 'media-video-widget', "/wp-admin/js/widgets/media-video-widget$suffix.js", array( 'media-widgets', 'media-audiovideo' ) );
-			$wp_scripts->add( 'text-widgets', "/wp-admin/js/widgets/text-widgets$suffix.js", array( 'jquery', 'editor', 'wp-util' ) );
-			$wp_scripts->add_inline_script( 'text-widgets', 'wp.textWidgets.init();', 'after' );
-
-			wp_enqueue_style( 'widgets' );
-			wp_enqueue_style( 'media-views' );
-
-			wp_get_current_user()->syntax_highlighting = 'false';
-
-			/** This action is documented in wp-admin/admin-header.php */
-			do_action( 'admin_print_scripts-widgets.php' ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
-
-			/** This action is documented in wp-admin/admin-footer.php */
-			do_action( 'admin_footer-widgets.php' ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
-
 		}
 	}
+
+	// Re-register and enqueue widget scripts (needed for media library).
+	$suffix = '.min';
+	$wp_scripts->add( 'media-widgets', "/wp-admin/js/widgets/media-widgets$suffix.js", array( 'jquery', 'media-models', 'media-views' ) );
+	$wp_scripts->add_inline_script( 'media-widgets', 'wp.mediaWidgets.init();', 'after' );
+	$wp_scripts->add( 'media-audio-widget', "/wp-admin/js/widgets/media-audio-widget$suffix.js", array( 'media-widgets', 'media-audiovideo' ) );
+	$wp_scripts->add( 'media-image-widget', "/wp-admin/js/widgets/media-image-widget$suffix.js", array( 'media-widgets' ) );
+	$wp_scripts->add( 'media-video-widget', "/wp-admin/js/widgets/media-video-widget$suffix.js", array( 'media-widgets', 'media-audiovideo' ) );
+	$wp_scripts->add( 'text-widgets', "/wp-admin/js/widgets/text-widgets$suffix.js", array( 'jquery', 'editor', 'wp-util' ) );
+	$wp_scripts->add_inline_script( 'text-widgets', 'wp.textWidgets.init();', 'after' );
+
+	// Enqueue essential styles.
+	wp_enqueue_style( 'widgets' );
+	wp_enqueue_style( 'media-views' );
+
+	// Disable syntax highlighting in code editor.
+	wp_get_current_user()->syntax_highlighting = 'false';
+
+	/** This action is documented in wp-admin/admin-header.php */
+	do_action( 'admin_print_scripts-widgets.php' ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+
+	/** This action is documented in wp-admin/admin-footer.php */
+	do_action( 'admin_footer-widgets.php' ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 }
 
 add_filter( 'admin_body_class', 'seedprod_lite_add_admin_body_classes' );

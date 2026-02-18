@@ -3,7 +3,7 @@
  * Plugin Name: Coming Soon Page, Maintenance Mode, Landing Pages & WordPress Website Builder by SeedProd
  * Plugin URI: https://www.seedprod.com/lite-upgrade/?utm_source=WordPress&utm_campaign=liteplugin&utm_medium=plugin-uri-link
  * Description: The Easiest WordPress Drag & Drop Page Builder that allows you to build your website, create Landing Pages, Coming Soon Pages, Maintenance Mode Pages and more.
- * Version:  6.19.6
+ * Version:  6.19.8
  * Author: SeedProd
  * Author URI: https://www.seedprod.com/lite-upgrade/?utm_source=WordPress&utm_campaign=liteplugin&utm_medium=author-uri-link
  * Text Domain: coming-soon
@@ -20,7 +20,7 @@
 
 define( 'SEEDPROD_BUILD', 'lite' );
 define( 'SEEDPROD_SLUG', 'coming-soon/coming-soon.php' );
-define( 'SEEDPROD_VERSION', '6.19.6' );
+define( 'SEEDPROD_VERSION', '6.19.8' );
 define( 'SEEDPROD_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 // Example output: /Applications/MAMP/htdocs/wordpress/wp-content/plugins/seedprod/.
 define( 'SEEDPROD_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -29,11 +29,8 @@ define( 'SEEDPROD_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 if ( defined( 'SEEDPROD_LOCAL_JS' ) ) {
 	// phpcs:disable Squiz.PHP.CommentedOutCode,Squiz.Commenting.InlineComment.InvalidEndChar,WordPress.Commenting.InlineComment.InvalidEndChar
-	// define( 'SEEDPROD_API_URL', 'http://v4app.seedprod.test/v4/' );
-	// define( 'SEEDPROD_WEB_API_URL', 'http://v4app.seedprod.test/' );
-	// phpcs:enable Squiz.PHP.CommentedOutCode,Squiz.Commenting.InlineComment.InvalidEndChar,WordPress.Commenting.InlineComment.InvalidEndChar
-		define( 'SEEDPROD_API_URL', 'https://api.seedprod.com/v4/' );
-	define( 'SEEDPROD_WEB_API_URL', 'https://app.seedprod.com/' );
+	define( 'SEEDPROD_API_URL', 'http://v4app.seedprod.test/v4/' );
+	define( 'SEEDPROD_WEB_API_URL', 'http://v4app.seedprod.test/' );
 	define( 'SEEDPROD_BACKGROUND_DOWNLOAD_API_URL', 'https://api.seedprod.com/v3/background_download' );
 
 } else {
