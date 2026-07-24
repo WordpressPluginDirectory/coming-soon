@@ -112,7 +112,9 @@ function seedprod_lite_v2_validate_import_zip( $zip_file, $is_theme = false ) {
 
 	// Check for required JSON file.
 	$required_file     = $is_theme ? 'export_theme.json' : 'export_page.json';
+	$other_type_file   = $is_theme ? 'export_page.json' : 'export_theme.json';
 	$has_required_file = false;
+	$has_other_type    = false;
 
 	// Validate file structure.
 	$allowed_extensions = array( 'json', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'css', 'ico', 'bmp', 'tiff' );
@@ -131,6 +133,8 @@ function seedprod_lite_v2_validate_import_zip( $zip_file, $is_theme = false ) {
 		// Check for required file.
 		if ( basename( $filename ) === $required_file ) {
 			$has_required_file = true;
+		} elseif ( basename( $filename ) === $other_type_file ) {
+			$has_other_type = true;
 		}
 
 		// Skip directories.
@@ -157,6 +161,12 @@ function seedprod_lite_v2_validate_import_zip( $zip_file, $is_theme = false ) {
 	$zip->close();
 
 	if ( ! $has_required_file ) {
+		if ( $has_other_type ) {
+			$error_msg = $is_theme ?
+				__( 'This ZIP is a landing page export (export_page.json), not a theme. Import it from the Landing Pages screen instead.', 'coming-soon' ) :
+				__( 'This ZIP is a theme export (export_theme.json), not a landing page. Import it from the Website Builder screen instead.', 'coming-soon' );
+			return new WP_Error( 'wrong_import_type', $error_msg );
+		}
 		$error_msg = $is_theme ?
 			__( 'Theme data file (export_theme.json) not found in ZIP', 'coming-soon' ) :
 			__( 'Landing page data file (export_page.json) not found in ZIP', 'coming-soon' );
@@ -649,7 +659,7 @@ function seedprod_lite_v2_theme_import_json( $json_content = null ) {
 						seedprod_lite_generate_css_file( $id, $code['css'] );
 					}
 				}
-				$template_condition = isset( $meta->_seedprod_theme_template_condition[0] ) ? $meta->_seedprod_theme_template_condition[0] : '';
+				$template_condition = isset( $meta->_seedprod_theme_template_condition[0] ) ? seedprod_lite_normalize_conditions_json( $meta->_seedprod_theme_template_condition[0] ) : '';
 				update_post_meta( $id, '_seedprod_theme_template_condition', $template_condition );
 				// Process conditon to see if we need to create a placeholder page.
 				$conditions = $template_condition;
